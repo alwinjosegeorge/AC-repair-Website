@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { FloatingActions } from "@/components/FloatingActions";
 import { BookingWizard } from "@/components/BookingWizard";
-import { ShieldCheck, Clock, Award, Phone, MessageSquare } from "lucide-react";
+import { ShieldCheck, Clock, Phone, MessageSquare, CheckCircle2 } from "lucide-react";
 import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "@/lib/store";
+import { trackCallClick, trackWhatsAppClick } from "@/lib/tracking";
 
 export const Route = createFileRoute("/book")({
   head: () => ({
@@ -26,61 +26,96 @@ function BookingPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-1 px-4 pt-6 pb-32 md:py-14 md:px-8">
-        <div className="mx-auto max-w-4xl">
-          {/* Header Title */}
-          <div className="text-center max-w-2xl mx-auto mb-8 space-y-3">
+      <main className="flex-1 relative overflow-hidden pt-28 sm:pt-32 pb-20">
+        {/* Background stripes matching website hero */}
+        <div className="absolute inset-0 cool-stripes mask-bottom-fade -z-10" />
+
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Header Title with website badges */}
+          <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 space-y-3">
             <span className="inline-block rounded-full bg-brand-soft px-3.5 py-1 text-xs font-black uppercase tracking-wider text-brand">
-              Instant Online Booking
+              ONLINE SERVICE BOOKING
             </span>
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-              Book Verified HVAC Service in 4 Simple Steps
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-foreground">
+              Book Certified AC Service in 5 Easy Steps
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-              Select your service, choose your preferred slot, and receive instant WhatsApp confirmation with real-time technician assignment.
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              Select your service, AC type, unit count, address, and arrival time. Get instant WhatsApp confirmation with live technician assignment.
             </p>
 
-            {/* Quick Guarantees Pill */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs font-bold text-foreground/80">
+            {/* Trust Highlights */}
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-2 text-xs font-bold">
               <span className="flex items-center gap-1.5 text-emerald-600">
-                <ShieldCheck className="size-4" />
-                30-Day Post-Service Guarantee
+                <CheckCircle2 className="size-4" /> Flat ₹499 Jet Wash
               </span>
-              <span>•</span>
+              <span className="text-muted-foreground/30">•</span>
               <span className="flex items-center gap-1.5 text-brand">
-                <Clock className="size-4" />
-                Pay After Service (Zero Advance)
+                <ShieldCheck className="size-4" /> 30-Day Post-Service Guarantee
               </span>
-              <span>•</span>
+              <span className="text-muted-foreground/30">•</span>
               <span className="flex items-center gap-1.5 text-amber-600">
-                <Award className="size-4" />
-                Free Rescheduling Anytime
+                <Clock className="size-4" /> Pay After Service (Zero Advance)
               </span>
             </div>
           </div>
 
-          {/* Booking Wizard */}
-          <BookingWizard className="mx-auto max-w-3xl" />
+          {/* Framer-Style Blue Banner Card with Concentric Ripple Circles & Tool Box Technician */}
+          <div className="relative rounded-3xl sm:rounded-[2.5rem] bg-[#0084f6] text-white shadow-2xl overflow-hidden border border-white/20">
+            {/* Subtle Concentric Rings centered behind the technician */}
+            <div className="absolute left-[20%] top-[50%] -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0">
+              <div className="size-[260px] sm:size-[340px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/25 bg-white/5" />
+              <div className="size-[420px] sm:size-[520px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/15" />
+              <div className="size-[600px] sm:size-[720px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/10" />
+              <div className="size-[800px] sm:size-[940px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/5" />
+            </div>
+
+            {/* Grid Layout: Left Technician Cutout, Right Translucent 5-Step Wizard Card */}
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 pb-0">
+              {/* Left Column: Technician Cutout holding Toolbox (Flush to bottom edge) */}
+              <div className="lg:col-span-5 flex flex-col items-center lg:items-start justify-end self-end order-2 lg:order-1 pt-2 lg:pt-0 pb-0 mb-0 leading-none">
+                <picture className="block w-full flex justify-center lg:justify-start items-end leading-none">
+                  <source srcSet="/tool-box-man.avif" type="image/avif" />
+                  <img
+                    src="/tool-box-man.png"
+                    alt="EGS Certified AC Technician with Tool Box"
+                    width={720}
+                    height={960}
+                    loading="lazy"
+                    className="block w-auto h-auto max-h-[380px] sm:max-h-[460px] lg:max-h-[520px] object-contain object-bottom drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)] select-none pointer-events-none align-bottom -mb-1"
+                  />
+                </picture>
+              </div>
+
+              {/* Right Column: 5-Step Wizard inside Glassmorphism Container */}
+              <div className="lg:col-span-7 order-1 lg:order-2 w-full pt-1 pb-5 sm:pb-7">
+                <div className="rounded-2xl sm:rounded-3xl bg-[#0074db]/65 sm:bg-[#0074db]/50 backdrop-blur-md p-3.5 sm:p-5 md:p-6 border border-white/20 shadow-2xl text-left">
+                  <BookingWizard theme="glass-blue" />
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Alternative Assistance Callout */}
-          <div className="mt-10 rounded-2xl border border-border bg-surface/50 p-5 text-center max-w-xl mx-auto text-xs text-muted-foreground">
-            <span>Prefer booking over a direct phone call or WhatsApp message?</span>
-            <div className="mt-3 flex items-center justify-center gap-4 font-bold text-foreground">
+          <div className="mt-12 rounded-2xl border border-border bg-card p-6 text-center max-w-xl mx-auto shadow-sm">
+            <span className="text-xs text-muted-foreground block">Prefer booking over a direct phone call or WhatsApp message?</span>
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-4 font-bold text-sm">
               <a
                 href={`tel:${EGS_CALL_NUMBER}`}
-                className="flex items-center gap-1.5 hover:text-brand transition-colors"
+                onClick={() => trackCallClick("booking_page")}
+                className="flex items-center gap-1.5 text-foreground hover:text-brand transition-colors"
               >
-                <Phone className="size-3.5 text-brand" />
+                <Phone className="size-4 text-brand" />
                 Call +91 9895688833
               </a>
-              <span>•</span>
+              <span className="text-muted-foreground/40">•</span>
               <a
-                href={`https://wa.me/${EGS_WHATSAPP_NUMBER}`}
+                href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I need assistance with booking an AC service.")}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick("booking_page")}
                 className="flex items-center gap-1.5 text-emerald-600 hover:underline"
               >
-                <MessageSquare className="size-3.5" />
+                <MessageSquare className="size-4" />
                 WhatsApp Us Directly
               </a>
             </div>

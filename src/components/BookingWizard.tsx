@@ -620,7 +620,7 @@ export function BookingWizard({
           )}
 
           {/* 8 Requested Services Grid (2 Columns for Full Text Visibility) */}
-          <div className={isGlass ? "grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5" : "grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3"}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
             {SERVICES_DATA.map((svc) => {
               const isSelected = selectedCategory === svc.id;
 
@@ -670,36 +670,38 @@ export function BookingWizard({
                   key={svc.id}
                   type="button"
                   onClick={() => handleCategorySelect(svc.id)}
-                  className={`group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border p-3 sm:p-4 text-left transition-all cursor-pointer ${
+                  className={`group relative flex items-center justify-between gap-3 rounded-2xl border p-3 sm:p-3.5 text-left transition-all cursor-pointer ${
                     isSelected
                       ? "border-brand bg-brand/5 shadow-md ring-2 ring-brand/30"
                       : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
                   }`}
                 >
-                  <div>
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="text-xl sm:text-2xl">{svc.emoji}</span>
-                      <span className="rounded-full px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-black uppercase bg-brand-soft text-brand">
-                        {svc.badge}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-2xl shrink-0 leading-none">{svc.emoji}</span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-sm sm:text-base text-foreground leading-tight">
+                          {svc.title}
+                        </span>
+                        <span className="rounded-full px-2 py-0.5 text-[9px] font-black uppercase bg-brand-soft text-brand">
+                          {svc.badge}
+                        </span>
+                      </div>
+                      <span className="text-xs font-black text-brand block mt-1">
+                        {svc.priceText}
                       </span>
                     </div>
-
-                    <h3 className="mt-2.5 sm:mt-3 font-extrabold text-xs sm:text-base flex items-center gap-1 leading-tight text-foreground">
-                      <span>{svc.title}</span>
-                    </h3>
-                    <p className="hidden sm:block mt-1 text-xs line-clamp-2 leading-relaxed text-muted-foreground">
-                      {svc.desc}
-                    </p>
                   </div>
 
-                  <div className="mt-3 sm:mt-4 flex w-full items-center justify-between border-t border-border/60 pt-2 sm:pt-3">
-                    <span className="text-[11px] sm:text-xs font-black text-brand">{svc.priceText}</span>
-                    <span className={`text-[10px] sm:text-xs font-bold flex items-center gap-0.5 sm:gap-1 ${
-                      isSelected ? "text-brand" : "text-muted-foreground"
-                    }`}>
+                  <div className="shrink-0 flex items-center">
+                    <span
+                      className={`text-xs font-bold flex items-center gap-1 ${
+                        isSelected ? "text-brand" : "text-muted-foreground"
+                      }`}
+                    >
                       {isSelected ? (
                         <>
-                          <Check className="size-3 sm:size-3.5" /> Selected
+                          <Check className="size-4 text-brand stroke-[3]" /> Selected
                         </>
                       ) : (
                         "Select"
