@@ -24,13 +24,28 @@ import {
   MessageSquare,
   CheckCircle2,
   Calendar,
+  ChevronDown,
+  SlidersHorizontal,
+  AlertCircle,
 } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { BookingWizard } from "@/components/BookingWizard";
-import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "@/lib/store";
-import { captureTrackingParams, trackCallClick, trackWhatsAppClick } from "@/lib/tracking";
+import { BookingWizard, SERVICES_DATA } from "@/components/BookingWizard";
+import {
+  EGS_CALL_NUMBER,
+  EGS_WHATSAPP_NUMBER,
+  saveBooking,
+  Booking,
+  generateCustomerWhatsAppURL,
+  ServiceCategory,
+} from "@/lib/store";
+import {
+  captureTrackingParams,
+  trackCallClick,
+  trackWhatsAppClick,
+  trackBookingComplete,
+} from "@/lib/tracking";
 import { CoolAirFlow } from "@/components/CoolAirFlow";
 import heroInline from "@/assets/hero-inline.jpg";
 import aboutTech from "@/assets/about-tech.jpg";
@@ -507,20 +522,354 @@ function Services() {
 }
 
 function BookOnlineSection() {
+  const [fullName, setFullName] = useState("");
+  const [selectedService, setSelectedService] = useState<ServiceCategory>("ac-service");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const [formError, setFormError] = useState("");
+  const [submittedBooking, setSubmittedBooking] = useState<Booking | null>(null);
+  const [bookingMode, setBookingMode] = useState<"quick" | "wizard">("quick");
+
+  const handleQuickSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError("");
+
+    if (!fullName.trim()) {
+      setFormError("Please enter your full name.");
+      return;
+    }
+
+    const cleanPhone = phone.replace(/\D/g, "");
+    if (cleanPhone.length < 10) {
+      setFormError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    const serviceObj = SERVICES_DATA.find((s) => s.id === selectedService) ?? SERVICES_DATA[0]!;
+
+    const booking = saveBooking({
+      serviceCategory: serviceObj.id,
+      serviceName: `${serviceObj.emoji} ${serviceObj.title}`,
+      subService: serviceObj.title,
+      acType: "Split AC",
+      unitCount: 1,
+      issueDescription: message.trim() || undefined,
+      preferredDate: "Today (Express 90-Min Arrival)",
+      preferredSlot: "⚡ Emergency Now (Within 90 Mins)",
+      customerName: fullName.trim(),
+      phone: phone.trim(),
+      whatsappNumber: phone.trim(),
+      email: email.trim() || undefined,
+      address: "Doorstep Service Address, Kerala, India",
+      city: "Kollam",
+      pincode: "691001",
+      estimatedAmount: serviceObj.defaultAmount || 499,
+    });
+
+    trackBookingComplete({
+      bookingId: booking.id,
+      service: booking.serviceName,
+      amount: booking.estimatedAmount,
+      city: booking.city,
+      customerName: booking.customerName,
+      customerPhone: booking.phone,
+      customerEmail: booking.email,
+      pincode: booking.pincode,
+      address: booking.address,
+    });
+
+    setSubmittedBooking(booking);
+  };
+
+  const handleResetForm = () => {
+    setSubmittedBooking(null);
+    setFullName("");
+    setPhone("");
+    setEmail("");
+    setMessage("");
+    setFormError("");
+  };
+
   return (
-    <section id="book-online" className="py-20 px-4 md:px-8 bg-surface/50 border-y border-border">
-      <div className="mx-auto max-w-4xl">
-        <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
+    <section id="book-online" className="relative py-12 sm:py-20 px-4 md:px-8 overflow-hidden bg-background">
+      <div className="mx-auto max-w-7xl">
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-3">
           <Badge>ONLINE SERVICE BOOKING</Badge>
-          <h2 className="text-3xl sm:text-5xl font-black text-foreground">
-            Book AC Service in 4 Simple Steps
+          <h2 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight">
+            Book Certified AC Service
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Choose your service, select preferred date & slot, and get instant WhatsApp confirmation with real-time technician assignment.
+            Get certified HVAC technicians at your doorstep within 90 minutes. Instant WhatsApp confirmation with live technician assignment.
           </p>
         </div>
 
-        <BookingWizard className="mx-auto" />
+        {/* Framer-Style Blue Banner Card with Concentric Ripple Circles */}
+        <div className="relative rounded-3xl sm:rounded-[2.5rem] bg-[#0084f6] text-white shadow-2xl overflow-hidden border border-white/20">
+          {/* Subtle Concentric Rings centered behind the technician */}
+          <div className="absolute left-[20%] top-[55%] -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0">
+            <div className="size-[260px] sm:size-[340px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/25 bg-white/5" />
+            <div className="size-[420px] sm:size-[520px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/15" />
+            <div className="size-[600px] sm:size-[720px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/10" />
+            <div className="size-[800px] sm:size-[940px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/5" />
+          </div>
+
+          {/* Grid Layout: Left Technician Cutout, Right Translucent Form Card */}
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-end px-4 sm:px-8 lg:px-12 pt-8 sm:pt-12 pb-6 sm:pb-8">
+            {/* Left Column: Technician Cutout holding Toolbox */}
+            <div className="lg:col-span-5 flex flex-col items-center justify-end self-end order-2 lg:order-1 pt-4 lg:pt-0">
+              <picture className="w-full flex justify-center">
+                <source srcSet="/tool-box-man.avif" type="image/avif" />
+                <img
+                  src="/tool-box-man.png"
+                  alt="EGS Certified AC Technician with Tool Box"
+                  width={720}
+                  height={960}
+                  loading="lazy"
+                  className="w-auto h-auto max-h-[360px] sm:max-h-[460px] lg:max-h-[560px] object-contain object-bottom drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)] select-none pointer-events-none"
+                />
+              </picture>
+            </div>
+
+            {/* Right Column: Form Container */}
+            <div className="lg:col-span-7 order-1 lg:order-2 w-full pb-2 sm:pb-6">
+              <div className="rounded-2xl sm:rounded-3xl bg-[#0074db]/65 sm:bg-[#0074db]/50 backdrop-blur-md p-5 sm:p-8 md:p-10 border border-white/20 shadow-2xl">
+                {/* Header Mode Switcher: Quick Request vs 5-Step Scheduling Wizard */}
+                <div className="flex items-center justify-between border-b border-white/15 pb-4 mb-6 gap-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setBookingMode("quick")}
+                      className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                        bookingMode === "quick"
+                          ? "bg-white text-slate-900 shadow-sm"
+                          : "text-white/80 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      ⚡ Quick Request
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBookingMode("wizard")}
+                      className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                        bookingMode === "wizard"
+                          ? "bg-white text-slate-900 shadow-sm"
+                          : "text-white/80 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      📋 5-Step Wizard
+                    </button>
+                  </div>
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-white/80">
+                    <Clock className="size-3 text-white" /> 90-Min Arrival
+                  </span>
+                </div>
+
+                {bookingMode === "quick" ? (
+                  submittedBooking ? (
+                    /* Booking Confirmation State */
+                    <div className="text-center py-4 sm:py-6 space-y-5 animate-fade-in">
+                      <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-emerald-400/20 text-emerald-300 ring-4 ring-emerald-400/30">
+                        <CheckCircle2 className="size-9" />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                          Service Request Logged
+                        </span>
+                        <h3 className="text-2xl sm:text-3xl font-black text-white">
+                          Thank You, {submittedBooking.customerName}!
+                        </h3>
+                        <p className="text-sm text-white/90 max-w-md mx-auto">
+                          Your request for <strong className="text-white">{submittedBooking.serviceName}</strong> has been saved. Technician dispatch is in progress.
+                        </p>
+                      </div>
+
+                      {/* Booking Details Box */}
+                      <div className="mx-auto max-w-md rounded-2xl bg-[#0060b8]/80 p-4 text-left border border-white/20 text-xs sm:text-sm space-y-2">
+                        <div className="flex justify-between items-center border-b border-white/15 pb-2">
+                          <span className="text-white/70">Booking ID:</span>
+                          <span className="font-mono font-bold text-white text-sm bg-white/15 px-2.5 py-0.5 rounded-md">
+                            {submittedBooking.id}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/70">Phone Number:</span>
+                          <span className="font-semibold text-white">{submittedBooking.phone}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/70">Status:</span>
+                          <span className="font-semibold text-emerald-300">NEW • Nearest Tech Contacting</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/70">Estimated Cost:</span>
+                          <span className="font-bold text-white">
+                            {submittedBooking.estimatedAmount > 0
+                              ? `₹${submittedBooking.estimatedAmount.toLocaleString("en-IN")}`
+                              : "Free Inspection Quote"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Instant WhatsApp & Call Actions */}
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center max-w-md mx-auto pt-2">
+                        <a
+                          href={generateCustomerWhatsAppURL(submittedBooking)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => trackWhatsAppClick("toolbox_section_success")}
+                          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 text-sm font-black text-white shadow-lg hover:bg-[#20ba59] transition-transform active:scale-95"
+                        >
+                          <MessageSquare className="size-4 fill-current" />
+                          <span>Confirm on WhatsApp</span>
+                        </a>
+                        <a
+                          href={`tel:${EGS_CALL_NUMBER}`}
+                          onClick={() => trackCallClick("toolbox_section_success")}
+                          className="flex items-center justify-center gap-2 rounded-xl bg-white text-slate-900 px-5 py-3.5 text-sm font-black shadow-lg hover:bg-slate-100 transition-transform active:scale-95"
+                        >
+                          <Phone className="size-4 text-[#0084f6]" />
+                          <span>Call Dispatch</span>
+                        </a>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleResetForm}
+                        className="text-xs text-white/80 hover:text-white underline underline-offset-4 decoration-white/40 block mx-auto pt-2 cursor-pointer"
+                      >
+                        Submit another request
+                      </button>
+                    </div>
+                  ) : (
+                    /* The Framer-Style Quick Request Form */
+                    <form onSubmit={handleQuickSubmit} className="space-y-4 sm:space-y-5">
+                      {formError && (
+                        <div className="flex items-center gap-2 rounded-xl bg-red-500/20 border border-red-400/40 px-4 py-2.5 text-xs sm:text-sm text-red-100">
+                          <AlertCircle className="size-4 shrink-0 text-red-300" />
+                          <span>{formError}</span>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Full Name * */}
+                        <div>
+                          <label className="block text-xs sm:text-sm font-medium text-white mb-1.5">
+                            Full Name *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Your Name"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            className="w-full rounded-xl border border-white/25 bg-[#006ccf]/60 px-4 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder:text-white/60 outline-none transition-all focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
+                          />
+                        </div>
+
+                        {/* Choose a Service */}
+                        <div>
+                          <label className="block text-xs sm:text-sm font-medium text-white mb-1.5">
+                            Choose a Service
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={selectedService}
+                              onChange={(e) => setSelectedService(e.target.value as any)}
+                              className="w-full appearance-none rounded-xl border border-white/25 bg-[#006ccf]/60 px-4 py-3 sm:py-3.5 text-sm sm:text-base text-white outline-none transition-all focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25 pr-10 cursor-pointer"
+                            >
+                              {SERVICES_DATA.map((s) => (
+                                <option key={s.id} value={s.id} className="bg-slate-900 text-white py-1">
+                                  {s.emoji} {s.title} ({s.priceText})
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-white/80" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Email Address * */}
+                        <div>
+                          <label className="block text-xs sm:text-sm font-medium text-white mb-1.5">
+                            Email Address *
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            placeholder="Email Address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full rounded-xl border border-white/25 bg-[#006ccf]/60 px-4 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder:text-white/60 outline-none transition-all focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
+                          />
+                        </div>
+
+                        {/* Phone Number * */}
+                        <div>
+                          <label className="block text-xs sm:text-sm font-medium text-white mb-1.5">
+                            Phone Number *
+                          </label>
+                          <input
+                            type="tel"
+                            required
+                            placeholder="Phone Number"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className="w-full rounded-xl border border-white/25 bg-[#006ccf]/60 px-4 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder:text-white/60 outline-none transition-all focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Message */}
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-white mb-1.5">
+                          Message
+                        </label>
+                        <textarea
+                          rows={3}
+                          placeholder="Type your message..."
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          className="w-full rounded-xl border border-white/25 bg-[#006ccf]/60 px-4 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder:text-white/60 outline-none transition-all focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25 resize-none"
+                        />
+                      </div>
+
+                      {/* Bottom Action: Request Services CTA Button */}
+                      <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                        <button
+                          type="submit"
+                          className="rounded-xl bg-white px-8 py-3.5 text-sm sm:text-base font-bold text-slate-900 shadow-xl transition-all hover:bg-slate-100 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                        >
+                          Request Services
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setBookingMode("wizard")}
+                          className="inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm text-white/80 hover:text-white underline underline-offset-4 decoration-white/30 cursor-pointer"
+                        >
+                          <SlidersHorizontal className="size-3.5" />
+                          Need custom AC type, GPS or slot? 5-Step Wizard →
+                        </button>
+                      </div>
+                    </form>
+                  )
+                ) : (
+                  /* 5-Step Wizard Embedded Mode */
+                  <div className="bg-background rounded-2xl p-3 sm:p-5 text-foreground text-left shadow-2xl">
+                    <BookingWizard
+                      onSuccess={(b) => {
+                        setSubmittedBooking(b);
+                        setBookingMode("quick");
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
