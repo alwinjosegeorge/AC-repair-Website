@@ -24,7 +24,7 @@ export function FloatingActions() {
   return (
     <>
       {/* Mobile Sticky Bottom Action Bar (always visible on small screens) */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 block border-t border-border/80 bg-background/95 backdrop-blur-md p-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 block border-t border-border/80 bg-background/95 backdrop-blur-md p-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] md:hidden">
         <div className="mx-auto flex max-w-md items-center justify-between gap-2">
           {/* Call button */}
           <a
@@ -98,16 +98,16 @@ export function FloatingActions() {
 
       {/* Instant Booking Modal when triggered from floating action */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-card shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-2.5 sm:p-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl max-h-[94vh] overflow-y-auto rounded-2xl sm:rounded-3xl bg-card shadow-2xl">
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 z-10 flex size-9 items-center justify-center rounded-full bg-surface border border-border text-foreground hover:bg-muted"
+              className="absolute right-3.5 top-3.5 z-10 flex size-9 items-center justify-center rounded-full bg-surface border border-border text-foreground hover:bg-muted"
             >
               <X className="size-5" />
             </button>
-            <div className="p-2">
+            <div className="p-1 sm:p-2">
               <BookingWizard
                 isModal={true}
                 onSuccess={() => {

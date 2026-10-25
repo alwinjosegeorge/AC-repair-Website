@@ -42,6 +42,7 @@ import {
 import {
   LayoutDashboard,
   CalendarCheck,
+  Calendar,
   Users,
   HardHat,
   FileCheck2,
@@ -246,17 +247,13 @@ export function AdminDashboard() {
   const handleFireTestGoogleAds = () => {
     const txId = `GADS-TEST-${Math.floor(1000 + Math.random() * 9000)}`;
     trackGoogleAdsConversion({
-      conversionLabel: trackingConfig.googleAdsLeadLabel,
-      value: 1499,
       transactionId: txId,
-      customerData: {
-        email: "contact@egsindia.com",
-        phone: "+919895012345",
-        firstName: "Rajesh",
-        city: "Kollam",
-        postalCode: "691001",
-        country: "IN",
-      },
+      value: 1499,
+      customerEmail: "contact@egsindia.com",
+      customerPhone: "+919895012345",
+      customerName: "Rajesh",
+      city: "Kollam",
+      pincode: "691001",
     });
     setTrackingLogs(getTrackingLogs());
     setTrackingToast(`✓ Google Ads Lead Conversion & Enhanced Conversions dispatched (${txId})`);
@@ -276,7 +273,7 @@ export function AdminDashboard() {
         phone: "+919895012345",
         firstName: "Rajesh",
         city: "Ernakulam",
-        zip: "682020",
+        pincode: "682020",
       },
       {
         content_name: "AC Deep Jet Service",
@@ -623,7 +620,7 @@ export function AdminDashboard() {
     .reduce((sum, b) => sum + (b.estimatedAmount || 0), 0);
 
   const attributionStats = useMemo(() => {
-    const counts: Record<string, number> = { google: 0, meta: 0, direct: 0, other: 0 };
+    const counts = { google: 0, meta: 0, direct: 0, other: 0 };
     bookings.forEach((b) => {
       const src = (b.attribution?.utm_source || "direct").toLowerCase();
       if (src.includes("google")) counts.google += 1;
@@ -707,7 +704,9 @@ export function AdminDashboard() {
     const currentIndex = BOOKING_STATUS_FLOW.indexOf(booking.status);
     if (currentIndex >= 0 && currentIndex < BOOKING_STATUS_FLOW.length - 1) {
       const nextStatus = BOOKING_STATUS_FLOW[currentIndex + 1];
-      handleStatusChange(booking.id, nextStatus);
+      if (nextStatus) {
+        handleStatusChange(booking.id, nextStatus);
+      }
     }
   };
 
@@ -1629,7 +1628,7 @@ export function AdminDashboard() {
                                   type="button"
                                   onClick={() => {
                                     setScheduleServiceContract(c);
-                                    setServiceVisitDate(c.nextServiceDate || new Date().toISOString().split("T")[0]);
+                                    setServiceVisitDate(c.nextServiceDate || new Date().toISOString().split("T")[0] || "");
                                     setServiceVisitSlot(c.nextServiceSlot || "Morning Slot (9:00 AM - 12:00 PM)");
                                   }}
                                   className="mt-1 inline-flex items-center gap-1 rounded-md bg-brand-soft px-2 py-0.5 text-[10px] font-black text-brand hover:bg-brand/20 transition-colors"
@@ -2194,7 +2193,8 @@ export function AdminDashboard() {
                   <div className="space-y-2 text-xs">
                     {["Kollam", "Thiruvananthapuram", "Ernakulam / Cochin", "Thrissur", "Chennai"].map(
                       (city) => {
-                        const count = bookings.filter((b) => b.city.includes(city.split(" ")[0])).length;
+                        const cityPrefix = city.split(" ")[0] || "";
+                        const count = bookings.filter((b) => b.city.includes(cityPrefix)).length;
                         return (
                           <div key={city} className="flex items-center justify-between py-1.5 border-b border-border/60">
                             <span className="font-semibold text-foreground">{city}</span>
@@ -2519,7 +2519,7 @@ export function AdminDashboard() {
                                     } else {
                                       const mockInv: EGSInvoice = {
                                         invoiceNo: t.invoiceNo,
-                                        date: t.paidAt ? t.paidAt.split("T")[0] : new Date().toISOString().split("T")[0],
+                                        date: (t.paidAt ? t.paidAt.split("T")[0] : new Date().toISOString().split("T")[0]) || "",
                                         bookingId: t.bookingId,
                                         amcContractNo: t.amcContractNo,
                                         customerName: t.customerName,
@@ -2545,7 +2545,7 @@ export function AdminDashboard() {
                                         paymentStatus: t.status,
                                         transactionRef: t.transactionRef,
                                         warrantyPeriodDays: 30,
-                                        warrantyValidUntil: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+                                        warrantyValidUntil: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0] || "",
                                       };
                                       setSelectedInvoice(mockInv);
                                     }
@@ -2657,7 +2657,7 @@ export function AdminDashboard() {
                   <div className="space-y-1.5 text-xs bg-surface p-3 rounded-xl border border-border/60">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Container ID:</span>
-                      <code className="font-mono font-bold text-foreground">{trackingConfig.gtmContainerId}</code>
+                      <code className="font-mono font-bold text-foreground">{trackingConfig.gtmContainerId || trackingConfig.gtmId}</code>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">DataLayer State:</span>
@@ -2697,7 +2697,7 @@ export function AdminDashboard() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Lead Label:</span>
-                      <code className="font-mono text-brand truncate max-w-[140px]">{trackingConfig.googleAdsLeadLabel}</code>
+                      <code className="font-mono text-brand truncate max-w-[140px]">{trackingConfig.googleAdsLeadLabel || trackingConfig.googleAdsConversionLabel}</code>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Phone / WA Labels:</span>
@@ -3007,11 +3007,11 @@ export function AdminDashboard() {
                                   className={`inline-block px-2 py-0.5 rounded text-[10px] font-black ${
                                     log.platform === "GTM"
                                       ? "bg-blue-500/15 text-blue-600 border border-blue-500/20"
-                                      : log.platform === "GOOGLE_ADS"
+                                      : log.platform === "Google Ads" || log.platform === "GOOGLE_ADS"
                                       ? "bg-amber-500/15 text-amber-600 border border-amber-500/20"
                                       : log.platform === "GA4"
                                       ? "bg-orange-500/15 text-orange-600 border border-orange-500/20"
-                                      : log.platform === "META_PIXEL"
+                                      : log.platform === "Meta Pixel" || log.platform === "META_PIXEL"
                                       ? "bg-pink-500/15 text-pink-600 border border-pink-500/20"
                                       : "bg-indigo-500/15 text-indigo-600 border border-indigo-500/20"
                                   }`}
@@ -3020,7 +3020,7 @@ export function AdminDashboard() {
                                 </span>
                               </td>
                               <td className="py-2 px-3 font-bold text-foreground whitespace-nowrap">
-                                {log.event}
+                                {log.eventName || log.event}
                               </td>
                               <td className="py-2 px-3 text-muted-foreground text-[11px] max-w-md truncate">
                                 <span title={JSON.stringify(log.payload, null, 2)}>
@@ -3683,8 +3683,8 @@ export function AdminDashboard() {
                 onClick={() => {
                   const tech = technicians.find((t) => t.id === serviceVisitTechId);
                   scheduleAMCNextService(scheduleServiceContract.id, {
-                    date: serviceVisitDate || new Date().toISOString().split("T")[0],
-                    slot: serviceVisitSlot,
+                    date: serviceVisitDate || new Date().toISOString().split("T")[0] || "",
+                    slot: serviceVisitSlot || "Morning Slot (9:00 AM - 12:00 PM)",
                     technicianId: serviceVisitTechId,
                     technicianName: tech?.name,
                   });
@@ -3875,9 +3875,10 @@ export function AdminDashboard() {
                 type="button"
                 onClick={() => {
                   if (!newCustName || !newCustPhone) return;
-                  const endD = new Date(newStartDate);
+                  const effectiveStartDate = newStartDate || new Date().toISOString().split("T")[0] || "";
+                  const endD = new Date(effectiveStartDate);
                   endD.setFullYear(endD.getFullYear() + 1);
-                  const nextD = new Date(newStartDate);
+                  const nextD = new Date(effectiveStartDate);
                   nextD.setDate(nextD.getDate() + 45);
 
                   const newContract: AMCContract = {
@@ -3892,13 +3893,13 @@ export function AdminDashboard() {
                     numberOfUnits: Number(newUnitsCount),
                     unitsCovered: Number(newUnitsCount),
                     serviceFrequency: newFrequency,
-                    amcStartDate: newStartDate,
-                    startDate: newStartDate,
-                    amcEndDate: endD.toISOString().split("T")[0],
-                    expiryDate: endD.toISOString().split("T")[0],
-                    lastServiceDate: newStartDate,
+                    amcStartDate: effectiveStartDate,
+                    startDate: effectiveStartDate,
+                    amcEndDate: endD.toISOString().split("T")[0] || "",
+                    expiryDate: endD.toISOString().split("T")[0] || "",
+                    lastServiceDate: effectiveStartDate,
                     lastServiceDetails: "Initial Setup Inspection",
-                    nextServiceDate: nextD.toISOString().split("T")[0],
+                    nextServiceDate: nextD.toISOString().split("T")[0] || "",
                     nextServiceSlot: "Morning Slot (9:00 AM - 12:00 PM)",
                     nextServiceStatus: "scheduled",
                     servicesIncluded: newFrequency.includes("Bi-Monthly") ? 6 : newFrequency.includes("Monthly") ? 12 : 4,
@@ -4339,7 +4340,7 @@ export function AdminDashboard() {
                     saveTransaction(txn);
                     const inv: EGSInvoice = {
                       invoiceNo: invNo,
-                      date: new Date().toISOString().split("T")[0],
+                      date: new Date().toISOString().split("T")[0] || "",
                       customerName: txn.customerName,
                       customerPhone: txn.phone,
                       customerAddress: "Kerala, India",
@@ -4362,7 +4363,7 @@ export function AdminDashboard() {
                       paymentStatus: "PAID",
                       transactionRef: txn.transactionRef,
                       warrantyPeriodDays: 30,
-                      warrantyValidUntil: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+                      warrantyValidUntil: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0] || "",
                     };
                     setSelectedInvoice(inv);
                     setPaymentActionToast(`Custom Invoice ${invNo} generated successfully!`);

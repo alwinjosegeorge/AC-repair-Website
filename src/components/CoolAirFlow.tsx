@@ -12,11 +12,11 @@ export function CoolAirFlow({ className = "" }: CoolAirFlowProps) {
   const isTurbo = speedMode === "turbo";
 
   return (
-    <div className={`relative mx-auto w-full max-w-4xl select-none ${className}`}>
+    <div className={`relative mx-auto w-full max-w-4xl select-none overflow-x-clip px-2 sm:px-4 ${className}`}>
       {/* Floating Speed Control Pill above the AC Unit */}
-      <div className="absolute -top-10 sm:-top-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 rounded-full border border-sky-500/30 bg-background/85 px-3.5 py-1.5 text-[11px] font-bold text-foreground shadow-lg backdrop-blur-md">
-        <div className="flex items-center gap-1.5 text-sky-500">
-          <Snowflake className="size-3.5 animate-spin" style={{ animationDuration: isTurbo ? "4s" : "9s" }} />
+      <div className="absolute -top-7 sm:-top-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 sm:gap-2 rounded-full border border-sky-500/30 bg-background/90 px-2.5 py-1 sm:px-3.5 sm:py-1.5 text-[10px] sm:text-[11px] font-bold text-foreground shadow-lg backdrop-blur-md whitespace-nowrap">
+        <div className="flex items-center gap-1 text-sky-500">
+          <Snowflake className="size-3 sm:size-3.5 animate-spin" style={{ animationDuration: isTurbo ? "4s" : "9s" }} />
           <span className="font-black text-sky-600 dark:text-sky-400">18°C</span>
         </div>
         <span className="text-muted-foreground/40">•</span>
@@ -24,14 +24,14 @@ export function CoolAirFlow({ className = "" }: CoolAirFlowProps) {
         <button
           type="button"
           onClick={() => setSpeedMode(isTurbo ? "gentle" : "turbo")}
-          className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+          className={`flex items-center gap-1 rounded-full px-2 py-0.5 sm:px-2.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
             isTurbo
               ? "bg-sky-500 text-white shadow-sm shadow-sky-500/30"
               : "bg-surface text-muted-foreground hover:text-foreground"
           }`}
           title="Click to toggle Airflow speed"
         >
-          <Wind className="size-3" />
+          <Wind className="size-2.5 sm:size-3" />
           <span>{isTurbo ? "Turbo Breeze" : "Gentle Eco"}</span>
         </button>
       </div>
@@ -240,8 +240,8 @@ export function CoolAirFlow({ className = "" }: CoolAirFlowProps) {
           />
 
           {/* Inverter Turbo Cool Badge Tag */}
-          <div className="absolute right-4 top-4 hidden sm:flex items-center gap-1.5 rounded-lg border border-sky-400/30 bg-white/80 dark:bg-slate-900/80 px-2 py-1 text-[10px] font-extrabold text-sky-600 dark:text-sky-400 shadow-sm backdrop-blur-xs">
-            <Sparkles className="size-3 text-sky-500 animate-pulse" />
+          <div className="absolute right-2 top-2 sm:right-4 sm:top-4 flex items-center gap-1 rounded-md sm:rounded-lg border border-sky-400/30 bg-white/85 dark:bg-slate-900/85 px-1.5 py-0.5 sm:px-2 sm:py-1 text-[8px] sm:text-[10px] font-extrabold text-sky-600 dark:text-sky-400 shadow-sm backdrop-blur-xs">
+            <Sparkles className="size-2.5 sm:size-3 text-sky-500 animate-pulse" />
             <span>Dual Inverter • Fast Chill</span>
           </div>
         </div>

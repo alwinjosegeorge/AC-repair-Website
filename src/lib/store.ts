@@ -69,35 +69,35 @@ export interface Booking {
   // Service info
   serviceCategory: ServiceCategory;
   serviceName: string;
-  subService?: string;
+  subService?: string | undefined;
   acType: ACType;
-  acBrand?: string;
+  acBrand?: string | undefined;
   unitCount: number | string; // 1, 2, 3, 4, "5+"
-  issueDescription?: string;
+  issueDescription?: string | undefined;
   
   // Schedule
-  preferredDate?: string;
-  preferredSlot?: string; // "Morning (9 AM - 12 PM)", "Afternoon (12 PM - 3 PM)", etc.
+  preferredDate?: string | undefined;
+  preferredSlot?: string | undefined; // "Morning (9 AM - 12 PM)", "Afternoon (12 PM - 3 PM)", etc.
   
   // Customer info
   customerName: string;
   phone: string;
-  whatsappNumber?: string;
-  alternatePhone?: string;
-  email?: string;
-  houseBuilding?: string;
-  area?: string;
+  whatsappNumber?: string | undefined;
+  alternatePhone?: string | undefined;
+  email?: string | undefined;
+  houseBuilding?: string | undefined;
+  area?: string | undefined;
   address: string;
-  landmark?: string;
+  landmark?: string | undefined;
   city: string;
   pincode: string;
-  locationCoordinates?: { latitude: number; longitude: number };
-  specialNotes?: string;
+  locationCoordinates?: { latitude: number; longitude: number } | undefined;
+  specialNotes?: string | undefined;
   
   // Pricing & Assignment
   estimatedAmount: number;
-  assignedTechnicianId?: string;
-  assignedTechnicianName?: string;
+  assignedTechnicianId?: string | undefined;
+  assignedTechnicianName?: string | undefined;
   
   // Ad & Attribution Tracking
   attribution: TrackingData;
@@ -116,15 +116,15 @@ export interface Technician {
 }
 
 export interface CustomerBookingHistory {
-  bookingId: string;
-  serviceCategory: ServiceCategory;
-  serviceName: string;
-  subService?: string;
-  date: string;
-  slot?: string;
+  bookingId?: string | undefined;
+  serviceCategory?: ServiceCategory | undefined;
+  serviceName?: string | undefined;
+  subService?: string | undefined;
+  date?: string | undefined;
+  slot?: string | undefined;
   amount: number;
   status: BookingStatus;
-  technicianName?: string;
+  technicianName?: string | undefined;
 }
 
 export interface Customer {
@@ -136,15 +136,15 @@ export interface Customer {
   address: string;
   pin: string;
   location: string;
-  locationCoordinates?: { latitude: number; longitude: number };
+  locationCoordinates?: { latitude: number; longitude: number } | undefined;
   previousServices: string[];
   acType: ACType;
   numberOfUnits: number | string;
   amcStatus: "Active" | "Expiring Soon" | "Expired" | "None";
-  amcPlan?: string;
+  amcPlan?: string | undefined;
   bookingHistory: CustomerBookingHistory[];
   totalSpend: number;
-  lastBookingDate?: string;
+  lastBookingDate?: string | undefined;
 }
 
 export type AMCServiceFrequency =
@@ -223,28 +223,28 @@ export type PaymentStatus = "PAID" | "PENDING" | "REFUNDED";
 export interface PaymentTransaction {
   id: string; // e.g. "TXN-2026-8801"
   invoiceNo: string; // e.g. "INV-2026-1088"
-  bookingId?: string; // e.g. "EGS-2026-1088b"
-  amcContractNo?: string; // e.g. "AMC-2026-104"
+  bookingId?: string | undefined; // e.g. "EGS-2026-1088b"
+  amcContractNo?: string | undefined; // e.g. "AMC-2026-104"
   customerName: string;
   phone: string;
-  whatsapp?: string;
+  whatsapp?: string | undefined;
   amount: number;
   subtotal: number;
   taxAmount: number; // 18% GST (CGST 9% + SGST 9%)
   paymentMethod: PaymentMethod;
   status: PaymentStatus;
-  transactionRef?: string; // e.g. UPI UTR number or cash slip
-  technicianId?: string;
-  technicianName?: string;
+  transactionRef?: string | undefined; // e.g. UPI UTR number or cash slip
+  technicianId?: string | undefined;
+  technicianName?: string | undefined;
   serviceName: string;
   createdAt: string;
-  paidAt?: string;
-  notes?: string;
+  paidAt?: string | undefined;
+  notes?: string | undefined;
 }
 
 export interface EGSInvoiceItem {
   description: string;
-  hsnCode?: string; // e.g. "998719"
+  hsnCode?: string | undefined; // e.g. "998719"
   quantity: number;
   unitPrice: number;
   amount: number;
@@ -253,17 +253,17 @@ export interface EGSInvoiceItem {
 export interface EGSInvoice {
   invoiceNo: string;
   date: string;
-  dueDate?: string;
-  bookingId?: string;
-  amcContractNo?: string;
+  dueDate?: string | undefined;
+  bookingId?: string | undefined;
+  amcContractNo?: string | undefined;
   customerName: string;
   customerPhone: string;
-  customerEmail?: string;
+  customerEmail?: string | undefined;
   customerAddress: string;
   customerCity: string;
-  customerGstin?: string;
-  acType?: ACType | string;
-  technicianName?: string;
+  customerGstin?: string | undefined;
+  acType?: ACType | string | undefined;
+  technicianName?: string | undefined;
   items: EGSInvoiceItem[];
   subtotal: number;
   cgst: number; // 9%
@@ -272,10 +272,10 @@ export interface EGSInvoice {
   grandTotal: number;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
-  transactionRef?: string;
+  transactionRef?: string | undefined;
   warrantyPeriodDays: number;
   warrantyValidUntil: string;
-  notes?: string;
+  notes?: string | undefined;
 }
 
 export const EGS_COMPANY_DETAILS = {
@@ -1301,7 +1301,7 @@ export function renewAMCContract(
   const renewalEntry = {
     renewedOn: new Date().toISOString(),
     previousEndDate: target.amcEndDate || target.expiryDate || "",
-    newEndDate: newEndDate.toISOString().split("T")[0],
+    newEndDate: newEndDate.toISOString().split("T")[0] || "",
     amountPaid: options.amountPaid || target.amount,
     paymentMode: options.paymentMode || "UPI / GPay",
     notes: options.notes || `Renewed for ${durationMonths} months.`,
@@ -1309,17 +1309,17 @@ export function renewAMCContract(
 
   const updated: AMCContract = {
     ...target,
-    amcStartDate: newStartDate.toISOString().split("T")[0],
-    startDate: newStartDate.toISOString().split("T")[0],
-    amcEndDate: newEndDate.toISOString().split("T")[0],
-    expiryDate: newEndDate.toISOString().split("T")[0],
+    amcStartDate: newStartDate.toISOString().split("T")[0] || "",
+    startDate: newStartDate.toISOString().split("T")[0] || "",
+    amcEndDate: newEndDate.toISOString().split("T")[0] || "",
+    expiryDate: newEndDate.toISOString().split("T")[0] || "",
     status: "active",
     amount: options.amountPaid || target.amount,
     planName: options.newPlanName || target.planName,
     servicesCompleted: 0,
     servicesIncluded: target.servicesIncluded || (target.serviceFrequency.includes("Bi-Monthly") ? 6 : target.serviceFrequency.includes("Monthly") ? 12 : 4),
     lastRenewedDate: new Date().toISOString(),
-    nextServiceDate: new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString().split("T")[0],
+    nextServiceDate: new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString().split("T")[0] || "",
     nextServiceSlot: "Morning Slot (9:00 AM - 12:00 PM)",
     nextServiceStatus: "scheduled",
     renewalHistory: [...(target.renewalHistory || []), renewalEntry],
@@ -1333,10 +1333,10 @@ export function scheduleAMCNextService(
   contractId: string,
   options: {
     date: string;
-    slot?: string;
-    technicianId?: string;
-    technicianName?: string;
-    serviceNotes?: string;
+    slot?: string | undefined;
+    technicianId?: string | undefined;
+    technicianName?: string | undefined;
+    serviceNotes?: string | undefined;
   }
 ): { contract: AMCContract; booking: Booking } | undefined {
   const all = getAMCContracts();
@@ -1379,7 +1379,7 @@ export function scheduleAMCNextService(
     lastServiceDate: options.date,
     lastServiceDetails: `AMC Maintenance Service - Routine Cleaning & Diagnostics`,
     lastServiceTechnician: options.technicianName || "Arun Kumar",
-    nextServiceDate: nextDateObj.toISOString().split("T")[0],
+    nextServiceDate: nextDateObj.toISOString().split("T")[0] || "",
     nextServiceSlot: options.slot || "Morning Slot (9:00 AM - 12:00 PM)",
     servicesCompleted: (target.servicesCompleted || 0) + 1,
     nextServiceStatus: "scheduled",
@@ -2093,8 +2093,8 @@ export function generateInvoiceForBooking(
 
   const invoice: EGSInvoice = {
     invoiceNo: invNum,
-    date: new Date().toISOString().split("T")[0],
-    dueDate: new Date().toISOString().split("T")[0],
+    date: new Date().toISOString().split("T")[0] || "",
+    dueDate: new Date().toISOString().split("T")[0] || "",
     bookingId: booking.id,
     customerName: booking.customerName,
     customerPhone: booking.phone,
@@ -2121,7 +2121,7 @@ export function generateInvoiceForBooking(
     paymentStatus: "PAID",
     transactionRef: transactionRef || (transactionId ? `REF-${transactionId}` : `UPI-${Date.now().toString().slice(-6)}`),
     warrantyPeriodDays: 30,
-    warrantyValidUntil: validUntilDate.toISOString().split("T")[0],
+    warrantyValidUntil: validUntilDate.toISOString().split("T")[0] || "",
     notes: "Includes 30-Day Post-Service Guarantee covering cooling performance, gas pressure, and workmanship.",
   };
 
@@ -2142,8 +2142,8 @@ export function generateInvoiceForAMC(
 
   const invoice: EGSInvoice = {
     invoiceNo: `INV-2026-${contract.contractNo.replace(/\D/g, "")}`,
-    date: contract.amcStartDate || new Date().toISOString().split("T")[0],
-    dueDate: contract.amcStartDate || new Date().toISOString().split("T")[0],
+    date: contract.amcStartDate || new Date().toISOString().split("T")[0] || "",
+    dueDate: contract.amcStartDate || new Date().toISOString().split("T")[0] || "",
     amcContractNo: contract.contractNo,
     customerName: contract.customerName,
     customerPhone: contract.phone,

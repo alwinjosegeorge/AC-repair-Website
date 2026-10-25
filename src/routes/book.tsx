@@ -26,7 +26,7 @@ function BookingPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-1 px-4 py-8 md:py-14 md:px-8">
+      <main className="flex-1 px-4 pt-6 pb-32 md:py-14 md:px-8">
         <div className="mx-auto max-w-4xl">
           {/* Header Title */}
           <div className="text-center max-w-2xl mx-auto mb-8 space-y-3">

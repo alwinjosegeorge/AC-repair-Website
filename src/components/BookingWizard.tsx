@@ -278,7 +278,7 @@ export function BookingWizard({
   // Step 5: Preferred time
   const [dateOption, setDateOption] = useState<"today" | "tomorrow" | "custom">("today");
   const [customDate, setCustomDate] = useState("");
-  const [preferredSlot, setPreferredSlot] = useState(TIME_SLOTS[0].label);
+  const [preferredSlot, setPreferredSlot] = useState(TIME_SLOTS[0]?.label || "Morning (8:00 AM - 11:00 AM)");
   const [specialTimingNotes, setSpecialTimingNotes] = useState("");
 
   // Step 6: Created Booking result
@@ -290,7 +290,7 @@ export function BookingWizard({
     if (initialCategory) {
       setSelectedCategory(initialCategory);
       const svc = SERVICES_DATA.find((s) => s.id === initialCategory);
-      if (svc && svc.subServices.length > 0) {
+      if (svc && svc.subServices.length > 0 && svc.subServices[0]) {
         setSelectedSubService(svc.subServices[0]);
       }
     }
@@ -304,7 +304,7 @@ export function BookingWizard({
   }, [contactPhone, whatsappSameAsContact]);
 
   const currentServiceObj =
-    SERVICES_DATA.find((s) => s.id === selectedCategory) || SERVICES_DATA[0];
+    SERVICES_DATA.find((s) => s.id === selectedCategory) ?? SERVICES_DATA[0]!;
 
   const effectiveUnits =
     unitSelection === "5+" ? Math.max(5, customUnitCount) : parseInt(unitSelection, 10);
@@ -319,7 +319,7 @@ export function BookingWizard({
   const handleCategorySelect = (catId: ServiceCategory) => {
     setSelectedCategory(catId);
     const svc = SERVICES_DATA.find((s) => s.id === catId);
-    if (svc && svc.subServices.length > 0) {
+    if (svc && svc.subServices.length > 0 && svc.subServices[0]) {
       setSelectedSubService(svc.subServices[0]);
     }
   };
@@ -531,21 +531,23 @@ export function BookingWizard({
 
   return (
     <div
-      className={`rounded-3xl border border-border bg-card p-5 md:p-8 shadow-2xl transition-all ${className}`}
+      className={`rounded-2xl sm:rounded-3xl border border-border bg-card p-3.5 sm:p-6 md:p-8 shadow-2xl transition-all ${className}`}
     >
       {/* Step Header & Progress Indicator (Steps 1 to 5) */}
       {step < 6 && (
-        <div className="mb-6 border-b border-border/80 pb-5">
+        <div className="mb-5 sm:mb-6 border-b border-border/80 pb-4 sm:pb-5">
           <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             <span>
-              Step {step} of 5:{" "}
-              {step === 1 && "Service Selection"}
-              {step === 2 && "Select AC Type"}
-              {step === 3 && "No of ACs"}
-              {step === 4 && "Customer Details"}
-              {step === 5 && "Preferred Time"}
+              Step {step}/5:{" "}
+              <span className="text-foreground font-bold">
+                {step === 1 && "Service"}
+                {step === 2 && "AC Type"}
+                {step === 3 && "Units"}
+                {step === 4 && "Details"}
+                {step === 5 && "Time"}
+              </span>
             </span>
-            <span className="text-brand font-black text-sm">
+            <span className="text-brand font-black text-xs sm:text-sm">
               {estimatedTotal > 0
                 ? `Est: ₹${estimatedTotal.toLocaleString("en-IN")}`
                 : currentServiceObj.priceText}
@@ -553,11 +555,11 @@ export function BookingWizard({
           </div>
 
           {/* 5-Step Progress Bar */}
-          <div className="mt-3 grid grid-cols-5 gap-2">
+          <div className="mt-2.5 sm:mt-3 grid grid-cols-5 gap-1.5 sm:gap-2">
             {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className={`h-2 rounded-full transition-all duration-300 ${
+                className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
                   step >= i ? "bg-brand" : "bg-muted"
                 }`}
               />
@@ -590,8 +592,8 @@ export function BookingWizard({
             </p>
           </div>
 
-          {/* 8 Requested Services Grid */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {/* 8 Requested Services Grid (2 cols on mobile, 4 on desktop) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             {SERVICES_DATA.map((svc) => {
               const isSelected = selectedCategory === svc.id;
               return (
@@ -599,38 +601,38 @@ export function BookingWizard({
                   key={svc.id}
                   type="button"
                   onClick={() => handleCategorySelect(svc.id)}
-                  className={`group relative flex flex-col justify-between rounded-2xl border p-4 text-left transition-all cursor-pointer ${
+                  className={`group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border p-3 sm:p-4 text-left transition-all cursor-pointer ${
                     isSelected
                       ? "border-brand bg-brand/5 shadow-md ring-2 ring-brand/30"
                       : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
                   }`}
                 >
                   <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl">{svc.emoji}</span>
-                      <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-black uppercase text-brand">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-xl sm:text-2xl">{svc.emoji}</span>
+                      <span className="rounded-full bg-brand-soft px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-black uppercase text-brand truncate max-w-[85px] sm:max-w-none">
                         {svc.badge}
                       </span>
                     </div>
 
-                    <h3 className="mt-3 font-extrabold text-foreground text-base flex items-center gap-1.5">
+                    <h3 className="mt-2.5 sm:mt-3 font-extrabold text-foreground text-xs sm:text-base flex items-center gap-1 leading-tight">
                       <span>{svc.title}</span>
                     </h3>
-                    <p className="mt-1 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                    <p className="hidden sm:block mt-1 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                       {svc.desc}
                     </p>
                   </div>
 
-                  <div className="mt-4 flex w-full items-center justify-between border-t border-border/60 pt-3">
-                    <span className="text-xs font-black text-brand">{svc.priceText}</span>
+                  <div className="mt-3 sm:mt-4 flex w-full items-center justify-between border-t border-border/60 pt-2 sm:pt-3">
+                    <span className="text-[11px] sm:text-xs font-black text-brand">{svc.priceText}</span>
                     <span
-                      className={`text-xs font-bold flex items-center gap-1 ${
+                      className={`text-[10px] sm:text-xs font-bold flex items-center gap-0.5 sm:gap-1 ${
                         isSelected ? "text-brand" : "text-muted-foreground"
                       }`}
                     >
                       {isSelected ? (
                         <>
-                          <Check className="size-3.5" /> Selected
+                          <Check className="size-3 sm:size-3.5" /> Selected
                         </>
                       ) : (
                         "Select"
@@ -682,7 +684,7 @@ export function BookingWizard({
             <button
               type="button"
               onClick={goToStep2}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3.5 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 transition-all hover:scale-105 hover:bg-brand/90"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-7 py-3.5 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 transition-all hover:scale-105 hover:bg-brand/90"
             >
               <span>Continue to AC Type</span>
               <ArrowRight className="size-4" />
@@ -778,11 +780,11 @@ export function BookingWizard({
             />
           </div>
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between gap-2 pt-2">
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground hover:bg-border/40"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-3 text-xs sm:text-sm font-semibold text-foreground hover:bg-border/40 shrink-0"
             >
               <ArrowLeft className="size-4" />
               <span>Back</span>
@@ -790,7 +792,7 @@ export function BookingWizard({
             <button
               type="button"
               onClick={goToStep3}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 hover:scale-105 hover:bg-brand/90"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 sm:px-7 py-3 text-xs sm:text-sm font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 hover:scale-105 hover:bg-brand/90"
             >
               <span>Continue to No of ACs</span>
               <ArrowRight className="size-4" />
@@ -817,7 +819,7 @@ export function BookingWizard({
           </div>
 
           {/* Requested 1, 2, 3, 4, 5+ Selection */}
-          <div className="grid grid-cols-5 gap-2.5 sm:gap-4">
+          <div className="grid grid-cols-5 gap-1.5 sm:gap-4">
             {(["1", "2", "3", "4", "5+"] as const).map((count) => {
               const isSelected = unitSelection === count;
               return (
@@ -825,19 +827,19 @@ export function BookingWizard({
                   key={count}
                   type="button"
                   onClick={() => setUnitSelection(count)}
-                  className={`flex flex-col items-center justify-center rounded-2xl border py-4 sm:py-6 text-center transition-all cursor-pointer ${
+                  className={`flex flex-col items-center justify-center rounded-xl sm:rounded-2xl border py-3 sm:py-6 text-center transition-all cursor-pointer ${
                     isSelected
-                      ? "border-brand bg-brand text-brand-foreground shadow-xl ring-4 ring-brand/20 scale-105"
+                      ? "border-brand bg-brand text-brand-foreground shadow-xl ring-2 sm:ring-4 ring-brand/20 scale-105"
                       : "border-border bg-surface/50 text-foreground hover:border-brand/40 hover:bg-surface"
                   }`}
                 >
-                  <span className="text-2xl sm:text-3xl font-black">{count}</span>
+                  <span className="text-xl sm:text-3xl font-black">{count}</span>
                   <span
-                    className={`mt-1 text-[11px] font-semibold uppercase ${
+                    className={`mt-0.5 sm:mt-1 text-[9px] sm:text-[11px] font-semibold uppercase ${
                       isSelected ? "text-brand-foreground/85" : "text-muted-foreground"
                     }`}
                   >
-                    {count === "1" ? "AC Unit" : "Units"}
+                    {count === "1" ? "Unit" : "Units"}
                   </span>
                 </button>
               );
@@ -899,11 +901,11 @@ export function BookingWizard({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between gap-2 pt-2">
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground hover:bg-border/40"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-3 text-xs sm:text-sm font-semibold text-foreground hover:bg-border/40 shrink-0"
             >
               <ArrowLeft className="size-4" />
               <span>Back</span>
@@ -911,9 +913,9 @@ export function BookingWizard({
             <button
               type="button"
               onClick={goToStep4}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 hover:scale-105 hover:bg-brand/90"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 sm:px-7 py-3 text-xs sm:text-sm font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 hover:scale-105 hover:bg-brand/90"
             >
-              <span>Continue to Customer Details</span>
+              <span>Continue to Details</span>
               <ArrowRight className="size-4" />
             </button>
           </div>
@@ -952,7 +954,7 @@ export function BookingWizard({
                   placeholder="e.g. Rahul Nair"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="w-full rounded-xl border border-border bg-card py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
             </div>
@@ -971,15 +973,15 @@ export function BookingWizard({
                   placeholder="e.g. 9895688833"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="w-full rounded-xl border border-border bg-card py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
             </div>
           </div>
 
           {/* WhatsApp Number with Sync Checkbox */}
-          <div className="rounded-2xl border border-border bg-surface/40 p-4">
-            <div className="flex items-center justify-between">
+          <div className="rounded-2xl border border-border bg-surface/40 p-3.5 sm:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                 <MessageSquare className="size-3.5 text-[#25D366]" />
                 WhatsApp Number *
@@ -989,7 +991,7 @@ export function BookingWizard({
                   type="checkbox"
                   checked={whatsappSameAsContact}
                   onChange={(e) => setWhatsappSameAsContact(e.target.checked)}
-                  className="rounded border-border text-brand focus:ring-brand"
+                  className="rounded border-border text-brand focus:ring-brand size-4"
                 />
                 <span>Same as contact number</span>
               </label>
@@ -1005,7 +1007,7 @@ export function BookingWizard({
                   placeholder="e.g. 9895688833"
                   value={whatsappNumber}
                   onChange={(e) => setWhatsappNumber(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="w-full rounded-xl border border-border bg-card py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
             )}
@@ -1057,7 +1059,7 @@ export function BookingWizard({
                   placeholder="e.g. TC 14/120, Rose Villa / Flat 4B, Blue Horizon"
                   value={houseBuilding}
                   onChange={(e) => setHouseBuilding(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="w-full rounded-xl border border-border bg-card py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
             </div>
@@ -1074,7 +1076,7 @@ export function BookingWizard({
                     placeholder="e.g. Kadappakada / MG Road / Kakkanad"
                     value={area}
                     onChange={(e) => setArea(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="w-full rounded-xl border border-border bg-card py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                   />
                 </div>
               </div>
@@ -1088,7 +1090,7 @@ export function BookingWizard({
                   placeholder="e.g. Kollam / Thiruvananthapuram"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-3 sm:p-2.5 text-base sm:text-sm text-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                 />
                 <datalist id="city-suggestions">
                   {MAJOR_CITIES.map((c) => (
@@ -1109,7 +1111,7 @@ export function BookingWizard({
                   placeholder="e.g. 691001"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-3 sm:p-2.5 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
 
@@ -1120,17 +1122,17 @@ export function BookingWizard({
                   placeholder="e.g. Near SBI Bank / Opp. Metro Pillar 32"
                   value={landmark}
                   onChange={(e) => setLandmark(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-3 sm:p-2.5 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between gap-2 pt-2">
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground hover:bg-border/40"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-3 text-xs sm:text-sm font-semibold text-foreground hover:bg-border/40 shrink-0"
             >
               <ArrowLeft className="size-4" />
               <span>Back</span>
@@ -1138,9 +1140,9 @@ export function BookingWizard({
             <button
               type="button"
               onClick={goToStep5}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-xl shadow-brand/30 transition-all hover:scale-105 hover:bg-brand/90"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 sm:px-8 py-3.5 text-xs sm:text-sm font-black uppercase tracking-wider text-brand-foreground shadow-xl shadow-brand/30 transition-all hover:scale-105 hover:bg-brand/90"
             >
-              <span>Continue to Preferred Time</span>
+              <span>Continue to Time</span>
               <ArrowRight className="size-4" />
             </button>
           </div>
@@ -1301,7 +1303,7 @@ export function BookingWizard({
               placeholder="e.g. Call 30 mins before arrival, ring doorbell twice, visit after 10 AM..."
               value={specialTimingNotes}
               onChange={(e) => setSpecialTimingNotes(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-border bg-card p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+              className="mt-1.5 w-full rounded-xl border border-border bg-card p-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
 
@@ -1335,7 +1337,7 @@ export function BookingWizard({
               </div>
             </div>
 
-            <div className="pt-1 flex items-center justify-between text-[11px] font-semibold text-emerald-600">
+            <div className="pt-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-[11px] font-semibold text-emerald-600">
               <span className="flex items-center gap-1">
                 <CheckCircle2 className="size-3.5" /> 30-Day Post-Service Guarantee
               </span>
@@ -1344,20 +1346,20 @@ export function BookingWizard({
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between gap-2 pt-2">
             <button
               type="button"
               onClick={() => setStep(4)}
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground hover:bg-border/40"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-3 text-xs sm:text-sm font-semibold text-foreground hover:bg-border/40 shrink-0"
             >
               <ArrowLeft className="size-4" />
               <span>Back</span>
             </button>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 sm:px-8 py-3.5 text-xs sm:text-sm font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90"
             >
-              <span>Confirm &amp; Book Service</span>
+              <span>Confirm &amp; Book</span>
               <CheckCircle2 className="size-4" />
             </button>
           </div>

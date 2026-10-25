@@ -27,26 +27,37 @@ export interface TrackingData {
 export interface TrackingLogEntry {
   id: string;
   timestamp: string;
-  platform: "GTM" | "Google Ads" | "GA4" | "Meta Pixel" | "Meta CAPI" | "System";
+  platform: "GTM" | "Google Ads" | "GA4" | "Meta Pixel" | "Meta CAPI" | "System" | string;
   eventName: string;
+  event?: string | undefined;
   status: "success" | "pending" | "simulated";
   payload: Record<string, unknown>;
-  attribution?: TrackingData;
+  attribution?: TrackingData | undefined;
 }
 
 export interface MarketingConfig {
   gtmId: string;
+  gtmContainerId?: string | undefined;
+  enabled?: boolean | undefined;
   googleAdsId: string;
+  googleAdsEnabled?: boolean | undefined;
   googleAdsConversionLabel: string;
+  googleAdsLeadLabel?: string | undefined;
   googleAdsCallLabel: string;
+  googleAdsPhoneCallLabel?: string | undefined;
   googleAdsWhatsAppLabel: string;
   ga4MeasurementId: string;
+  ga4Enabled?: boolean | undefined;
   gscVerification: string;
   metaPixelId: string;
+  metaPixelEnabled?: boolean | undefined;
   metaCapiEnabled: boolean;
   metaTestEventCode: string;
-  metaAccessToken?: string;
+  metaAccessToken?: string | undefined;
 }
+
+export type TrackingConfig = MarketingConfig;
+export type TrackingLog = TrackingLogEntry;
 
 export const DEFAULT_TRACKING_CONFIG: MarketingConfig = {
   // 1. Google Tag Manager
@@ -359,12 +370,12 @@ export function trackGAEvent(eventName: string, params: Record<string, unknown> 
 export function trackGoogleAdsConversion(conversionData: {
   transactionId: string;
   value: number;
-  currency?: string;
-  customerEmail?: string;
-  customerPhone?: string;
-  customerName?: string;
-  city?: string;
-  pincode?: string;
+  currency?: string | undefined;
+  customerEmail?: string | undefined;
+  customerPhone?: string | undefined;
+  customerName?: string | undefined;
+  city?: string | undefined;
+  pincode?: string | undefined;
 }): void {
   const config = getTrackingConfig();
   const w = window as any;
@@ -430,11 +441,11 @@ export function trackMetaPixel(eventName: string, params: Record<string, unknown
 export async function sendMetaCapiEvent(
   eventName: string,
   userData: {
-    email?: string;
-    phone?: string;
-    firstName?: string;
-    city?: string;
-    pincode?: string;
+    email?: string | undefined;
+    phone?: string | undefined;
+    firstName?: string | undefined;
+    city?: string | undefined;
+    pincode?: string | undefined;
   } = {},
   customData: Record<string, unknown> = {}
 ): Promise<void> {
@@ -631,13 +642,13 @@ export function trackServiceView(serviceName: string, serviceCategory: string, s
 export async function trackBookingComplete(booking: {
   bookingId: string;
   service: string;
-  amount?: number;
+  amount?: number | undefined;
   city: string;
-  customerName?: string;
-  customerPhone?: string;
-  customerEmail?: string;
-  pincode?: string;
-  address?: string;
+  customerName?: string | undefined;
+  customerPhone?: string | undefined;
+  customerEmail?: string | undefined;
+  pincode?: string | undefined;
+  address?: string | undefined;
 }): Promise<void> {
   const tracking = getStoredTracking();
   const value = booking.amount || 499;
@@ -759,13 +770,14 @@ export async function trackPaymentPurchase(payment: {
   });
 
   // Meta CAPI Purchase
+  const capiUserData: { email?: string; phone?: string; firstName?: string } = {};
+  if (payment.customerEmail) capiUserData.email = payment.customerEmail;
+  if (payment.customerPhone) capiUserData.phone = payment.customerPhone;
+  if (payment.customerName) capiUserData.firstName = payment.customerName;
+
   await sendMetaCapiEvent(
     "Purchase",
-    {
-      email: payment.customerEmail,
-      phone: payment.customerPhone,
-      firstName: payment.customerName,
-    },
+    capiUserData,
     {
       currency: "INR",
       value,

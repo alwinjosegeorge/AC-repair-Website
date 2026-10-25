@@ -87,6 +87,7 @@ export function TechnicianMobilePortal() {
   const [activeJobDetails, setActiveJobDetails] = useState<Booking | null>(null);
   const [sparesNotesModal, setSparesNotesModal] = useState<Booking | null>(null);
   const [sparesText, setSparesText] = useState("");
+  const [techRemarks, setTechRemarks] = useState("");
   const [actionSuccessNotice, setActionSuccessNotice] = useState<string | null>(null);
 
   // Field Technician Payment Collector State

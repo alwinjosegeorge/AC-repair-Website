@@ -154,90 +154,92 @@ function FloatingCard({
 
 function Hero() {
   return (
-    <section className="relative -mt-24 overflow-hidden cool-stripes pt-40 pb-24">
-      <div className="mx-auto max-w-6xl px-6 text-center">
-        <h1 className="text-5xl leading-[0.95] font-extrabold md:text-7xl lg:text-[5.5rem] animate-fade-in-up">
+    <section className="relative -mt-24 overflow-hidden cool-stripes pt-32 pb-16 sm:pt-40 sm:pb-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 text-center">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-extrabold leading-tight sm:leading-[0.95] animate-fade-in-up">
           Digital AC <span className="text-brand">Solutions</span>
-          <span className="mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <span className="mt-2 flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-5 gap-y-2">
             For
             <img
               src={heroInline}
               alt="Homeowner enjoying cool air from a serviced air conditioner"
               width={640}
               height={512}
-              className="h-16 w-32 rounded-xl border-4 border-background object-cover shadow-lg md:h-24 md:w-48"
+              className="h-10 w-24 sm:h-16 sm:w-32 md:h-24 md:w-48 rounded-xl border-2 sm:border-4 border-background object-cover shadow-lg"
             />
             Tomorrow
           </span>
         </h1>
-        <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-ink/65 md:text-lg animate-fade-in-up-delay-1">
+        <p className="mx-auto mt-4 sm:mt-8 max-w-xl text-sm leading-relaxed text-ink/75 sm:text-base md:text-lg animate-fade-in-up-delay-1 px-2">
           Expert AC repair and maintenance services that keep your home comfortable year-round.
           Certified technicians, 90-minute rapid arrival, guaranteed results.
         </p>
 
-        {/* 3 Main Action Buttons */}
-        <div className="mt-10 mx-auto max-w-3xl animate-fade-in-up-delay-2">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
-            {/* 1. Book a service */}
+        {/* 3 Main Action Buttons optimized for mobile & desktop */}
+        <div className="mt-7 sm:mt-10 mx-auto max-w-3xl animate-fade-in-up-delay-2">
+          <div className="flex flex-col gap-2.5 sm:grid sm:grid-cols-3 sm:gap-4">
+            {/* 1. Book a service (prominent full width on mobile) */}
             <Link
               to="/book"
-              className="group relative flex flex-col items-center justify-center rounded-2xl bg-brand px-6 py-4 text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90 hover:shadow-brand/60 ring-4 ring-brand/20 active:scale-95 animate-pulse"
+              className="group relative flex items-center justify-center gap-3 sm:flex-col rounded-2xl bg-brand px-5 sm:px-6 py-3.5 sm:py-4 text-brand-foreground shadow-xl shadow-brand/35 transition-all hover:scale-105 hover:bg-brand/90 ring-4 ring-brand/20 active:scale-95"
             >
-              <div className="flex items-center gap-2">
-                <Calendar className="size-5 shrink-0" />
-                <span className="text-base font-black tracking-wide uppercase">Book a service</span>
+              <Calendar className="size-5 shrink-0" />
+              <div className="text-left sm:text-center">
+                <span className="text-sm sm:text-base font-black tracking-wide uppercase block">Book a service</span>
+                <span className="text-[11px] font-semibold text-brand-foreground/85 block sm:mt-0.5">
+                  Online Slot • 90-Min Arrival
+                </span>
               </div>
-              <span className="mt-1 text-[11px] font-semibold text-brand-foreground/85">
-                Online Slot • 90-Min Arrival
-              </span>
             </Link>
 
-            {/* 2. WhatsApp us */}
-            <a
-              href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I need assistance with AC Service/Repair.")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackWhatsAppClick("homepage_hero")}
-              className="group relative flex flex-col items-center justify-center rounded-2xl bg-[#25D366] px-6 py-4 text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59] hover:shadow-2xl active:scale-95"
-            >
-              <div className="flex items-center gap-2">
-                <MessageSquare className="size-5 shrink-0 fill-current" />
-                <span className="text-base font-black tracking-wide uppercase">WhatsApp us</span>
-              </div>
-              <span className="mt-1 text-[11px] font-semibold text-white/90">
-                Direct Chat with Engineer
-              </span>
-            </a>
+            {/* 2 & 3: WhatsApp us and Call now side-by-side on mobile */}
+            <div className="grid grid-cols-2 gap-2 sm:contents">
+              <a
+                href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I need assistance with AC Service/Repair.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick("homepage_hero")}
+                className="group relative flex flex-col items-center justify-center rounded-2xl bg-[#25D366] px-3 sm:px-6 py-3 sm:py-4 text-white shadow-lg shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59] active:scale-95 text-center"
+              >
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <MessageSquare className="size-4 sm:size-5 shrink-0 fill-current" />
+                  <span className="text-xs sm:text-base font-black tracking-wide uppercase">WhatsApp</span>
+                </div>
+                <span className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] font-semibold text-white/90">
+                  Direct Chat
+                </span>
+              </a>
 
-            {/* 3. Call now */}
-            <a
-              href={`tel:${EGS_CALL_NUMBER}`}
-              onClick={() => trackCallClick("homepage_hero")}
-              className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-border bg-card px-6 py-4 text-card-foreground shadow-lg transition-all hover:scale-105 hover:border-brand/50 hover:bg-surface active:scale-95"
-            >
-              <div className="flex items-center gap-2">
-                <div className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <Phone className="size-5 shrink-0 text-brand" />
-                <span className="text-base font-black tracking-wide uppercase">Call now</span>
-              </div>
-              <span className="mt-1 text-[11px] font-semibold text-muted-foreground">
-                +91 98956 88833 (24/7 Desk)
-              </span>
-            </a>
+              <a
+                href={`tel:${EGS_CALL_NUMBER}`}
+                onClick={() => trackCallClick("homepage_hero")}
+                className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-border bg-card px-3 sm:px-6 py-3 sm:py-4 text-card-foreground shadow-md transition-all hover:scale-105 hover:border-brand/50 hover:bg-surface active:scale-95 text-center"
+              >
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <Phone className="size-4 sm:size-5 shrink-0 text-brand" />
+                  <span className="text-xs sm:text-base font-black tracking-wide uppercase">Call now</span>
+                </div>
+                <span className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] font-semibold text-muted-foreground">
+                  +91 98956 88833
+                </span>
+              </a>
+            </div>
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-ink/70">
-          <span className="flex items-center gap-1.5 text-emerald-600">
-            <CheckCircle2 className="size-4" /> Flat ₹499 Jet Wash
+        {/* Trust Badges */}
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs font-semibold text-ink/75">
+          <span className="flex items-center gap-1 text-emerald-600">
+            <CheckCircle2 className="size-3.5" /> Flat ₹499 Jet Wash
           </span>
-          <span>•</span>
-          <span className="flex items-center gap-1.5 text-brand">
-            <CheckCircle2 className="size-4" /> 30-Day Guarantee
+          <span className="text-muted-foreground/30">•</span>
+          <span className="flex items-center gap-1 text-brand">
+            <CheckCircle2 className="size-3.5" /> 30-Day Guarantee
           </span>
-          <span>•</span>
-          <span className="flex items-center gap-1.5 text-amber-600">
-            <CheckCircle2 className="size-4" /> Pay After Service
+          <span className="text-muted-foreground/30">•</span>
+          <span className="flex items-center gap-1 text-amber-600">
+            <CheckCircle2 className="size-3.5" /> Pay After Service
           </span>
         </div>
       </div>
@@ -341,10 +343,10 @@ function Marquee() {
       <div className="absolute inset-0 cool-stripes mask-bottom-fade -z-10" />
 
       {/* Foreground text that remains fully opaque */}
-      <div className="flex flex-wrap items-center justify-center gap-6 px-6 text-4xl font-extrabold tracking-tight md:text-6xl">
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 px-4 text-2xl sm:text-4xl md:text-6xl font-extrabold tracking-tight">
         {items.map((t, i) => (
-          <span key={t} className="flex items-center gap-6">
-            <Sparkles className="size-8 text-brand/60" fill="currentColor" strokeWidth={0} />
+          <span key={t} className="flex items-center gap-3 sm:gap-6">
+            <Sparkles className="size-5 sm:size-8 text-brand/60" fill="currentColor" strokeWidth={0} />
             <span className={i % 2 === 0 ? "text-brand" : "text-ink"}>{t}</span>
           </span>
         ))}
@@ -465,7 +467,7 @@ function Services() {
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map(({ icon: Icon, title, href, price, badge, text }) => (
-            <article key={title} className="flex flex-col justify-between rounded-3xl bg-background p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 border border-border/80">
+            <article key={title} className="flex flex-col justify-between rounded-2xl sm:rounded-3xl bg-background p-5 sm:p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 border border-border/80">
               <div>
                 <div className="flex items-center justify-between">
                   <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-soft text-brand">
@@ -809,7 +811,7 @@ function Contact() {
           </div>
 
           {/* Form */}
-          <div className="rounded-2xl bg-background p-8 md:p-10 shadow-2xl text-ink">
+          <div className="rounded-2xl bg-background p-5 sm:p-8 md:p-10 shadow-2xl text-ink">
             <h3 className="text-xl md:text-2xl font-extrabold mb-8 text-ink">Fill The Form Below</h3>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -819,7 +821,7 @@ function Contact() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Name"
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-sm outline-none transition-colors focus:border-[#1888ff]"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-base sm:text-sm outline-none transition-colors focus:border-[#1888ff]"
                 />
               </div>
               <div>
@@ -829,7 +831,7 @@ function Contact() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="Email"
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-sm outline-none transition-colors focus:border-[#1888ff]"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-base sm:text-sm outline-none transition-colors focus:border-[#1888ff]"
                 />
               </div>
               <div>
@@ -839,14 +841,14 @@ function Contact() {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="Phone"
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-sm outline-none transition-colors focus:border-[#1888ff]"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-base sm:text-sm outline-none transition-colors focus:border-[#1888ff]"
                 />
               </div>
               <div>
                 <select
                   value={formData.service}
                   onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-sm outline-none transition-colors focus:border-[#1888ff] text-ink/80"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-base sm:text-sm outline-none transition-colors focus:border-[#1888ff] text-ink/80"
                 >
                   <option value="" disabled>Choose Options</option>
                   <option value="climate-fix">Climate Fix</option>
@@ -862,13 +864,13 @@ function Contact() {
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="Message"
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-sm outline-none transition-colors focus:border-[#1888ff] resize-none"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-base sm:text-sm outline-none transition-colors focus:border-[#1888ff] resize-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#1888ff] py-4 text-center text-base font-semibold text-white shadow-md transition-opacity hover:opacity-90 cursor-pointer mt-2"
+                className="w-full rounded-xl bg-[#1888ff] py-4 text-center text-base font-semibold text-white shadow-md transition-opacity hover:opacity-90 cursor-pointer mt-2 active:scale-98"
               >
                 Make An Appointment
               </button>
