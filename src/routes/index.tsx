@@ -528,7 +528,7 @@ function BookOnlineSection() {
         {/* Framer-Style Blue Banner Card with Concentric Ripple Circles */}
         <div className="relative rounded-3xl sm:rounded-[2.5rem] bg-[#0084f6] text-white shadow-2xl overflow-hidden border border-white/20">
           {/* Subtle Concentric Rings centered behind the technician */}
-          <div className="absolute left-[20%] top-[55%] -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0">
+          <div className="absolute left-[20%] top-[50%] -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0">
             <div className="size-[260px] sm:size-[340px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/25 bg-white/5" />
             <div className="size-[420px] sm:size-[520px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/15" />
             <div className="size-[600px] sm:size-[720px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/10" />
@@ -536,9 +536,9 @@ function BookOnlineSection() {
           </div>
 
           {/* Grid Layout: Left Technician Cutout, Right Translucent 5-Step Wizard Card */}
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-end px-4 sm:px-8 lg:px-12 pt-8 sm:pt-12 pb-0">
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 pb-0">
             {/* Left Column: Technician Cutout holding Toolbox (Flush to bottom edge) */}
-            <div className="lg:col-span-5 flex flex-col items-center lg:items-start justify-end self-end order-2 lg:order-1 pt-4 lg:pt-0 pb-0 mb-0 leading-none">
+            <div className="lg:col-span-5 flex flex-col items-center lg:items-start justify-end self-end order-2 lg:order-1 pt-2 lg:pt-0 pb-0 mb-0 leading-none">
               <picture className="block w-full flex justify-center lg:justify-start items-end leading-none">
                 <source srcSet="/tool-box-man.avif" type="image/avif" />
                 <img
@@ -547,14 +547,14 @@ function BookOnlineSection() {
                   width={720}
                   height={960}
                   loading="lazy"
-                  className="block w-auto h-auto max-h-[380px] sm:max-h-[480px] lg:max-h-[580px] object-contain object-bottom drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)] select-none pointer-events-none align-bottom -mb-1"
+                  className="block w-auto h-auto max-h-[380px] sm:max-h-[460px] lg:max-h-[520px] object-contain object-bottom drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)] select-none pointer-events-none align-bottom -mb-1"
                 />
               </picture>
             </div>
 
             {/* Right Column: 5-Step Wizard inside Glassmorphism Container */}
-            <div className="lg:col-span-7 order-1 lg:order-2 w-full pt-2 pb-8 sm:pb-12">
-              <div className="rounded-2xl sm:rounded-3xl bg-[#0074db]/65 sm:bg-[#0074db]/50 backdrop-blur-md p-5 sm:p-8 md:p-10 border border-white/20 shadow-2xl text-left">
+            <div className="lg:col-span-7 order-1 lg:order-2 w-full pt-1 pb-5 sm:pb-7">
+              <div className="rounded-2xl sm:rounded-3xl bg-[#0074db]/65 sm:bg-[#0074db]/50 backdrop-blur-md p-3.5 sm:p-5 md:p-6 border border-white/20 shadow-2xl text-left">
                 <BookingWizard theme="glass-blue" />
               </div>
             </div>

@@ -542,7 +542,7 @@ export function BookingWizard({
     >
       {/* Step Header & Progress Indicator (Steps 1 to 5) */}
       {step < 6 && (
-        <div className={`mb-5 sm:mb-6 border-b ${isGlass ? "border-white/15" : "border-border/80"} pb-4 sm:pb-5`}>
+        <div className={`mb-3 sm:mb-4 border-b ${isGlass ? "border-white/15" : "border-border/80"} pb-2.5 sm:pb-3`}>
           <div className={`flex items-center justify-between text-xs font-semibold ${isGlass ? "text-white/80" : "text-muted-foreground"} uppercase tracking-wider`}>
             <span>
               Step {step}/5:{" "}
@@ -562,11 +562,11 @@ export function BookingWizard({
           </div>
 
           {/* 5-Step Progress Bar */}
-          <div className="mt-2.5 sm:mt-3 grid grid-cols-5 gap-1.5 sm:gap-2">
+          <div className="mt-2 grid grid-cols-5 gap-1.5 sm:gap-2">
             {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
+                className={`h-1.5 rounded-full transition-all duration-300 ${
                   step >= i
                     ? isGlass ? "bg-white" : "bg-brand"
                     : isGlass ? "bg-white/20" : "bg-muted"
@@ -578,7 +578,7 @@ export function BookingWizard({
       )}
 
       {errorMsg && (
-        <div className={`mb-5 flex items-center gap-2 rounded-xl p-3.5 text-sm font-medium ${
+        <div className={`mb-3 flex items-center gap-2 rounded-xl p-2.5 sm:p-3 text-xs sm:text-sm font-medium ${
           isGlass ? "bg-red-500/25 border border-red-300/40 text-white" : "border border-destructive/20 bg-destructive/10 text-destructive"
         }`}>
           <AlertCircle className={`size-4 shrink-0 ${isGlass ? "text-red-200" : ""}`} />
@@ -590,27 +590,81 @@ export function BookingWizard({
       {/* STEP 1: SERVICE SELECTION */}
       {/* ============================================================ */}
       {step === 1 && (
-        <div className="space-y-6">
-          <div>
-            <div className={`inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "bg-white/20 text-white shadow-sm" : "bg-brand-soft text-brand"
-            }`}>
-              Step 1 • Service Selection
+        <div className={isGlass ? "space-y-3 sm:space-y-3.5" : "space-y-6"}>
+          {isGlass ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Choose Service
+                </h2>
+                <p className="text-[11px] sm:text-xs text-white/80">
+                  Instant pricing • Verified technicians • 90-min doorstep arrival
+                </p>
+              </div>
+              <span className="hidden sm:inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-white uppercase">
+                Step 1 of 5
+              </span>
             </div>
-            <h2 className={`mt-2 text-xl md:text-2xl font-black tracking-tight ${
-              isGlass ? "text-white" : "text-foreground"
-            }`}>
-              Choose the HVAC Service You Need
-            </h2>
-            <p className={`mt-1 text-sm ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
-              Instant pricing, verified technicians, and guaranteed 90-minute doorstep arrival.
-            </p>
-          </div>
+          ) : (
+            <div>
+              <div className="inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-brand-soft text-brand">
+                Step 1 • Service Selection
+              </div>
+              <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+                Choose the HVAC Service You Need
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Instant pricing, verified technicians, and guaranteed 90-minute doorstep arrival.
+              </p>
+            </div>
+          )}
 
-          {/* 8 Requested Services Grid (2 cols on mobile, 4 on desktop) */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+          {/* 8 Requested Services Grid (2 Columns for Full Text Visibility) */}
+          <div className={isGlass ? "grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5" : "grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3"}>
             {SERVICES_DATA.map((svc) => {
               const isSelected = selectedCategory === svc.id;
+
+              if (isGlass) {
+                return (
+                  <button
+                    key={svc.id}
+                    type="button"
+                    onClick={() => handleCategorySelect(svc.id)}
+                    className={`group relative flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-white bg-white text-slate-900 shadow-xl ring-2 ring-white/70 font-bold scale-[1.01]"
+                        : "border-white/25 bg-white/10 hover:bg-white/20 hover:border-white/50 text-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="text-xl sm:text-2xl shrink-0 leading-none">{svc.emoji}</span>
+                      <div className="min-w-0">
+                        <div className={`text-xs sm:text-sm font-extrabold leading-tight ${
+                          isSelected ? "text-slate-900" : "text-white"
+                        }`}>
+                          {svc.title}
+                        </div>
+                        <div className={`text-[11px] font-semibold leading-tight mt-0.5 ${
+                          isSelected ? "text-slate-600 font-bold" : "text-white/80"
+                        }`}>
+                          {svc.priceText}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 flex items-center">
+                      {isSelected ? (
+                        <div className="size-5 sm:size-5.5 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-md">
+                          <Check className="size-3.5 stroke-[3]" />
+                        </div>
+                      ) : (
+                        <div className="size-5 sm:size-5.5 rounded-full border-2 border-white/40 group-hover:border-white/70" />
+                      )}
+                    </div>
+                  </button>
+                );
+              }
+
               return (
                 <button
                   key={svc.id}
@@ -618,53 +672,31 @@ export function BookingWizard({
                   onClick={() => handleCategorySelect(svc.id)}
                   className={`group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border p-3 sm:p-4 text-left transition-all cursor-pointer ${
                     isSelected
-                      ? isGlass
-                        ? "border-white bg-white text-slate-900 shadow-xl ring-2 ring-white/50"
-                        : "border-brand bg-brand/5 shadow-md ring-2 ring-brand/30"
-                      : isGlass
-                        ? "border-white/20 bg-white/10 hover:bg-white/20 hover:border-white/40 text-white"
-                        : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
+                      ? "border-brand bg-brand/5 shadow-md ring-2 ring-brand/30"
+                      : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between gap-1">
                       <span className="text-xl sm:text-2xl">{svc.emoji}</span>
-                      <span className={`rounded-full px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-black uppercase truncate max-w-[85px] sm:max-w-none ${
-                        isSelected && isGlass
-                          ? "bg-slate-900 text-white"
-                          : isGlass
-                            ? "bg-white/20 text-white"
-                            : "bg-brand-soft text-brand"
-                      }`}>
+                      <span className="rounded-full px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-black uppercase bg-brand-soft text-brand">
                         {svc.badge}
                       </span>
                     </div>
 
-                    <h3 className={`mt-2.5 sm:mt-3 font-extrabold text-xs sm:text-base flex items-center gap-1 leading-tight ${
-                      isSelected && isGlass ? "text-slate-900" : isGlass ? "text-white" : "text-foreground"
-                    }`}>
+                    <h3 className="mt-2.5 sm:mt-3 font-extrabold text-xs sm:text-base flex items-center gap-1 leading-tight text-foreground">
                       <span>{svc.title}</span>
                     </h3>
-                    <p className={`hidden sm:block mt-1 text-xs line-clamp-2 leading-relaxed ${
-                      isSelected && isGlass ? "text-slate-700" : isGlass ? "text-white/75" : "text-muted-foreground"
-                    }`}>
+                    <p className="hidden sm:block mt-1 text-xs line-clamp-2 leading-relaxed text-muted-foreground">
                       {svc.desc}
                     </p>
                   </div>
 
-                  <div className={`mt-3 sm:mt-4 flex w-full items-center justify-between border-t pt-2 sm:pt-3 ${
-                    isSelected && isGlass ? "border-slate-200" : isGlass ? "border-white/20" : "border-border/60"
-                  }`}>
-                    <span className={`text-[11px] sm:text-xs font-black ${
-                      isSelected && isGlass ? "text-slate-900" : isGlass ? "text-white" : "text-brand"
-                    }`}>{svc.priceText}</span>
-                    <span
-                      className={`text-[10px] sm:text-xs font-bold flex items-center gap-0.5 sm:gap-1 ${
-                        isSelected
-                          ? isGlass ? "text-slate-900 font-extrabold" : "text-brand"
-                          : isGlass ? "text-white/70" : "text-muted-foreground"
-                      }`}
-                    >
+                  <div className="mt-3 sm:mt-4 flex w-full items-center justify-between border-t border-border/60 pt-2 sm:pt-3">
+                    <span className="text-[11px] sm:text-xs font-black text-brand">{svc.priceText}</span>
+                    <span className={`text-[10px] sm:text-xs font-bold flex items-center gap-0.5 sm:gap-1 ${
+                      isSelected ? "text-brand" : "text-muted-foreground"
+                    }`}>
                       {isSelected ? (
                         <>
                           <Check className="size-3 sm:size-3.5" /> Selected
@@ -681,60 +713,78 @@ export function BookingWizard({
 
           {/* Sub Service Checklist */}
           {currentServiceObj.subServices.length > 0 && (
-            <div className={`rounded-2xl border p-4 ${
-              isGlass ? "border-white/20 bg-white/10 text-white" : "border-border bg-surface/40"
-            }`}>
-              <h4 className={`text-xs font-bold uppercase tracking-wider ${
-                isGlass ? "text-white/80" : "text-muted-foreground"
-              }`}>
-                Specific Work Requirement ({currentServiceObj.title}):
-              </h4>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                {currentServiceObj.subServices.map((sub) => (
-                  <button
-                    key={sub}
-                    type="button"
-                    onClick={() => setSelectedSubService(sub)}
-                    className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left text-xs font-medium transition-all ${
-                      selectedSubService === sub
-                        ? isGlass
-                          ? "border-white bg-white text-slate-900 shadow-md font-bold"
-                          : "border-brand bg-brand text-brand-foreground shadow-sm"
-                        : isGlass
-                          ? "border-white/20 bg-white/10 text-white hover:bg-white/20"
-                          : "border-border bg-card text-foreground hover:border-brand/40"
-                    }`}
+            <div className={isGlass ? "rounded-xl border border-white/20 bg-white/10 px-3 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2" : "rounded-2xl border border-border bg-surface/40 p-4"}>
+              {isGlass ? (
+                <>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-white shrink-0 flex items-center gap-1.5">
+                    <Sparkles className="size-3.5 text-amber-300" />
+                    <span>Work Requirement:</span>
+                  </label>
+                  <select
+                    value={selectedSubService}
+                    onChange={(e) => setSelectedSubService(e.target.value)}
+                    className="w-full sm:w-auto flex-1 bg-white/20 border border-white/30 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:bg-white focus:text-slate-900 transition-colors cursor-pointer"
                   >
-                    <div
-                      className={`size-3.5 rounded-full border flex items-center justify-center shrink-0 ${
-                        selectedSubService === sub
-                          ? isGlass ? "border-slate-900 bg-slate-900" : "border-white bg-white"
-                          : isGlass ? "border-white/50" : "border-muted-foreground"
-                      }`}
-                    >
-                      {selectedSubService === sub && (
-                        <div className={`size-1.5 rounded-full ${isGlass ? "bg-white" : "bg-brand"}`} />
-                      )}
-                    </div>
-                    <span>{sub}</span>
-                  </button>
-                ))}
-              </div>
+                    {currentServiceObj.subServices.map((sub) => (
+                      <option key={sub} value={sub} className="text-slate-900 bg-white font-medium">
+                        {sub}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Requirement ({currentServiceObj.title}):
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">Included in visit</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    {currentServiceObj.subServices.map((sub) => {
+                      const isSubSelected = selectedSubService === sub;
+                      return (
+                        <button
+                          key={sub}
+                          type="button"
+                          onClick={() => setSelectedSubService(sub)}
+                          className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-[11px] sm:text-xs font-medium transition-all cursor-pointer ${
+                            isSubSelected
+                              ? "border-brand bg-brand text-brand-foreground shadow-sm"
+                              : "border-border bg-card text-foreground hover:border-brand/40"
+                          }`}
+                        >
+                          <div className={`size-3 rounded-full border flex items-center justify-center shrink-0 ${
+                            isSubSelected ? "border-white bg-white" : "border-muted-foreground"
+                          }`}>
+                            {isSubSelected && <div className="size-1 rounded-full bg-brand" />}
+                          </div>
+                          <span>{sub}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           )}
 
-          <div className="flex justify-end pt-2">
+          {/* Action Row */}
+          <div className="flex items-center justify-between pt-1">
+            <div className={isGlass ? "text-[11px] text-white/80" : "text-xs text-muted-foreground"}>
+              <span className={isGlass ? "font-extrabold text-white" : "font-bold text-foreground"}>No advance payment</span> • Pay after service
+            </div>
             <button
               type="button"
               onClick={goToStep2}
-              className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3.5 text-sm font-black uppercase tracking-wider shadow-lg transition-all hover:scale-105 cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-black uppercase tracking-wider shadow-xl transition-all hover:scale-105 cursor-pointer ${
                 isGlass
-                  ? "bg-white text-slate-900 hover:bg-slate-100 shadow-xl"
+                  ? "bg-white text-slate-900 hover:bg-slate-100 shadow-2xl"
                   : "bg-brand text-brand-foreground shadow-brand/25 hover:bg-brand/90"
               }`}
             >
               <span>Continue to AC Type</span>
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-3.5 sm:size-4" />
             </button>
           </div>
         </div>
@@ -744,27 +794,61 @@ export function BookingWizard({
       {/* STEP 2: SELECT AC TYPE */}
       {/* ============================================================ */}
       {step === 2 && (
-        <div className="space-y-6">
-          <div>
-            <div className={`inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "bg-white/20 text-white shadow-sm" : "bg-brand-soft text-brand"
-            }`}>
-              Step 2 • Select AC Type
+        <div className={isGlass ? "space-y-3 sm:space-y-3.5" : "space-y-6"}>
+          {isGlass ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Select AC Type &amp; Brand
+                </h2>
+                <p className="text-[11px] sm:text-xs text-white/80">
+                  Helps technicians carry exact diagnostic tools &amp; spares
+                </p>
+              </div>
+              <span className="hidden sm:inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-white uppercase">
+                Step 2 of 5
+              </span>
             </div>
-            <h2 className={`mt-2 text-xl md:text-2xl font-black tracking-tight ${
-              isGlass ? "text-white" : "text-foreground"
-            }`}>
-              What Type of Air Conditioner?
-            </h2>
-            <p className={`mt-1 text-sm ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
-              Helps our technicians carry the exact diagnostic tools, manifold gauges, and replacement spares.
-            </p>
-          </div>
+          ) : (
+            <div>
+              <div className="inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-brand-soft text-brand">
+                Step 2 • Select AC Type
+              </div>
+              <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+                What Type of Air Conditioner?
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Helps our technicians carry the exact diagnostic tools, manifold gauges, and replacement spares.
+              </p>
+            </div>
+          )}
 
           {/* 7 Requested AC Types */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div className={isGlass ? "grid grid-cols-2 sm:grid-cols-4 gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"}>
             {AC_TYPES.map((type) => {
               const isSelected = acType === type;
+
+              if (isGlass) {
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setAcType(type)}
+                    className={`flex items-center justify-between rounded-xl border p-2 sm:p-2.5 text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-white bg-white text-slate-900 shadow-xl ring-2 ring-white/60 font-bold"
+                        : "border-white/20 bg-white/10 text-white hover:bg-white/20"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <AirVent className={`size-4 shrink-0 ${isSelected ? "text-slate-900" : "text-white"}`} />
+                      <span className="text-xs font-bold leading-tight">{type}</span>
+                    </div>
+                    {isSelected && <Check className="size-3.5 text-slate-900 shrink-0 stroke-[3]" />}
+                  </button>
+                );
+              }
+
               return (
                 <button
                   key={type}
@@ -772,31 +856,17 @@ export function BookingWizard({
                   onClick={() => setAcType(type)}
                   className={`group flex flex-col items-center justify-center rounded-2xl border p-4 text-center transition-all cursor-pointer ${
                     isSelected
-                      ? isGlass
-                        ? "border-white bg-white text-slate-900 shadow-xl ring-2 ring-white/50"
-                        : "border-brand bg-brand text-brand-foreground shadow-lg ring-2 ring-brand/30"
-                      : isGlass
-                        ? "border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/40"
-                        : "border-border bg-surface/50 text-foreground hover:border-brand/40 hover:bg-surface"
+                      ? "border-brand bg-brand text-brand-foreground shadow-lg ring-2 ring-brand/30"
+                      : "border-border bg-surface/50 text-foreground hover:border-brand/40 hover:bg-surface"
                   }`}
                 >
                   <AirVent
                     className={`size-7 mb-2 transition-transform group-hover:scale-110 ${
-                      isSelected
-                        ? isGlass ? "text-slate-900" : "text-brand-foreground"
-                        : isGlass ? "text-white" : "text-brand"
+                      isSelected ? "text-brand-foreground" : "text-brand"
                     }`}
                   />
-                  <span className={`text-sm font-bold ${
-                    isSelected && isGlass ? "text-slate-900" : isGlass ? "text-white" : ""
-                  }`}>{type}</span>
-                  <span
-                    className={`text-[10px] mt-1 ${
-                      isSelected
-                        ? isGlass ? "text-slate-700 font-bold" : "text-brand-foreground/80"
-                        : isGlass ? "text-white/70" : "text-muted-foreground"
-                    }`}
-                  >
+                  <span className="text-sm font-bold">{type}</span>
+                  <span className={`text-[10px] mt-1 ${isSelected ? "text-brand-foreground/80" : "text-muted-foreground"}`}>
                     {isSelected ? "Selected ✓" : "Tap to pick"}
                   </span>
                 </button>
@@ -806,18 +876,23 @@ export function BookingWizard({
 
           {/* Brand Selection */}
           <div>
-            <label className={`text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "text-white/80" : "text-muted-foreground"
-            }`}>
-              AC Brand / Manufacturer (Optional)
-            </label>
-            <div className="mt-2.5 flex flex-wrap gap-2">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider ${
+                isGlass ? "text-white/85" : "text-muted-foreground"
+              }`}>
+                AC Brand / Manufacturer (Optional)
+              </label>
+              <span className={`text-[10px] ${isGlass ? "text-white/70" : "text-muted-foreground"}`}>
+                Selected: <strong className={isGlass ? "text-white" : "text-foreground"}>{acBrand}</strong>
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
               {TOP_BRANDS.map((b) => (
                 <button
                   key={b}
                   type="button"
                   onClick={() => setAcBrand(b)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all ${
+                  className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
                     acBrand === b
                       ? isGlass
                         ? "border-white bg-white text-slate-900 font-bold shadow-sm"
@@ -835,48 +910,48 @@ export function BookingWizard({
 
           {/* Optional Issue description */}
           <div>
-            <label className={`text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "text-white/80" : "text-muted-foreground"
+            <label className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider ${
+              isGlass ? "text-white/85" : "text-muted-foreground"
             }`}>
               Describe Any Specific Issue or Need (Optional)
             </label>
-            <textarea
-              rows={2}
+            <input
+              type="text"
               value={issueDescription}
               onChange={(e) => setIssueDescription(e.target.value)}
               placeholder="e.g. Less cooling, water dripping on floor, bad odor, remote not working..."
-              className={`mt-2 w-full rounded-xl border p-3 text-sm focus:outline-none transition-all ${
+              className={`mt-1 w-full rounded-xl p-2.5 text-xs sm:text-sm focus:outline-none transition-all ${
                 isGlass
-                  ? "bg-[#006ccf]/60 sm:bg-white/10 border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                  : "border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
+                  ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                  : "border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
               }`}
             />
           </div>
 
-          <div className="flex items-center justify-between gap-2 pt-2">
+          <div className="flex items-center justify-between gap-2 pt-1">
             <button
               type="button"
               onClick={() => setStep(1)}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-4 py-3 text-xs sm:text-sm font-semibold shrink-0 cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold shrink-0 cursor-pointer ${
                 isGlass
                   ? "border-white/25 bg-white/15 text-white hover:bg-white/25"
                   : "border-border bg-surface text-foreground hover:bg-border/40"
               }`}
             >
-              <ArrowLeft className="size-4" />
+              <ArrowLeft className="size-3.5" />
               <span>Back</span>
             </button>
             <button
               type="button"
               onClick={goToStep3}
-              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-xl px-5 sm:px-7 py-3 text-xs sm:text-sm font-black uppercase tracking-wider shadow-lg transition-all hover:scale-105 cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-black uppercase tracking-wider shadow-xl transition-all hover:scale-105 cursor-pointer ${
                 isGlass
-                  ? "bg-white text-slate-900 hover:bg-slate-100 shadow-xl"
+                  ? "bg-white text-slate-900 hover:bg-slate-100 shadow-2xl"
                   : "bg-brand text-brand-foreground shadow-brand/25 hover:bg-brand/90"
               }`}
             >
               <span>Continue to No of ACs</span>
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-3.5 sm:size-4" />
             </button>
           </div>
         </div>
@@ -886,25 +961,37 @@ export function BookingWizard({
       {/* STEP 3: NO OF ACS (1, 2, 3, 4, 5+) */}
       {/* ============================================================ */}
       {step === 3 && (
-        <div className="space-y-6">
-          <div>
-            <div className={`inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "bg-white/20 text-white shadow-sm" : "bg-brand-soft text-brand"
-            }`}>
-              Step 3 • Number of ACs
+        <div className={isGlass ? "space-y-3 sm:space-y-3.5" : "space-y-6"}>
+          {isGlass ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  How Many AC Units?
+                </h2>
+                <p className="text-[11px] sm:text-xs text-white/80">
+                  Multi-unit bookings receive up to 15% discount
+                </p>
+              </div>
+              <span className="hidden sm:inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-white uppercase">
+                Step 3 of 5
+              </span>
             </div>
-            <h2 className={`mt-2 text-xl md:text-2xl font-black tracking-tight ${
-              isGlass ? "text-white" : "text-foreground"
-            }`}>
-              How Many AC Units Need Service?
-            </h2>
-            <p className={`mt-1 text-sm ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
-              Select the total number of air conditioners. Multi-unit bookings receive up to 15% discount!
-            </p>
-          </div>
+          ) : (
+            <div>
+              <div className="inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-brand-soft text-brand">
+                Step 3 • Number of ACs
+              </div>
+              <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+                How Many AC Units Need Service?
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Select the total number of air conditioners. Multi-unit bookings receive up to 15% discount!
+              </p>
+            </div>
+          )}
 
           {/* Requested 1, 2, 3, 4, 5+ Selection */}
-          <div className="grid grid-cols-5 gap-1.5 sm:gap-4">
+          <div className="grid grid-cols-5 gap-1.5 sm:gap-3">
             {(["1", "2", "3", "4", "5+"] as const).map((count) => {
               const isSelected = unitSelection === count;
               return (
@@ -912,7 +999,7 @@ export function BookingWizard({
                   key={count}
                   type="button"
                   onClick={() => setUnitSelection(count)}
-                  className={`flex flex-col items-center justify-center rounded-xl sm:rounded-2xl border py-3 sm:py-6 text-center transition-all cursor-pointer ${
+                  className={`flex flex-col items-center justify-center rounded-xl sm:rounded-2xl border py-2.5 sm:py-3.5 text-center transition-all cursor-pointer ${
                     isSelected
                       ? isGlass
                         ? "border-white bg-white text-slate-900 shadow-xl ring-2 sm:ring-4 ring-white/40 scale-105"
@@ -922,11 +1009,11 @@ export function BookingWizard({
                         : "border-border bg-surface/50 text-foreground hover:border-brand/40 hover:bg-surface"
                   }`}
                 >
-                  <span className={`text-xl sm:text-3xl font-black ${
+                  <span className={`text-lg sm:text-2xl font-black ${
                     isSelected && isGlass ? "text-slate-900" : isGlass ? "text-white" : ""
                   }`}>{count}</span>
                   <span
-                    className={`mt-0.5 sm:mt-1 text-[9px] sm:text-[11px] font-semibold uppercase ${
+                    className={`mt-0.5 text-[9px] sm:text-[10px] font-semibold uppercase ${
                       isSelected
                         ? isGlass ? "text-slate-700 font-bold" : "text-brand-foreground/85"
                         : isGlass ? "text-white/70" : "text-muted-foreground"
@@ -941,22 +1028,22 @@ export function BookingWizard({
 
           {/* If 5+ selected, allow custom count entry */}
           {unitSelection === "5+" && (
-            <div className={`rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            <div className={`rounded-xl border p-3 flex items-center justify-between gap-3 ${
               isGlass ? "border-white/20 bg-white/10 text-white" : "border-brand/30 bg-brand/5"
             }`}>
               <div>
-                <span className={`text-sm font-bold block ${isGlass ? "text-white" : "text-foreground"}`}>
+                <span className={`text-xs font-bold block ${isGlass ? "text-white" : "text-foreground"}`}>
                   Enter Exact Unit Count:
                 </span>
-                <span className={`text-xs block ${isGlass ? "text-white/75" : "text-muted-foreground"}`}>
+                <span className={`text-[10px] block ${isGlass ? "text-white/75" : "text-muted-foreground"}`}>
                   For corporate, school, or multi-villa bulk requests.
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setCustomUnitCount((prev) => Math.max(5, prev - 1))}
-                  className={`flex size-9 items-center justify-center rounded-xl border font-bold cursor-pointer ${
+                  className={`flex size-8 items-center justify-center rounded-lg border font-bold cursor-pointer ${
                     isGlass ? "border-white/30 bg-white/20 text-white hover:bg-white/30" : "border-border bg-card hover:bg-surface"
                   }`}
                 >
@@ -967,14 +1054,14 @@ export function BookingWizard({
                   min={5}
                   value={customUnitCount}
                   onChange={(e) => setCustomUnitCount(Math.max(5, parseInt(e.target.value, 10) || 5))}
-                  className={`w-16 text-center font-black text-lg rounded-xl border p-1 ${
+                  className={`w-14 text-center font-black text-base rounded-lg border p-1 ${
                     isGlass ? "bg-white/20 border-white/30 text-white" : "bg-card border-border text-brand"
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setCustomUnitCount((prev) => prev + 1)}
-                  className={`flex size-9 items-center justify-center rounded-xl border font-bold cursor-pointer ${
+                  className={`flex size-8 items-center justify-center rounded-lg border font-bold cursor-pointer ${
                     isGlass ? "border-white/30 bg-white/20 text-white hover:bg-white/30" : "border-border bg-card hover:bg-surface"
                   }`}
                 >
@@ -985,20 +1072,20 @@ export function BookingWizard({
           )}
 
           {/* Pricing Highlight */}
-          <div className={`rounded-2xl border p-4 flex items-center justify-between ${
+          <div className={`rounded-xl border p-2.5 sm:p-3 flex items-center justify-between ${
             isGlass ? "border-white/20 bg-white/15 text-white" : "border-brand/20 bg-brand/5"
           }`}>
             <div>
-              <span className={`font-bold text-sm block ${isGlass ? "text-white" : "text-foreground"}`}>
-                {currentServiceObj.emoji} {currentServiceObj.title} ({unitSelection}{" "}
-                {unitSelection === "1" ? "Unit" : "Units"})
+              <span className={`font-bold text-xs sm:text-sm block ${isGlass ? "text-white" : "text-foreground"}`}>
+                {currentServiceObj.emoji} {currentServiceObj.title} ({effectiveUnits}{" "}
+                {effectiveUnits === 1 ? "Unit" : "Units"})
               </span>
-              <span className={`text-xs ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
+              <span className={`text-[10px] ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
                 {effectiveUnits >= 2 ? "Multi-unit discount included • Pay after service" : "Upfront standard rate • Pay after service"}
               </span>
             </div>
             <div className="text-right">
-              <span className={`text-lg font-black ${isGlass ? "text-white text-xl" : "text-brand"}`}>
+              <span className={`text-base sm:text-lg font-black ${isGlass ? "text-white" : "text-brand"}`}>
                 {estimatedTotal > 0
                   ? `₹${estimatedTotal.toLocaleString("en-IN")}`
                   : currentServiceObj.priceText}
@@ -1006,30 +1093,30 @@ export function BookingWizard({
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-2 pt-2">
+          <div className="flex items-center justify-between gap-2 pt-1">
             <button
               type="button"
               onClick={() => setStep(2)}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-4 py-3 text-xs sm:text-sm font-semibold shrink-0 cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold shrink-0 cursor-pointer ${
                 isGlass
                   ? "border-white/25 bg-white/15 text-white hover:bg-white/25"
                   : "border-border bg-surface text-foreground hover:bg-border/40"
               }`}
             >
-              <ArrowLeft className="size-4" />
+              <ArrowLeft className="size-3.5" />
               <span>Back</span>
             </button>
             <button
               type="button"
               onClick={goToStep4}
-              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-xl px-5 sm:px-7 py-3 text-xs sm:text-sm font-black uppercase tracking-wider shadow-lg transition-all hover:scale-105 cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-black uppercase tracking-wider shadow-xl transition-all hover:scale-105 cursor-pointer ${
                 isGlass
-                  ? "bg-white text-slate-900 hover:bg-slate-100 shadow-xl"
+                  ? "bg-white text-slate-900 hover:bg-slate-100 shadow-2xl"
                   : "bg-brand text-brand-foreground shadow-brand/25 hover:bg-brand/90"
               }`}
             >
               <span>Continue to Details</span>
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-3.5 sm:size-4" />
             </button>
           </div>
         </div>
@@ -1039,44 +1126,54 @@ export function BookingWizard({
       {/* STEP 4: CUSTOMER DETAILS */}
       {/* ============================================================ */}
       {step === 4 && (
-        <div className="space-y-6">
-          <div>
-            <div className={`inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "bg-white/20 text-white shadow-sm" : "bg-brand-soft text-brand"
-            }`}>
-              Step 4 • Customer Details
+        <div className={isGlass ? "space-y-2.5 sm:space-y-3" : "space-y-6"}>
+          {isGlass ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Contact &amp; Location
+                </h2>
+                <p className="text-[11px] sm:text-xs text-white/80">
+                  Tell us where and who we are serving
+                </p>
+              </div>
+              <span className="hidden sm:inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-white uppercase">
+                Step 4 of 5
+              </span>
             </div>
-            <h2 className={`mt-2 text-xl md:text-2xl font-black tracking-tight ${
-              isGlass ? "text-white" : "text-foreground"
-            }`}>
-              Contact &amp; Service Location
-            </h2>
-            <p className={`mt-1 text-sm ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
-              Tell us where and who we are serving. Next step: pick your preferred arrival time.
-            </p>
-          </div>
+          ) : (
+            <div>
+              <div className="inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-brand-soft text-brand">
+                Step 4 • Customer Details
+              </div>
+              <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+                Contact &amp; Service Location
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Tell us where and who we are serving. Next step: pick your preferred arrival time.
+              </p>
+            </div>
+          )}
 
           {/* Contact Details */}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-2 sm:grid-cols-2">
             {/* Name */}
             <div>
-              <label className={`text-xs font-bold uppercase tracking-wider ${
-                isGlass ? "text-white/85" : "text-muted-foreground"
-              }`}>
+              <label className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
                 Name *
               </label>
-              <div className="relative mt-1.5">
-                <User className={`absolute left-3.5 top-3.5 size-4 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
+              <div className="relative">
+                <User className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
                 <input
                   type="text"
                   required
                   placeholder="e.g. Rahul Nair"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className={`w-full rounded-xl py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm focus:outline-none transition-all ${
+                  className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
                     isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
+                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
                   }`}
                 />
               </div>
@@ -1084,13 +1181,11 @@ export function BookingWizard({
 
             {/* Contact */}
             <div>
-              <label className={`text-xs font-bold uppercase tracking-wider ${
-                isGlass ? "text-white/85" : "text-muted-foreground"
-              }`}>
-                Contact (Mobile Number) *
+              <label className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
+                Mobile Number *
               </label>
-              <div className="relative mt-1.5">
-                <Phone className={`absolute left-3.5 top-3.5 size-4 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
+              <div className="relative">
+                <Phone className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
                 <input
                   type="tel"
                   required
@@ -1098,231 +1193,165 @@ export function BookingWizard({
                   placeholder="e.g. 9895688833"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
-                  className={`w-full rounded-xl py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm focus:outline-none transition-all ${
+                  className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
                     isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
+                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
                   }`}
                 />
               </div>
             </div>
           </div>
 
-          {/* WhatsApp Number with Sync Checkbox */}
-          <div className={`rounded-2xl border p-3.5 sm:p-4 ${
-            isGlass ? "border-white/20 bg-white/10 text-white" : "border-border bg-surface/40"
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <label className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
-                isGlass ? "text-white" : "text-muted-foreground"
-              }`}>
-                <MessageSquare className="size-3.5 text-[#25D366]" />
-                WhatsApp Number *
-              </label>
-              <label className={`flex items-center gap-2 cursor-pointer text-xs font-medium ${
-                isGlass ? "text-white" : "text-foreground"
-              }`}>
-                <input
-                  type="checkbox"
-                  checked={whatsappSameAsContact}
-                  onChange={(e) => setWhatsappSameAsContact(e.target.checked)}
-                  className="rounded border-border text-brand focus:ring-brand size-4 cursor-pointer"
-                />
-                <span>Same as contact number</span>
-              </label>
-            </div>
-
+          {/* WhatsApp Sync Checkbox (Compact) */}
+          <div className="flex items-center justify-between text-xs">
+            <label className={`flex items-center gap-1.5 cursor-pointer text-[11px] font-medium ${isGlass ? "text-white/90" : "text-foreground"}`}>
+              <input
+                type="checkbox"
+                checked={whatsappSameAsContact}
+                onChange={(e) => setWhatsappSameAsContact(e.target.checked)}
+                className="rounded border-border text-brand focus:ring-brand size-3.5 cursor-pointer"
+              />
+              <span>WhatsApp same as mobile number</span>
+            </label>
             {!whatsappSameAsContact && (
-              <div className="relative mt-2.5">
-                <MessageSquare className="absolute left-3.5 top-3.5 size-4 text-[#25D366]" />
-                <input
-                  type="tel"
-                  required
-                  maxLength={10}
-                  placeholder="e.g. 9895688833"
-                  value={whatsappNumber}
-                  onChange={(e) => setWhatsappNumber(e.target.value)}
-                  className={`w-full rounded-xl py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm focus:outline-none transition-all ${
-                    isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
-                  }`}
-                />
-              </div>
+              <span className="text-[10px] text-amber-300 font-semibold">Enter WhatsApp below</span>
             )}
           </div>
 
-          {/* Location Section */}
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <label className={`text-xs font-bold uppercase tracking-wider ${
-                isGlass ? "text-white/85" : "text-muted-foreground"
-              }`}>
-                Location
-              </label>
-
-              {/* "Use My Location" GPS Button */}
-              <button
-                type="button"
-                onClick={handleUseMyLocation}
-                disabled={isLocating}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition-all cursor-pointer ${
+          {!whatsappSameAsContact && (
+            <div className="relative">
+              <MessageSquare className="absolute left-3 top-2.5 size-3.5 text-[#25D366]" />
+              <input
+                type="tel"
+                required
+                maxLength={10}
+                placeholder="WhatsApp Number (10 digits)"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
                   isGlass
-                    ? "border border-white bg-white text-slate-900 hover:bg-slate-100 shadow-md"
-                    : "border-2 border-brand/30 bg-brand/10 text-brand hover:bg-brand/20 active:scale-95"
+                    ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                    : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
                 }`}
-              >
-                <LocateFixed className={`size-4 ${isLocating ? "animate-spin" : ""}`} />
-                <span>{isLocating ? "Detecting GPS..." : "📍 Use my location"}</span>
-              </button>
+              />
             </div>
+          )}
 
-            {locationStatus && (
-              <div className={`rounded-xl px-3.5 py-2 text-xs font-semibold flex items-center gap-2 ${
+          {/* Location Heading + GPS Button */}
+          <div className="flex items-center justify-between pt-0.5">
+            <span className={`text-[10px] font-bold uppercase tracking-wider ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
+              Service Address
+            </span>
+            <button
+              type="button"
+              onClick={handleUseMyLocation}
+              disabled={isLocating}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
                 isGlass
-                  ? "border border-white/30 bg-white/20 text-white"
-                  : "border border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-              }`}>
-                <CheckCircle2 className="size-4 shrink-0" />
-                <span>{locationStatus}</span>
-              </div>
-            )}
+                  ? "border border-white/40 bg-white/20 text-white hover:bg-white/30"
+                  : "border border-brand/30 bg-brand/10 text-brand hover:bg-brand/20"
+              }`}
+            >
+              <LocateFixed className={`size-3 ${isLocating ? "animate-spin" : ""}`} />
+              <span>{isLocating ? "Locating..." : "📍 Auto GPS"}</span>
+            </button>
+          </div>
 
-            <div className="relative flex py-1 items-center">
-              <div className={`flex-grow border-t ${isGlass ? "border-white/20" : "border-border"}`}></div>
-              <span className={`flex-shrink mx-4 text-[11px] font-bold uppercase tracking-wider ${
-                isGlass ? "text-white/75" : "text-muted-foreground"
-              }`}>
-                or enter manually
-              </span>
-              <div className={`flex-grow border-t ${isGlass ? "border-white/20" : "border-border"}`}></div>
+          {locationStatus && (
+            <div className={`rounded-lg px-2.5 py-1 text-[10px] font-medium flex items-center gap-1.5 ${
+              isGlass ? "border border-white/30 bg-white/20 text-white" : "border border-emerald-500/20 bg-emerald-500/10 text-emerald-700"
+            }`}>
+              <CheckCircle2 className="size-3 shrink-0" />
+              <span className="truncate">{locationStatus}</span>
+            </div>
+          )}
+
+          {/* House / Flat + Area */}
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div className="relative">
+              <Home className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
+              <input
+                type="text"
+                placeholder="House / Flat / Building"
+                value={houseBuilding}
+                onChange={(e) => setHouseBuilding(e.target.value)}
+                className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                  isGlass
+                    ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                    : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
+                }`}
+              />
             </div>
 
-            {/* House / Building */}
-            <div>
-              <label className={`text-xs font-semibold ${isGlass ? "text-white" : "text-foreground"}`}>
-                House / Building
-              </label>
-              <div className="relative mt-1">
-                <Home className={`absolute left-3.5 top-3.5 size-4 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
-                <input
-                  type="text"
-                  placeholder="e.g. TC 14/120, Rose Villa / Flat 4B, Blue Horizon"
-                  value={houseBuilding}
-                  onChange={(e) => setHouseBuilding(e.target.value)}
-                  className={`w-full rounded-xl py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm focus:outline-none transition-all ${
-                    isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
-                  }`}
-                />
-              </div>
-            </div>
-
-            {/* Area & City */}
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <label className={`text-xs font-semibold ${isGlass ? "text-white" : "text-foreground"}`}>Area *</label>
-                <div className="relative mt-1">
-                  <MapPin className={`absolute left-3.5 top-3.5 size-4 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Kadappakada / MG Road / Kakkanad"
-                    value={area}
-                    onChange={(e) => setArea(e.target.value)}
-                    className={`w-full rounded-xl py-3 sm:py-2.5 pl-10 pr-4 text-base sm:text-sm focus:outline-none transition-all ${
-                      isGlass
-                        ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                        : "border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
-                    }`}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className={`text-xs font-semibold ${isGlass ? "text-white" : "text-foreground"}`}>City *</label>
-                <input
-                  list="city-suggestions"
-                  type="text"
-                  required
-                  placeholder="e.g. Kollam / Thiruvananthapuram"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className={`mt-1 w-full rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:outline-none transition-all ${
-                    isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                      : "border border-border bg-card text-foreground focus:border-brand focus:ring-1 focus:ring-brand"
-                  }`}
-                />
-                <datalist id="city-suggestions">
-                  {MAJOR_CITIES.map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-              </div>
-            </div>
-
-            {/* PIN Code & Landmark */}
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <label className={`text-xs font-semibold ${isGlass ? "text-white" : "text-foreground"}`}>PIN Code *</label>
-                <input
-                  type="text"
-                  required
-                  maxLength={6}
-                  placeholder="e.g. 691001"
-                  value={pincode}
-                  onChange={(e) => setPincode(e.target.value)}
-                  className={`mt-1 w-full rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:outline-none transition-all ${
-                    isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
-                  }`}
-                />
-              </div>
-
-              <div>
-                <label className={`text-xs font-semibold ${isGlass ? "text-white" : "text-foreground"}`}>Landmark</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Near SBI Bank / Opp. Metro Pillar 32"
-                  value={landmark}
-                  onChange={(e) => setLandmark(e.target.value)}
-                  className={`mt-1 w-full rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:outline-none transition-all ${
-                    isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
-                  }`}
-                />
-              </div>
+            <div className="relative">
+              <MapPin className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
+              <input
+                type="text"
+                required
+                placeholder="Area / Locality *"
+                value={area}
+                onChange={(e) => setArea(e.target.value)}
+                className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                  isGlass
+                    ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                    : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
+                }`}
+              />
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-2 pt-2">
+          {/* City & PIN */}
+          <div className="grid gap-2 sm:grid-cols-2">
+            <input
+              list="city-suggestions"
+              type="text"
+              required
+              placeholder="City (e.g. Kollam) *"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className={`w-full rounded-xl py-2 px-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                isGlass
+                  ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                  : "border border-border bg-card text-foreground"
+              }`}
+            />
+            <input
+              type="text"
+              required
+              maxLength={6}
+              placeholder="PIN Code (e.g. 691001) *"
+              value={pincode}
+              onChange={(e) => setPincode(e.target.value)}
+              className={`w-full rounded-xl py-2 px-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                isGlass
+                  ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                  : "border border-border bg-card text-foreground"
+              }`}
+            />
+          </div>
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between gap-2 pt-1">
             <button
               type="button"
               onClick={() => setStep(3)}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-4 py-3 text-xs sm:text-sm font-semibold shrink-0 cursor-pointer ${
-                isGlass
-                  ? "border-white/25 bg-white/15 text-white hover:bg-white/25"
-                  : "border-border bg-surface text-foreground hover:bg-border/40"
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold shrink-0 cursor-pointer ${
+                isGlass ? "border-white/25 bg-white/15 text-white hover:bg-white/25" : "border-border bg-surface text-foreground"
               }`}
             >
-              <ArrowLeft className="size-4" />
+              <ArrowLeft className="size-3.5" />
               <span>Back</span>
             </button>
             <button
               type="button"
               onClick={goToStep5}
-              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-xl px-5 sm:px-8 py-3.5 text-xs sm:text-sm font-black uppercase tracking-wider shadow-xl transition-all hover:scale-105 cursor-pointer ${
-                isGlass
-                  ? "bg-white text-slate-900 hover:bg-slate-100 shadow-2xl"
-                  : "bg-brand text-brand-foreground shadow-brand/30 hover:bg-brand/90"
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-black uppercase tracking-wider shadow-xl transition-all hover:scale-105 cursor-pointer ${
+                isGlass ? "bg-white text-slate-900 hover:bg-slate-100 shadow-2xl" : "bg-brand text-brand-foreground"
               }`}
             >
               <span>Continue to Time</span>
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-3.5 sm:size-4" />
             </button>
           </div>
         </div>
@@ -1332,163 +1361,109 @@ export function BookingWizard({
       {/* STEP 5: PREFERRED TIME */}
       {/* ============================================================ */}
       {step === 5 && (
-        <form onSubmit={handleSubmitBooking} className="space-y-6">
-          <div>
-            <div className={`inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "bg-white/20 text-white shadow-sm" : "bg-brand-soft text-brand"
-            }`}>
-              Step 5 • Preferred Time
+        <form onSubmit={handleSubmitBooking} className={isGlass ? "space-y-2.5 sm:space-y-3" : "space-y-6"}>
+          {isGlass ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Preferred Arrival Time
+                </h2>
+                <p className="text-[11px] sm:text-xs text-white/80">
+                  Open 7 days a week, 8:00 AM – 9:00 PM
+                </p>
+              </div>
+              <span className="hidden sm:inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-white uppercase">
+                Step 5 of 5
+              </span>
             </div>
-            <h2 className={`mt-2 text-xl md:text-2xl font-black tracking-tight ${
-              isGlass ? "text-white" : "text-foreground"
-            }`}>
-              When Should Our Technician Arrive?
-            </h2>
-            <p className={`mt-1 text-sm ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
-              Select your preferred service day and arrival slot. Our certified team works 7 days a week, 8:00 AM – 9:00 PM.
-            </p>
-          </div>
+          ) : (
+            <div>
+              <div className="inline-block rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-brand-soft text-brand">
+                Step 5 • Preferred Time
+              </div>
+              <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+                When Should Our Technician Arrive?
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Select your preferred service day and arrival slot. Our certified team works 7 days a week, 8:00 AM – 9:00 PM.
+              </p>
+            </div>
+          )}
 
           {/* Service Day Selection */}
-          <div className="space-y-3">
-            <label className={`text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "text-white/85" : "text-muted-foreground"
-            }`}>
+          <div>
+            <span className={`text-[10px] font-bold uppercase tracking-wider block mb-1.5 ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
               Service Day *
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            </span>
+            <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setDateOption("today")}
-                className={`flex flex-col items-start rounded-2xl border p-4 text-left transition-all cursor-pointer ${
+                className={`flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-center transition-all cursor-pointer ${
                   dateOption === "today"
-                    ? isGlass
-                      ? "border-white bg-white text-slate-900 shadow-xl ring-2 ring-white/50"
-                      : "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
-                    : isGlass
-                      ? "border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/40"
-                      : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
+                    ? isGlass ? "border-white bg-white text-slate-900 shadow-lg font-bold" : "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
+                    : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50"
                 }`}
               >
-                <div className="flex w-full items-center justify-between">
-                  <span className={`text-base font-black ${
-                    dateOption === "today" && isGlass ? "text-slate-900" : isGlass ? "text-white" : "text-foreground"
-                  }`}>Today</span>
-                  <span className={`rounded-md px-2 py-0.5 text-[10px] font-black ${
-                    dateOption === "today" && isGlass
-                      ? "bg-slate-900 text-white"
-                      : isGlass
-                        ? "bg-white/20 text-white"
-                        : "bg-emerald-500/10 text-emerald-600"
-                  }`}>
-                    ⚡ 90-Min Arrival
-                  </span>
-                </div>
-                <span className={`mt-1 text-xs ${
-                  dateOption === "today" && isGlass ? "text-slate-700" : isGlass ? "text-white/75" : "text-muted-foreground"
-                }`}>
-                  Immediate breakdown &amp; express arrival
+                <span className="text-xs font-black">Today</span>
+                <span className={`text-[9px] font-bold mt-0.5 ${dateOption === "today" && isGlass ? "text-slate-700" : "text-emerald-300"}`}>
+                  ⚡ 90-Min
                 </span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setDateOption("tomorrow")}
-                className={`flex flex-col items-start rounded-2xl border p-4 text-left transition-all cursor-pointer ${
+                className={`flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-center transition-all cursor-pointer ${
                   dateOption === "tomorrow"
-                    ? isGlass
-                      ? "border-white bg-white text-slate-900 shadow-xl ring-2 ring-white/50"
-                      : "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
-                    : isGlass
-                      ? "border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/40"
-                      : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
+                    ? isGlass ? "border-white bg-white text-slate-900 shadow-lg font-bold" : "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
+                    : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50"
                 }`}
               >
-                <div className="flex w-full items-center justify-between">
-                  <span className={`text-base font-black ${
-                    dateOption === "tomorrow" && isGlass ? "text-slate-900" : isGlass ? "text-white" : "text-foreground"
-                  }`}>Tomorrow</span>
-                  <span className={`rounded-md px-2 py-0.5 text-[10px] font-black ${
-                    dateOption === "tomorrow" && isGlass
-                      ? "bg-slate-900 text-white"
-                      : isGlass
-                        ? "bg-white/20 text-white"
-                        : "bg-brand-soft text-brand"
-                  }`}>
-                    Guaranteed Slot
-                  </span>
-                </div>
-                <span className={`mt-1 text-xs ${
-                  dateOption === "tomorrow" && isGlass ? "text-slate-700" : isGlass ? "text-white/75" : "text-muted-foreground"
-                }`}>
-                  Scheduled regular service visit
+                <span className="text-xs font-black">Tomorrow</span>
+                <span className={`text-[9px] font-semibold mt-0.5 ${dateOption === "tomorrow" && isGlass ? "text-slate-700" : "text-white/70"}`}>
+                  Scheduled
                 </span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setDateOption("custom")}
-                className={`flex flex-col items-start rounded-2xl border p-4 text-left transition-all cursor-pointer ${
+                className={`flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-center transition-all cursor-pointer ${
                   dateOption === "custom"
-                    ? isGlass
-                      ? "border-white bg-white text-slate-900 shadow-xl ring-2 ring-white/50"
-                      : "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
-                    : isGlass
-                      ? "border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/40"
-                      : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
+                    ? isGlass ? "border-white bg-white text-slate-900 shadow-lg font-bold" : "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
+                    : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50"
                 }`}
               >
-                <div className="flex w-full items-center justify-between">
-                  <span className={`text-base font-black ${
-                    dateOption === "custom" && isGlass ? "text-slate-900" : isGlass ? "text-white" : "text-foreground"
-                  }`}>Pick Date</span>
-                  <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${
-                    dateOption === "custom" && isGlass
-                      ? "bg-slate-900 text-white"
-                      : isGlass
-                        ? "bg-white/20 text-white"
-                        : "bg-muted text-muted-foreground"
-                  }`}>
-                    Advance
-                  </span>
-                </div>
-                <span className={`mt-1 text-xs ${
-                  dateOption === "custom" && isGlass ? "text-slate-700" : isGlass ? "text-white/75" : "text-muted-foreground"
-                }`}>
-                  Choose specific upcoming date
+                <span className="text-xs font-black">Pick Date</span>
+                <span className={`text-[9px] font-semibold mt-0.5 ${dateOption === "custom" && isGlass ? "text-slate-700" : "text-white/70"}`}>
+                  Calendar
                 </span>
               </button>
             </div>
 
             {dateOption === "custom" && (
-              <div className="pt-1">
-                <label className={`text-xs font-semibold ${isGlass ? "text-white" : "text-foreground"}`}>
-                  Select Specific Calendar Date:
-                </label>
-                <input
-                  type="date"
-                  required
-                  min={new Date().toISOString().split("T")[0]}
-                  value={customDate}
-                  onChange={(e) => setCustomDate(e.target.value)}
-                  className={`mt-1.5 w-full rounded-xl p-3 text-sm focus:outline-none transition-all ${
-                    isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                      : "border border-border bg-card text-foreground focus:border-brand focus:ring-1 focus:ring-brand"
-                  }`}
-                />
-              </div>
+              <input
+                type="date"
+                required
+                min={new Date().toISOString().split("T")[0]}
+                value={customDate}
+                onChange={(e) => setCustomDate(e.target.value)}
+                className={`mt-2 w-full rounded-xl py-1.5 px-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                  isGlass
+                    ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white focus:bg-[#006ccf]/90 focus:border-white"
+                    : "border border-border bg-card text-foreground"
+                }`}
+              />
             )}
           </div>
 
           {/* Time Slot Selection */}
-          <div className="space-y-3">
-            <label className={`text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "text-white/85" : "text-muted-foreground"
-            }`}>
-              Preferred Arrival Window *
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <span className={`text-[10px] font-bold uppercase tracking-wider block mb-1.5 ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
+              Preferred Window *
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {TIME_SLOTS.map((slot) => {
                 const isSelected = preferredSlot === slot.label;
                 return (
@@ -1496,140 +1471,83 @@ export function BookingWizard({
                     key={slot.id}
                     type="button"
                     onClick={() => setPreferredSlot(slot.label)}
-                    className={`flex items-center justify-between rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
+                    className={`flex items-center justify-between rounded-xl border px-2.5 py-1.5 text-left transition-all cursor-pointer ${
                       isSelected
-                        ? isGlass
-                          ? "border-white bg-white text-slate-900 shadow-xl ring-2 ring-white/50"
-                          : "border-brand bg-brand text-brand-foreground shadow-md ring-2 ring-brand/30"
-                        : isGlass
-                          ? "border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/40"
-                          : "border-border bg-surface/50 text-foreground hover:border-brand/40 hover:bg-surface"
+                        ? isGlass ? "border-white bg-white text-slate-900 shadow-md font-bold" : "border-brand bg-brand text-brand-foreground shadow-md"
+                        : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50"
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
-                      <Clock
-                        className={`size-4 shrink-0 ${
-                          isSelected
-                            ? isGlass ? "text-slate-900" : "text-brand-foreground"
-                            : isGlass ? "text-white" : "text-brand"
-                        }`}
-                      />
-                      <div>
-                        <div className={`text-xs sm:text-sm font-bold ${
-                          isSelected && isGlass ? "text-slate-900" : isGlass ? "text-white" : ""
-                        }`}>{slot.label}</div>
-                        <div
-                          className={`text-[10px] ${
-                            isSelected
-                              ? isGlass ? "text-slate-700 font-semibold" : "text-brand-foreground/80"
-                              : isGlass ? "text-white/75" : "text-muted-foreground"
-                          }`}
-                        >
-                          {slot.note}
-                        </div>
-                      </div>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Clock className={`size-3 shrink-0 ${isSelected && isGlass ? "text-slate-900" : "text-white/80"}`} />
+                      <span className="text-[11px] font-bold leading-tight">{slot.label}</span>
                     </div>
-                    {isSelected && (
-                      <Check className={`size-4 shrink-0 ${isGlass ? "text-slate-900 font-bold" : "text-brand-foreground"}`} />
-                    )}
+                    {isSelected && <Check className="size-3.5 text-slate-900 shrink-0 stroke-[3]" />}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Special Timing / Arrival Notes */}
+          {/* Special Instructions (Optional) */}
           <div>
-            <label className={`text-xs font-bold uppercase tracking-wider ${
-              isGlass ? "text-white/85" : "text-muted-foreground"
-            }`}>
-              Special Instructions for Technician (Optional)
+            <label className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
+              Special Instructions (Optional)
             </label>
             <input
               type="text"
-              placeholder="e.g. Call 30 mins before arrival, ring doorbell twice, visit after 10 AM..."
+              placeholder="e.g. Call before arrival, ring doorbell twice..."
               value={specialTimingNotes}
               onChange={(e) => setSpecialTimingNotes(e.target.value)}
-              className={`mt-1.5 w-full rounded-xl p-3 text-base sm:text-sm focus:outline-none transition-all ${
+              className={`w-full rounded-xl py-1.5 px-3 text-xs sm:text-sm focus:outline-none transition-all ${
                 isGlass
-                  ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-2 focus:ring-white/25"
-                  : "border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand focus:ring-1 focus:ring-brand"
+                  ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                  : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
               }`}
             />
           </div>
 
           {/* Complete Booking Review Card */}
-          <div className={`rounded-2xl border p-4 sm:p-5 space-y-3 text-sm ${
+          <div className={`rounded-xl border p-2.5 sm:p-3 text-xs ${
             isGlass ? "border-white/20 bg-white/15 text-white" : "border-2 border-brand/20 bg-brand/5"
           }`}>
-            <div className={`flex items-center justify-between border-b pb-2 ${
-              isGlass ? "border-white/15" : "border-brand/10"
-            }`}>
-              <span className={`font-extrabold ${isGlass ? "text-white" : "text-foreground"}`}>
-                {currentServiceObj.emoji} {currentServiceObj.title}
+            <div className="flex items-center justify-between pb-1.5 border-b border-white/15">
+              <span className="font-extrabold text-white">
+                {currentServiceObj.emoji} {currentServiceObj.title} • {acType} ({effectiveUnits} {effectiveUnits === 1 ? "Unit" : "Units"})
               </span>
-              <span className={`font-black text-base ${isGlass ? "text-white text-lg" : "text-brand"}`}>
-                {estimatedTotal > 0
-                  ? `₹${estimatedTotal.toLocaleString("en-IN")}`
-                  : currentServiceObj.priceText}
+              <span className="font-black text-sm text-white">
+                {estimatedTotal > 0 ? `₹${estimatedTotal.toLocaleString("en-IN")}` : currentServiceObj.priceText}
               </span>
             </div>
-
-            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs ${
-              isGlass ? "text-white/85" : "text-muted-foreground"
-            }`}>
-              <div>
-                <strong className={isGlass ? "text-white" : "text-foreground"}>AC Type:</strong> {acType} ({unitSelection}{" "}
-                {unitSelection === "1" ? "Unit" : "Units"})
-              </div>
-              <div>
-                <strong className={isGlass ? "text-white" : "text-foreground"}>Customer:</strong> {customerName} ({contactPhone})
-              </div>
-              <div>
-                <strong className={isGlass ? "text-white" : "text-foreground"}>Location:</strong> {area}, {city} - {pincode}
-              </div>
-              <div>
-                <strong className={isGlass ? "text-white" : "text-foreground"}>Schedule:</strong>{" "}
-                {dateOption === "today" ? "Today" : dateOption === "tomorrow" ? "Tomorrow" : customDate} • {preferredSlot}
-              </div>
-            </div>
-
-            <div className={`pt-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-[11px] font-semibold ${
-              isGlass ? "text-emerald-300" : "text-emerald-600"
-            }`}>
-              <span className="flex items-center gap-1">
-                <CheckCircle2 className="size-3.5" /> 30-Day Post-Service Guarantee
-              </span>
-              <span className={isGlass ? "text-white font-bold" : "text-foreground font-bold"}>
-                Pay After Service (Cash / UPI)
-              </span>
+            <div className="flex flex-wrap items-center justify-between gap-1 pt-1.5 text-[10px] text-white/80">
+              <span>📍 {area || "Local"}, {city}</span>
+              <span className="text-emerald-300 font-bold">✓ Pay After Service (Cash/UPI)</span>
             </div>
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-between gap-2 pt-2">
+          <div className="flex items-center justify-between gap-2 pt-1">
             <button
               type="button"
               onClick={() => setStep(4)}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-4 py-3 text-xs sm:text-sm font-semibold shrink-0 cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold shrink-0 cursor-pointer ${
                 isGlass
                   ? "border-white/25 bg-white/15 text-white hover:bg-white/25"
                   : "border-border bg-surface text-foreground hover:bg-border/40"
               }`}
             >
-              <ArrowLeft className="size-4" />
+              <ArrowLeft className="size-3.5" />
               <span>Back</span>
             </button>
             <button
               type="submit"
-              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-xl px-5 sm:px-8 py-3.5 text-xs sm:text-sm font-black uppercase tracking-wider shadow-2xl transition-all hover:scale-105 cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-black uppercase tracking-wider shadow-2xl transition-all hover:scale-105 cursor-pointer ${
                 isGlass
                   ? "bg-white text-slate-900 hover:bg-slate-100 shadow-2xl"
                   : "bg-brand text-brand-foreground shadow-brand/40 hover:bg-brand/90"
               }`}
             >
               <span>Confirm &amp; Book</span>
-              <CheckCircle2 className="size-4" />
+              <CheckCircle2 className="size-3.5 sm:size-4" />
             </button>
           </div>
         </form>
