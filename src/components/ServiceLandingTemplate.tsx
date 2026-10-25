@@ -14,6 +14,7 @@ import {
   Users,
   Wrench,
   ThumbsUp,
+  Calendar,
 } from "lucide-react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
@@ -145,9 +146,10 @@ export function ServiceLandingTemplate({
                 <button
                   type="button"
                   onClick={scrollToBooking}
-                  className="rounded-2xl bg-brand px-6 py-3.5 text-sm font-black text-brand-foreground shadow-xl shadow-brand/30 transition-all hover:opacity-95"
+                  className="flex items-center gap-2.5 rounded-2xl bg-brand px-8 py-4 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90 hover:shadow-brand/60 ring-4 ring-brand/20 animate-pulse"
                 >
-                  Book Instant Slot Now
+                  <Calendar className="size-4" />
+                  <span>BOOK SERVICE NOW</span>
                 </button>
 
                 <a
@@ -255,13 +257,10 @@ export function ServiceLandingTemplate({
                   <button
                     type="button"
                     onClick={scrollToBooking}
-                    className={`w-full rounded-xl py-3 text-xs font-black uppercase tracking-wider transition-all ${
-                      pkg.popular
-                        ? "bg-brand text-brand-foreground shadow-md shadow-brand/25 hover:opacity-95"
-                        : "bg-surface border border-border text-foreground hover:bg-muted"
-                    }`}
+                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-brand py-3.5 px-4 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-md shadow-brand/20 transition-all hover:scale-[1.02] hover:bg-brand/90 hover:shadow-lg"
                   >
-                    Select & Book Slot
+                    <Calendar className="size-4" />
+                    <span>BOOK THIS SERVICE NOW</span>
                   </button>
                 </div>
               </div>
@@ -449,9 +448,10 @@ export function ServiceLandingTemplate({
             <button
               type="button"
               onClick={scrollToBooking}
-              className="rounded-2xl bg-white px-7 py-3.5 text-sm font-black text-brand shadow-xl transition-all hover:bg-white/90"
+              className="flex items-center gap-2 rounded-2xl bg-white px-8 py-4 text-sm font-black uppercase tracking-wider text-brand shadow-2xl transition-all hover:scale-105 hover:bg-white/95"
             >
-              Book Service Now
+              <Calendar className="size-4" />
+              <span>BOOK SERVICE NOW</span>
             </button>
             <a
               href={`tel:${EGS_CALL_NUMBER}`}

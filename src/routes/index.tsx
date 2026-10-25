@@ -23,6 +23,7 @@ import {
   Building2,
   MessageSquare,
   CheckCircle2,
+  Calendar,
 } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Navbar } from "@/components/Navbar";
@@ -177,9 +178,10 @@ function Hero() {
         <div className="mt-8 flex flex-wrap justify-center items-center gap-3 animate-fade-in-up-delay-2">
           <Link
             to="/book"
-            className="rounded-2xl bg-brand px-7 py-3.5 text-sm font-extrabold text-brand-foreground shadow-lg shadow-brand/30 transition-all hover:opacity-95 hover:scale-[1.02]"
+            className="flex items-center gap-2 rounded-2xl bg-brand px-8 py-4 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90 hover:shadow-brand/60 ring-4 ring-brand/20 animate-pulse"
           >
-            Book Service (90-Min Arrival)
+            <Calendar className="size-4" />
+            <span>BOOK SERVICE (90-MIN ARRIVAL)</span>
           </Link>
           <a
             href={`tel:${EGS_CALL_NUMBER}`}
@@ -409,18 +411,19 @@ function Services() {
                 <div className="mt-4 font-black text-brand text-lg">{price}</div>
               </div>
 
-              <div className="mt-8 border-t border-border pt-4 flex items-center justify-between">
+              <div className="mt-8 border-t border-border pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <Link
                   to={href}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand hover:underline"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-brand"
                 >
-                  View Details & Pricing <ArrowRight className="size-3.5" />
+                  Details <ArrowRight className="size-3.5" />
                 </Link>
                 <Link
                   to="/book"
-                  className="rounded-xl bg-brand px-3 py-1.5 text-xs font-black text-brand-foreground shadow hover:opacity-90"
+                  className="flex items-center justify-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-md shadow-brand/20 transition-all hover:scale-105 hover:bg-brand/90 hover:shadow-lg"
                 >
-                  Book Slot
+                  <Calendar className="size-3.5" />
+                  <span>BOOK SERVICE</span>
                 </Link>
               </div>
             </article>

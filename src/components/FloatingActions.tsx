@@ -49,26 +49,36 @@ export function FloatingActions() {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="flex flex-[1.6] items-center justify-center gap-1.5 rounded-xl bg-brand py-2.5 px-3 text-brand-foreground font-extrabold text-xs shadow-md shadow-brand/30 transition-transform active:scale-95"
+            className="flex flex-[1.6] items-center justify-center gap-1.5 rounded-xl bg-brand py-3 px-3 text-brand-foreground font-black text-xs uppercase tracking-wider shadow-lg shadow-brand/40 transition-transform active:scale-95 animate-pulse"
           >
             <Calendar className="size-4 shrink-0" />
-            <span>Book Service</span>
+            <span>BOOK SERVICE</span>
           </button>
         </div>
       </div>
 
       {/* Desktop Floating Actions Widget */}
       <div className="fixed bottom-8 right-8 z-50 hidden md:flex flex-col items-end gap-3">
+        {/* Instant Book Service Floating Button */}
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="group flex items-center gap-2.5 rounded-full bg-brand px-5 py-3 text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:shadow-brand/60 ring-2 ring-brand/30 animate-pulse"
+        >
+          <Calendar className="size-5" />
+          <span className="text-xs font-black uppercase tracking-wider">BOOK SERVICE</span>
+        </button>
+
         {/* WhatsApp Floating Pill */}
         <a
           href={waURL}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => trackWhatsAppClick("desktop_floating_pill")}
-          className="group flex items-center gap-2.5 rounded-full bg-[#25D366] px-4 py-3 text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:shadow-2xl"
+          className="group flex items-center gap-2.5 rounded-full bg-[#25D366] px-4 py-2.5 text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:shadow-2xl"
         >
-          <MessageSquare className="size-5 fill-current" />
-          <span className="text-xs font-bold tracking-wide">Chat on WhatsApp</span>
+          <MessageSquare className="size-4 fill-current" />
+          <span className="text-xs font-bold tracking-wide">WhatsApp</span>
         </a>
 
         {/* Call Floating Pill */}
