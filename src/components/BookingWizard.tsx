@@ -713,59 +713,45 @@ export function BookingWizard({
 
           {/* Sub Service Checklist */}
           {currentServiceObj.subServices.length > 0 && (
-            <div className={isGlass ? "rounded-xl border border-white/20 bg-white/10 px-3 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2" : "rounded-2xl border border-border bg-surface/40 p-4"}>
-              {isGlass ? (
-                <>
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-white shrink-0 flex items-center gap-1.5">
-                    <Sparkles className="size-3.5 text-amber-300" />
-                    <span>Work Requirement:</span>
-                  </label>
-                  <select
-                    value={selectedSubService}
-                    onChange={(e) => setSelectedSubService(e.target.value)}
-                    className="w-full sm:w-auto flex-1 bg-white/20 border border-white/30 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:bg-white focus:text-slate-900 transition-colors cursor-pointer"
+            <div className={`rounded-2xl border p-3.5 sm:p-4 ${
+              isGlass ? "border-white/20 bg-white/10 text-white" : "border-border bg-surface/40"
+            }`}>
+              <h4 className={`text-xs font-bold uppercase tracking-wider ${
+                isGlass ? "text-white/85" : "text-muted-foreground"
+              }`}>
+                Specific Work Requirement ({currentServiceObj.title}):
+              </h4>
+              <div className="mt-2.5 sm:mt-3 grid gap-2 sm:grid-cols-2">
+                {currentServiceObj.subServices.map((sub) => (
+                  <button
+                    key={sub}
+                    type="button"
+                    onClick={() => setSelectedSubService(sub)}
+                    className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left text-xs font-medium transition-all cursor-pointer ${
+                      selectedSubService === sub
+                        ? isGlass
+                          ? "border-white bg-white text-slate-900 shadow-md font-bold"
+                          : "border-brand bg-brand text-brand-foreground shadow-sm"
+                        : isGlass
+                          ? "border-white/20 bg-white/10 text-white hover:bg-white/20"
+                          : "border-border bg-card text-foreground hover:border-brand/40"
+                    }`}
                   >
-                    {currentServiceObj.subServices.map((sub) => (
-                      <option key={sub} value={sub} className="text-slate-900 bg-white font-medium">
-                        {sub}
-                      </option>
-                    ))}
-                  </select>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Requirement ({currentServiceObj.title}):
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">Included in visit</span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                    {currentServiceObj.subServices.map((sub) => {
-                      const isSubSelected = selectedSubService === sub;
-                      return (
-                        <button
-                          key={sub}
-                          type="button"
-                          onClick={() => setSelectedSubService(sub)}
-                          className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-[11px] sm:text-xs font-medium transition-all cursor-pointer ${
-                            isSubSelected
-                              ? "border-brand bg-brand text-brand-foreground shadow-sm"
-                              : "border-border bg-card text-foreground hover:border-brand/40"
-                          }`}
-                        >
-                          <div className={`size-3 rounded-full border flex items-center justify-center shrink-0 ${
-                            isSubSelected ? "border-white bg-white" : "border-muted-foreground"
-                          }`}>
-                            {isSubSelected && <div className="size-1 rounded-full bg-brand" />}
-                          </div>
-                          <span>{sub}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
+                    <div
+                      className={`size-3.5 rounded-full border flex items-center justify-center shrink-0 ${
+                        selectedSubService === sub
+                          ? isGlass ? "border-slate-900 bg-slate-900" : "border-white bg-white"
+                          : isGlass ? "border-white/50" : "border-muted-foreground"
+                      }`}
+                    >
+                      {selectedSubService === sub && (
+                        <div className={`size-1.5 rounded-full ${isGlass ? "bg-white" : "bg-brand"}`} />
+                      )}
+                    </div>
+                    <span>{sub}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
