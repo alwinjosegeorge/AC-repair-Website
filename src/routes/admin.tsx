@@ -4,6 +4,7 @@ import {
   Booking,
   Technician,
   AMCContract,
+  AMCServiceFrequency,
   Customer,
   CustomerBookingHistory,
   BookingStatus,
@@ -11,9 +12,14 @@ import {
   getBookings,
   getTechnicians,
   getAMCContracts,
+  renewAMCContract,
+  scheduleAMCNextService,
+  saveAMCContract,
   getCustomers,
   updateBookingStatus,
   generateAdminToCustomerWhatsAppURL,
+  generateAMCRenewalWhatsAppURL,
+  generateAMCRenewalConfirmationWhatsAppURL,
   EGS_CALL_NUMBER,
   EGS_WHATSAPP_NUMBER,
 } from "@/lib/store";
@@ -142,6 +148,35 @@ export function AdminDashboard() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  // AMC Renewal System State
+  const [amcSectionTab, setAmcSectionTab] = useState<"all" | "expiring_soon" | "active" | "expired" | "renewed">("all");
+  const [renewModalContract, setRenewModalContract] = useState<AMCContract | null>(null);
+  const [scheduleServiceContract, setScheduleServiceContract] = useState<AMCContract | null>(null);
+  const [showNewAMCModal, setShowNewAMCModal] = useState(false);
+  const [amcActionToast, setAmcActionToast] = useState<string | null>(null);
+
+  // Renewal form inputs
+  const [renewalAmount, setRenewalAmount] = useState<number>(0);
+  const [renewalPaymentMode, setRenewalPaymentMode] = useState<string>("UPI / GPay");
+  const [renewalDiscountPercent, setRenewalDiscountPercent] = useState<number>(0);
+  const [renewalNotes, setRenewalNotes] = useState<string>("");
+
+  // Schedule visit inputs
+  const [serviceVisitDate, setServiceVisitDate] = useState<string>("");
+  const [serviceVisitSlot, setServiceVisitSlot] = useState<string>("Morning Slot (9:00 AM - 12:00 PM)");
+  const [serviceVisitTechId, setServiceVisitTechId] = useState<string>("tech-1");
+
+  // New AMC contract form inputs
+  const [newCustName, setNewCustName] = useState("");
+  const [newCustPhone, setNewCustPhone] = useState("");
+  const [newCustCity, setNewCustCity] = useState("Ernakulam / Cochin");
+  const [newCustAddress, setNewCustAddress] = useState("");
+  const [newPlanName, setNewPlanName] = useState("Comprehensive Care");
+  const [newUnitsCount, setNewUnitsCount] = useState(2);
+  const [newFrequency, setNewFrequency] = useState<AMCServiceFrequency>("Quarterly (4 Services/Year)");
+  const [newContractAmount, setNewContractAmount] = useState(4999);
+  const [newStartDate, setNewStartDate] = useState(new Date().toISOString().split("T")[0]);
+
   // Load Data
   const loadData = () => {
     const b = getBookings();
@@ -157,9 +192,11 @@ export function AdminDashboard() {
     const handleUpdate = () => loadData();
     window.addEventListener("egs_bookings_updated", handleUpdate);
     window.addEventListener("egs_customers_updated", handleUpdate);
+    window.addEventListener("egs_amc_updated", handleUpdate);
     return () => {
       window.removeEventListener("egs_bookings_updated", handleUpdate);
       window.removeEventListener("egs_customers_updated", handleUpdate);
+      window.removeEventListener("egs_amc_updated", handleUpdate);
     };
   }, []);
 
@@ -195,7 +232,8 @@ export function AdminDashboard() {
       (b) => b.status === "COMPLETED" || b.status === "PAYMENT RECEIVED"
     ).length;
     const cancelled = bookings.filter((b) => b.status === "CANCELLED").length;
-    const amcLeads = bookings.filter((b) => b.serviceCategory === "ac-amc").length;
+    const amcLeads = amcContracts.length;
+    const amcExpiring = amcContracts.filter((a) => a.status === "expiring_soon").length;
     const quotation = bookings.filter(
       (b) =>
         b.serviceCategory === "commercial-hvac" ||
@@ -210,9 +248,41 @@ export function AdminDashboard() {
       completed,
       cancelled,
       amcLeads,
+      amcExpiring,
       quotation,
     };
-  }, [bookings]);
+  }, [bookings, amcContracts]);
+
+  // Filtered AMC Contracts for the AMC Renewal System
+  const filteredAMCContracts = useMemo(() => {
+    return amcContracts.filter((c) => {
+      // Tab filter
+      if (amcSectionTab === "expiring_soon" && c.status !== "expiring_soon") return false;
+      if (amcSectionTab === "active" && c.status !== "active") return false;
+      if (amcSectionTab === "expired" && c.status !== "expired") return false;
+      if (amcSectionTab === "renewed" && c.status !== "renewed") return false;
+
+      // Search filter
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const match =
+          c.contractNo.toLowerCase().includes(q) ||
+          c.customerName.toLowerCase().includes(q) ||
+          c.phone.includes(q) ||
+          c.city.toLowerCase().includes(q) ||
+          c.planName.toLowerCase().includes(q) ||
+          c.serviceFrequency.toLowerCase().includes(q);
+        if (!match) return false;
+      }
+
+      // City filter
+      if (cityFilter !== "all" && !c.city.toLowerCase().includes(cityFilter.toLowerCase())) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [amcContracts, amcSectionTab, searchQuery, cityFilter]);
 
   // Filtered Bookings for the current section
   const currentSectionBookings = useMemo(() => {
@@ -627,6 +697,7 @@ export function AdminDashboard() {
               </div>
               <div className="mt-2 space-y-1">
                 {/* 6. AMC Leads */}
+                {/* 6. AMC Renewal System */}
                 <button
                   type="button"
                   onClick={() => {
@@ -641,17 +712,29 @@ export function AdminDashboard() {
                 >
                   <div className="flex items-center gap-2.5">
                     <ShieldCheck className="size-4" />
-                    <span>AMC Leads</span>
+                    <span>AMC Renewal System</span>
                   </div>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                      activeSection === "amc-leads"
-                        ? "bg-white text-brand"
-                        : "bg-brand/10 text-brand"
-                    }`}
-                  >
-                    {counts.amcLeads}
-                  </span>
+                  {counts.amcExpiring > 0 ? (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                        activeSection === "amc-leads"
+                          ? "bg-white text-brand"
+                          : "bg-amber-500/15 text-amber-600 animate-pulse"
+                      }`}
+                    >
+                      {counts.amcExpiring} Expiring
+                    </span>
+                  ) : (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                        activeSection === "amc-leads"
+                          ? "bg-white text-brand"
+                          : "bg-brand/10 text-brand"
+                      }`}
+                    >
+                      {counts.amcLeads}
+                    </span>
+                  )}
                 </button>
 
                 {/* 7. Quotation Requests */}
@@ -874,13 +957,12 @@ export function AdminDashboard() {
           {/* SECTION VIEWS */}
           {/* ============================================================ */}
 
-          {/* VIEW: BOOKINGS TABLES (New, Today, Upcoming, Completed, Cancelled, AMC Leads, Quotes) */}
+          {/* VIEW: BOOKINGS TABLES (New, Today, Upcoming, Completed, Cancelled, Quotes) */}
           {(activeSection === "new-bookings" ||
             activeSection === "todays-bookings" ||
             activeSection === "upcoming-bookings" ||
             activeSection === "completed" ||
             activeSection === "cancelled" ||
-            activeSection === "amc-leads" ||
             activeSection === "quotation-requests") && (
             <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
@@ -966,6 +1048,333 @@ export function AdminDashboard() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* VIEW: AMC RENEWAL SYSTEM (7 Core Required AMC Fields) */}
+          {/* ============================================================ */}
+          {activeSection === "amc-leads" && (
+            <div className="space-y-4">
+              {/* AMC Action Toast */}
+              {amcActionToast && (
+                <div className="rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white shadow-lg flex items-center justify-between border border-emerald-400/30 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="size-4 shrink-0 text-white" />
+                    <span>{amcActionToast}</span>
+                  </div>
+                  <button onClick={() => setAmcActionToast(null)} className="opacity-75 hover:opacity-100">
+                    <X className="size-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Header & Quick Action Ribbon */}
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <div>
+                  <h2 className="text-base font-extrabold text-foreground flex items-center gap-2">
+                    <ShieldCheck className="size-5 text-brand" />
+                    <span>HVAC Annual Maintenance Contract (AMC) Renewal System</span>
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Track contract validity, automated 30-day renewal pipelines, and routine preventative service visits.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowNewAMCModal(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-xs font-black text-brand-foreground shadow-md shadow-brand/25 hover:bg-brand/90 transition-transform active:scale-95"
+                  >
+                    <span>+ New AMC Contract</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* AMC KPI Metric Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Active Contracts
+                  </div>
+                  <div className="text-2xl font-black text-foreground mt-1">
+                    {amcContracts.filter((c) => c.status === "active").length}
+                  </div>
+                  <div className="text-[11px] text-emerald-600 font-semibold mt-0.5">
+                    100% Protected Warranty
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 shadow-sm">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-amber-600 flex items-center justify-between">
+                    <span>Expiring in 30 Days</span>
+                    <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                  </div>
+                  <div className="text-2xl font-black text-amber-600 mt-1">
+                    {amcContracts.filter((c) => c.status === "expiring_soon").length}
+                  </div>
+                  <div className="text-[11px] text-amber-700/80 font-bold mt-0.5">
+                    ⚠️ Urgent Renewal Pipeline
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4 shadow-sm">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-rose-600">
+                    Expired Contracts
+                  </div>
+                  <div className="text-2xl font-black text-rose-600 mt-1">
+                    {amcContracts.filter((c) => c.status === "expired").length}
+                  </div>
+                  <div className="text-[11px] text-rose-700/80 font-bold mt-0.5">
+                    Win-back Renewal Leads
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Total Renewal Value
+                  </div>
+                  <div className="text-2xl font-black text-brand mt-1">
+                    ₹{amcContracts.reduce((sum, c) => sum + (c.amount || 0), 0).toLocaleString("en-IN")}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground font-semibold mt-0.5">
+                    Annual Contract Revenue
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Tab Filters */}
+              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                {[
+                  { id: "all", label: `All Contracts (${amcContracts.length})` },
+                  {
+                    id: "expiring_soon",
+                    label: `⚠️ Expiring Soon (${amcContracts.filter((c) => c.status === "expiring_soon").length})`,
+                    highlight: true,
+                  },
+                  { id: "active", label: `Active (${amcContracts.filter((c) => c.status === "active").length})` },
+                  { id: "expired", label: `Expired (${amcContracts.filter((c) => c.status === "expired").length})` },
+                  { id: "renewed", label: `Renewed (${amcContracts.filter((c) => c.status === "renewed").length})` },
+                ].map((tab) => {
+                  const active = amcSectionTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setAmcSectionTab(tab.id as any)}
+                      className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-all border whitespace-nowrap ${
+                        active
+                          ? "border-brand bg-brand text-brand-foreground shadow-sm"
+                          : tab.highlight
+                          ? "border-amber-500/40 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20"
+                          : "border-border bg-card text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* AMC RENEWAL TABLE WITH EXACT 7 REQUIRED FIELDS */}
+              <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-foreground">
+                    <thead className="border-b border-border bg-surface text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                      <tr>
+                        <th className="px-4 py-3">1. AMC Start Date</th>
+                        <th className="px-4 py-3">2. AMC End Date</th>
+                        <th className="px-4 py-3">3. Customer</th>
+                        <th className="px-4 py-3">4. Number of Units</th>
+                        <th className="px-4 py-3">5. Service Frequency</th>
+                        <th className="px-4 py-3">6. Last Service</th>
+                        <th className="px-4 py-3">7. Next Service</th>
+                        <th className="px-4 py-3 text-right">Renewal Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/60">
+                      {filteredAMCContracts.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
+                            No AMC contracts found matching this tab filter.
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredAMCContracts.map((c) => {
+                          const isExpiring = c.status === "expiring_soon";
+                          const isExpired = c.status === "expired";
+                          const isActive = c.status === "active";
+                          const isRenewed = c.status === "renewed";
+
+                          // Calculate days to expiry
+                          const end = new Date(c.amcEndDate);
+                          const diffDays = Math.ceil((end.getTime() - Date.now()) / (1000 * 3600 * 24));
+
+                          return (
+                            <tr
+                              key={c.id}
+                              className={`transition-colors ${
+                                isExpiring
+                                  ? "bg-amber-500/5 hover:bg-amber-500/10"
+                                  : isExpired
+                                  ? "bg-rose-500/5 hover:bg-rose-500/10"
+                                  : "hover:bg-surface/50"
+                              }`}
+                            >
+                              {/* 1. AMC Start Date */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <div className="font-bold text-foreground flex items-center gap-1.5">
+                                  <Calendar className="size-3.5 text-brand" />
+                                  <span>{c.amcStartDate}</span>
+                                </div>
+                                <span className="text-[10px] text-muted-foreground">Contract Inception</span>
+                              </td>
+
+                              {/* 2. AMC End Date (With Expiry Alert) */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <div className="font-extrabold text-foreground">{c.amcEndDate}</div>
+                                <div className="mt-0.5">
+                                  {isExpiring ? (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-black text-amber-600 animate-pulse">
+                                      ⚠️ Expires in {diffDays} {diffDays === 1 ? "day" : "days"}
+                                    </span>
+                                  ) : isExpired ? (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 text-[10px] font-black text-rose-600">
+                                      ❌ Expired {Math.abs(diffDays)}d ago
+                                    </span>
+                                  ) : isRenewed ? (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-teal-500/15 border border-teal-500/30 px-2 py-0.5 text-[10px] font-black text-teal-600">
+                                      ✨ Renewed
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+                                      ✓ Active ({diffDays}d left)
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* 3. Customer */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-bold text-foreground text-xs">{c.customerName}</span>
+                                  <span className="rounded bg-brand-soft px-1.5 py-0.5 font-mono text-[10px] font-black text-brand border border-brand/20">
+                                    {c.contractNo}
+                                  </span>
+                                </div>
+                                <div className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                                  <span>{c.phone}</span>
+                                  <span>•</span>
+                                  <span>{c.city}</span>
+                                </div>
+                              </td>
+
+                              {/* 4. Number of Units */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <span className="rounded-md bg-surface px-2 py-0.5 font-black text-foreground border border-border">
+                                  ❄️ {c.numberOfUnits} {c.numberOfUnits === 1 ? "Unit" : "Units"}
+                                </span>
+                                <div className="text-[10px] font-semibold text-muted-foreground mt-1">
+                                  Plan: {c.planName}
+                                </div>
+                              </td>
+
+                              {/* 5. Service Frequency */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <div className="font-bold text-foreground">{c.serviceFrequency}</div>
+                                <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">
+                                  Progress: <strong className="text-brand">{c.servicesCompleted}</strong> of{" "}
+                                  <strong>{c.servicesIncluded}</strong> Services Done
+                                </div>
+                              </td>
+
+                              {/* 6. Last Service */}
+                              <td className="px-4 py-3.5 max-w-[200px]">
+                                <div className="font-bold text-foreground flex items-center gap-1">
+                                  <CheckCircle2 className="size-3 text-emerald-500" />
+                                  <span>{c.lastServiceDate}</span>
+                                </div>
+                                {c.lastServiceDetails && (
+                                  <div className="text-[11px] text-muted-foreground truncate" title={c.lastServiceDetails}>
+                                    {c.lastServiceDetails}
+                                  </div>
+                                )}
+                                {c.lastServiceTechnician && (
+                                  <div className="text-[10px] text-muted-foreground font-semibold">
+                                    Tech: {c.lastServiceTechnician}
+                                  </div>
+                                )}
+                              </td>
+
+                              {/* 7. Next Service */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <div className="font-extrabold text-foreground flex items-center gap-1">
+                                  <Clock className="size-3 text-amber-500" />
+                                  <span>{c.nextServiceDate}</span>
+                                </div>
+                                <div className="text-[10px] text-muted-foreground">{c.nextServiceSlot || "Morning Slot"}</div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setScheduleServiceContract(c);
+                                    setServiceVisitDate(c.nextServiceDate || new Date().toISOString().split("T")[0]);
+                                    setServiceVisitSlot(c.nextServiceSlot || "Morning Slot (9:00 AM - 12:00 PM)");
+                                  }}
+                                  className="mt-1 inline-flex items-center gap-1 rounded-md bg-brand-soft px-2 py-0.5 text-[10px] font-black text-brand hover:bg-brand/20 transition-colors"
+                                >
+                                  <span>📅 Schedule Visit</span>
+                                </button>
+                              </td>
+
+                              {/* Actions Column */}
+                              <td className="px-4 py-3.5 text-right space-x-1.5 whitespace-nowrap">
+                                {/* 1-Click WhatsApp Renewal Alert */}
+                                <a
+                                  href={generateAMCRenewalWhatsAppURL(c)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex size-7 items-center justify-center rounded-lg bg-[#25D366]/15 text-[#25D366] hover:bg-[#25D366]/25 transition-colors"
+                                  title="Send WhatsApp Renewal Notice"
+                                >
+                                  <MessageSquare className="size-3.5 fill-current" />
+                                </a>
+
+                                {/* 1-Click Call */}
+                                <a
+                                  href={`tel:${c.phone}`}
+                                  className="inline-flex size-7 items-center justify-center rounded-lg border border-border bg-surface text-foreground hover:bg-surface/80 transition-colors"
+                                  title="Call Customer"
+                                >
+                                  <Phone className="size-3.5 text-brand" />
+                                </a>
+
+                                {/* 1-Click Renew AMC Button */}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setRenewModalContract(c);
+                                    setRenewalAmount(c.amount);
+                                    setRenewalDiscountPercent(0);
+                                    setRenewalNotes("");
+                                  }}
+                                  className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-black shadow-sm transition-transform active:scale-95 ${
+                                    isExpiring || isExpired
+                                      ? "bg-brand text-brand-foreground hover:bg-brand/90 animate-pulse"
+                                      : "bg-surface border border-border text-foreground hover:bg-surface/80"
+                                  }`}
+                                >
+                                  <RefreshCw className="size-3" />
+                                  <span>Renew AMC</span>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -1857,6 +2266,516 @@ export function AdminDashboard() {
                   ))
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 1: AMC RENEWAL MODAL */}
+      {renewModalContract && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="relative w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between border-b border-border pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-md bg-brand-soft px-2 py-0.5 font-mono text-xs font-black text-brand border border-brand/20">
+                    {renewModalContract.contractNo}
+                  </span>
+                  <span className="text-xs font-bold text-muted-foreground">Renewal Process</span>
+                </div>
+                <h3 className="text-lg font-black text-foreground mt-1">
+                  Renew AMC Contract
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Customer: <strong>{renewModalContract.customerName}</strong> ({renewModalContract.city})
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRenewModalContract(null)}
+                className="rounded-full p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Current vs New Extended Validity */}
+            <div className="rounded-2xl border border-border bg-surface/60 p-4 space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground font-semibold">Covered Units:</span>
+                <span className="font-extrabold text-foreground">
+                  ❄️ {renewModalContract.numberOfUnits} Units ({renewModalContract.planName})
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground font-semibold">Service Frequency:</span>
+                <span className="font-bold text-foreground">{renewModalContract.serviceFrequency}</span>
+              </div>
+              <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                    Current Expiry Date
+                  </span>
+                  <span className="font-mono font-bold text-rose-500">{renewModalContract.amcEndDate}</span>
+                </div>
+                <ArrowRight className="size-4 text-brand" />
+                <div className="text-right">
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                    New Extended Expiry (+12 Mo)
+                  </span>
+                  <span className="font-mono font-black text-emerald-600">
+                    {(() => {
+                      const d = new Date(renewModalContract.amcEndDate || new Date());
+                      const n = d < new Date() ? new Date() : d;
+                      n.setFullYear(n.getFullYear() + 1);
+                      return n.toISOString().split("T")[0];
+                    })()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Renewal Amount & Payment Mode Form */}
+            <div className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-foreground block mb-1">
+                    Renewal Amount (₹):
+                  </label>
+                  <input
+                    type="number"
+                    value={renewalAmount}
+                    onChange={(e) => setRenewalAmount(Number(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-bold text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-foreground block mb-1">
+                    Payment Mode:
+                  </label>
+                  <select
+                    value={renewalPaymentMode}
+                    onChange={(e) => setRenewalPaymentMode(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-semibold text-foreground focus:border-brand focus:outline-none"
+                  >
+                    <option value="UPI / GPay">UPI / GPay / PhonePe</option>
+                    <option value="Bank NEFT / RTGS">Bank NEFT / RTGS</option>
+                    <option value="Credit / Debit Card">Credit / Debit Card</option>
+                    <option value="Cash Collection">Cash Collection by Tech</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-foreground block mb-1">
+                  Loyalty Renewal Discount:
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { label: "Standard (0%)", val: 0 },
+                    { label: "Loyalty (10% Off)", val: 10 },
+                    { label: "VIP Multi (15% Off)", val: 15 },
+                  ].map((disc) => (
+                    <button
+                      key={disc.val}
+                      type="button"
+                      onClick={() => {
+                        setRenewalDiscountPercent(disc.val);
+                        const discounted = Math.round(
+                          renewModalContract.amount * (1 - disc.val / 100)
+                        );
+                        setRenewalAmount(discounted);
+                      }}
+                      className={`rounded-lg py-1.5 px-2 text-center text-[11px] font-bold border transition-colors ${
+                        renewalDiscountPercent === disc.val
+                          ? "border-brand bg-brand-soft text-brand font-black"
+                          : "border-border bg-surface text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {disc.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-foreground block mb-1">
+                  Renewal Notes &amp; Added Perks:
+                </label>
+                <input
+                  type="text"
+                  value={renewalNotes}
+                  onChange={(e) => setRenewalNotes(e.target.value)}
+                  placeholder="e.g. Free Hydro Foam wash included on next visit."
+                  className="w-full rounded-xl border border-border bg-surface p-2.5 text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2 pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setRenewModalContract(null)}
+                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-bold text-foreground hover:bg-surface"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const updated = renewAMCContract(renewModalContract.id, {
+                    amountPaid: renewalAmount,
+                    paymentMode: renewalPaymentMode,
+                    notes: renewalNotes,
+                  });
+                  if (updated) {
+                    setAmcActionToast(
+                      `AMC Contract ${updated.contractNo} successfully renewed until ${updated.amcEndDate}!`
+                    );
+                    setRenewModalContract(null);
+                    loadData();
+                    // Open WhatsApp confirmation preview
+                    window.open(generateAMCRenewalConfirmationWhatsAppURL(updated), "_blank");
+                  }
+                }}
+                className="flex-[1.5] flex items-center justify-center gap-1.5 rounded-xl bg-brand py-2.5 text-xs font-black text-brand-foreground shadow-lg shadow-brand/30 hover:bg-brand/90 transition-transform active:scale-95"
+              >
+                <RefreshCw className="size-3.5" />
+                <span>Confirm &amp; Activate Renewal</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: SCHEDULE NEXT AMC ROUTINE SERVICE VISIT */}
+      {scheduleServiceContract && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between border-b border-border pb-3">
+              <div>
+                <span className="rounded-md bg-brand-soft px-2 py-0.5 font-mono text-xs font-black text-brand border border-brand/20">
+                  {scheduleServiceContract.contractNo}
+                </span>
+                <h3 className="text-base font-black text-foreground mt-1">
+                  Schedule AMC Maintenance Visit
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {scheduleServiceContract.customerName} • {scheduleServiceContract.numberOfUnits} Units
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScheduleServiceContract(null)}
+                className="rounded-full p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="font-bold text-foreground block mb-1">
+                  Preferred Service Visit Date:
+                </label>
+                <input
+                  type="date"
+                  value={serviceVisitDate}
+                  onChange={(e) => setServiceVisitDate(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-surface p-2.5 font-bold text-foreground focus:border-brand focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-foreground block mb-1">
+                  Preferred Time Slot Window:
+                </label>
+                <select
+                  value={serviceVisitSlot}
+                  onChange={(e) => setServiceVisitSlot(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-surface p-2.5 font-semibold text-foreground focus:border-brand focus:outline-none"
+                >
+                  <option value="Morning Slot (9:00 AM - 12:00 PM)">🌅 Morning Slot (9:00 AM - 12:00 PM)</option>
+                  <option value="Afternoon Slot (12:00 PM - 3:00 PM)">☀️ Afternoon Slot (12:00 PM - 3:00 PM)</option>
+                  <option value="Evening Slot (3:00 PM - 6:00 PM)">🌇 Evening Slot (3:00 PM - 6:00 PM)</option>
+                  <option value="Express Night (6:00 PM - 9:00 PM)">🌙 Express Night (6:00 PM - 9:00 PM)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-bold text-foreground block mb-1">
+                  Assign Lead HVAC Technician:
+                </label>
+                <select
+                  value={serviceVisitTechId}
+                  onChange={(e) => setServiceVisitTechId(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-surface p-2.5 font-semibold text-foreground focus:border-brand focus:outline-none"
+                >
+                  {technicians.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name} ({t.city} • ⭐{t.rating})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="rounded-xl bg-surface/60 p-3 text-muted-foreground text-[11px] space-y-1">
+                <div className="font-bold text-foreground">💡 Auto-Booking Guarantee:</div>
+                <p>
+                  This creates an official service booking (₹0 charged as it is 100% covered under AMC)
+                  and automatically advances the next routine date based on {scheduleServiceContract.serviceFrequency}.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setScheduleServiceContract(null)}
+                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-bold text-foreground hover:bg-surface"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const tech = technicians.find((t) => t.id === serviceVisitTechId);
+                  scheduleAMCNextService(scheduleServiceContract.id, {
+                    date: serviceVisitDate || new Date().toISOString().split("T")[0],
+                    slot: serviceVisitSlot,
+                    technicianId: serviceVisitTechId,
+                    technicianName: tech?.name,
+                  });
+                  setAmcActionToast(
+                    `AMC Maintenance Visit booked for ${scheduleServiceContract.customerName} on ${serviceVisitDate}!`
+                  );
+                  setScheduleServiceContract(null);
+                  loadData();
+                }}
+                className="flex-1 rounded-xl bg-brand py-2.5 text-xs font-black text-brand-foreground shadow-lg shadow-brand/30 hover:bg-brand/90 transition-transform active:scale-95"
+              >
+                Confirm &amp; Dispatch Visit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: ONBOARD NEW AMC CONTRACT */}
+      {showNewAMCModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="relative w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between border-b border-border pb-3">
+              <div>
+                <h3 className="text-base font-black text-foreground">
+                  Create New AMC Contract
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Onboard customer to continuous annual preventative maintenance.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowNewAMCModal(false)}
+                className="rounded-full p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs max-h-[65vh] overflow-y-auto pr-1">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-foreground block mb-1">
+                    Customer / Company Name:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newCustName}
+                    onChange={(e) => setNewCustName(e.target.value)}
+                    placeholder="e.g. Skyline Residency"
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-foreground block mb-1">
+                    Mobile / WhatsApp:
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={newCustPhone}
+                    onChange={(e) => setNewCustPhone(e.target.value)}
+                    placeholder="+91 98950 12345"
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-foreground block mb-1">City Hub:</label>
+                  <select
+                    value={newCustCity}
+                    onChange={(e) => setNewCustCity(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-semibold text-foreground focus:border-brand focus:outline-none"
+                  >
+                    <option value="Kollam">Kollam</option>
+                    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                    <option value="Ernakulam / Cochin">Ernakulam / Cochin</option>
+                    <option value="Thrissur">Thrissur</option>
+                    <option value="Chennai">Chennai</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-foreground block mb-1">Address / Landmark:</label>
+                  <input
+                    type="text"
+                    value={newCustAddress}
+                    onChange={(e) => setNewCustAddress(e.target.value)}
+                    placeholder="Tower 2, MG Road"
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-foreground block mb-1">AMC Plan:</label>
+                  <select
+                    value={newPlanName}
+                    onChange={(e) => setNewPlanName(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-semibold text-foreground focus:border-brand focus:outline-none"
+                  >
+                    <option value="Comprehensive Care">Comprehensive Care</option>
+                    <option value="Commercial Pro">Commercial Pro</option>
+                    <option value="Residential Saver">Residential Saver</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-foreground block mb-1">Number of AC Units:</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={newUnitsCount}
+                    onChange={(e) => setNewUnitsCount(Number(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-bold text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-foreground block mb-1">
+                    Service Frequency:
+                  </label>
+                  <select
+                    value={newFrequency}
+                    onChange={(e) => setNewFrequency(e.target.value as any)}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-semibold text-foreground focus:border-brand focus:outline-none"
+                  >
+                    <option value="Quarterly (4 Services/Year)">Quarterly (4 Services/Year)</option>
+                    <option value="Bi-Monthly (6 Services/Year)">Bi-Monthly (6 Services/Year)</option>
+                    <option value="Monthly (12 Services/Year)">Monthly (12 Services/Year)</option>
+                    <option value="Half-Yearly (2 Services/Year)">Half-Yearly (2 Services/Year)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-foreground block mb-1">
+                    Annual Fee (₹):
+                  </label>
+                  <input
+                    type="number"
+                    value={newContractAmount}
+                    onChange={(e) => setNewContractAmount(Number(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-bold text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-foreground block mb-1">
+                    AMC Start Date:
+                  </label>
+                  <input
+                    type="date"
+                    value={newStartDate}
+                    onChange={(e) => setNewStartDate(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-bold text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-foreground block mb-1">
+                    AMC End Date (+1 Yr):
+                  </label>
+                  <div className="rounded-xl border border-border bg-surface/50 p-2.5 font-mono font-bold text-emerald-600">
+                    {(() => {
+                      const d = new Date(newStartDate || new Date());
+                      d.setFullYear(d.getFullYear() + 1);
+                      return d.toISOString().split("T")[0];
+                    })()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setShowNewAMCModal(false)}
+                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-bold text-foreground hover:bg-surface"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!newCustName || !newCustPhone) return;
+                  const endD = new Date(newStartDate);
+                  endD.setFullYear(endD.getFullYear() + 1);
+                  const nextD = new Date(newStartDate);
+                  nextD.setDate(nextD.getDate() + 45);
+
+                  const newContract: AMCContract = {
+                    id: `amc-${Date.now()}`,
+                    contractNo: `AMC-2026-${125 + amcContracts.length}`,
+                    customerName: newCustName,
+                    phone: newCustPhone,
+                    whatsapp: newCustPhone,
+                    city: newCustCity,
+                    address: newCustAddress || newCustCity,
+                    planName: newPlanName as any,
+                    numberOfUnits: Number(newUnitsCount),
+                    unitsCovered: Number(newUnitsCount),
+                    serviceFrequency: newFrequency,
+                    amcStartDate: newStartDate,
+                    startDate: newStartDate,
+                    amcEndDate: endD.toISOString().split("T")[0],
+                    expiryDate: endD.toISOString().split("T")[0],
+                    lastServiceDate: newStartDate,
+                    lastServiceDetails: "Initial Setup Inspection",
+                    nextServiceDate: nextD.toISOString().split("T")[0],
+                    nextServiceSlot: "Morning Slot (9:00 AM - 12:00 PM)",
+                    nextServiceStatus: "scheduled",
+                    servicesIncluded: newFrequency.includes("Bi-Monthly") ? 6 : newFrequency.includes("Monthly") ? 12 : 4,
+                    servicesCompleted: 1,
+                    status: "active",
+                    amount: Number(newContractAmount),
+                  };
+
+                  saveAMCContract(newContract);
+                  setAmcActionToast(`AMC Contract ${newContract.contractNo} successfully created!`);
+                  setShowNewAMCModal(false);
+                  loadData();
+                }}
+                className="flex-1 rounded-xl bg-brand py-2.5 text-xs font-black text-brand-foreground shadow-lg shadow-brand/30 hover:bg-brand/90 transition-transform active:scale-95"
+              >
+                Create Contract
+              </button>
             </div>
           </div>
         </div>

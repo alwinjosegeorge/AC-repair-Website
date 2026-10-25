@@ -147,20 +147,68 @@ export interface Customer {
   lastBookingDate?: string;
 }
 
+export type AMCServiceFrequency =
+  | "Quarterly (4 Services/Year)"
+  | "Bi-Monthly (6 Services/Year)"
+  | "Half-Yearly (2 Services/Year)"
+  | "Monthly (12 Services/Year)";
+
+export type AMCStatus = "active" | "expiring_soon" | "expired" | "renewed";
+
 export interface AMCContract {
-  id: string;
-  contractNo: string;
+  id: string; // e.g. "amc-1"
+  contractNo: string; // e.g. "AMC-2026-081"
+
+  // 1. AMC Start Date
+  amcStartDate: string; // e.g. "2026-01-15"
+  startDate?: string; // backwards compatibility
+
+  // 2. AMC End Date
+  amcEndDate: string; // e.g. "2027-01-14"
+  expiryDate?: string; // backwards compatibility
+
+  // 3. Customer
+  customerId?: string; // e.g. "CUST-2026-106"
   customerName: string;
   phone: string;
+  whatsapp?: string;
+  email?: string;
   city: string;
-  planName: "Residential Saver" | "Comprehensive Care" | "Commercial Pro";
-  unitsCovered: number;
-  startDate: string;
-  expiryDate: string;
+  address?: string;
+
+  // 4. Number of Units
+  numberOfUnits: number; // e.g. 3, 12, 2
+  unitsCovered?: number; // backwards compatibility
+
+  // 5. Service Frequency
+  serviceFrequency: AMCServiceFrequency;
+
+  // 6. Last Service
+  lastServiceDate: string; // e.g. "2026-07-20"
+  lastServiceDetails?: string; // e.g. "Deep Hydro Jet Clean & Gas Diagnostic"
+  lastServiceTechnician?: string; // e.g. "Arun Kumar"
+
+  // 7. Next Service
+  nextServiceDate: string; // e.g. "2026-10-28"
+  nextServiceSlot?: string; // e.g. "Morning Slot (9:00 AM - 12:00 PM)"
+  nextServiceStatus?: "scheduled" | "technician_dispatched" | "completed";
+
+  // Plan & Renewal Metadata
+  planName: "Residential Saver" | "Comprehensive Care" | "Commercial Pro" | string;
   servicesIncluded: number;
   servicesCompleted: number;
-  status: "active" | "expiring_soon" | "expired";
+  status: AMCStatus;
   amount: number;
+  renewalDiscountPercent?: number;
+  lastRenewedDate?: string;
+  renewalHistory?: Array<{
+    renewedOn: string;
+    previousEndDate: string;
+    newEndDate: string;
+    amountPaid: number;
+    paymentMode: string;
+    notes?: string;
+  }>;
 }
 
 // Initial Technicians Data
@@ -222,52 +270,181 @@ const SEED_TECHNICIANS: Technician[] = [
   },
 ];
 
-// Initial AMC Contracts
+// Initial AMC Contracts with Complete Renewal Lifecycle
 const SEED_AMC: AMCContract[] = [
   {
     id: "amc-1",
+    contractNo: "AMC-2026-104",
+    customerId: "CUST-2026-103",
+    customerName: "Apex Software Solutions",
+    phone: "+91 98956 77889",
+    whatsapp: "+91 98956 77889",
+    email: "facilities@apexsoftware.in",
+    city: "Ernakulam",
+    address: "Level 4, IT Tower 2, Infopark Phase 1, Kakkanad",
+    planName: "Commercial Pro",
+    numberOfUnits: 12,
+    unitsCovered: 12,
+    amcStartDate: "2025-11-01",
+    startDate: "2025-11-01",
+    amcEndDate: "2026-10-31",
+    expiryDate: "2026-10-31",
+    serviceFrequency: "Bi-Monthly (6 Services/Year)",
+    lastServiceDate: "2026-08-25",
+    lastServiceDetails: "VRV Compressor Diagnostic & Filter Deep Wash",
+    lastServiceTechnician: "Muhammed Shafi",
+    nextServiceDate: "2026-10-28",
+    nextServiceSlot: "Morning Slot (9:00 AM - 12:00 PM)",
+    nextServiceStatus: "scheduled",
+    servicesIncluded: 6,
+    servicesCompleted: 5,
+    status: "expiring_soon", // Expiring in 6 days! Needs renewal alert
+    amount: 34999,
+  },
+  {
+    id: "amc-2",
     contractNo: "AMC-2026-081",
+    customerId: "CUST-2026-106",
     customerName: "Dr. Thomas Mathew",
     phone: "+91 94471 22334",
+    whatsapp: "+91 94471 22334",
+    email: "drthomasmathew@yahoo.com",
     city: "Kollam",
+    address: "Grace Villa, Kadappakada",
     planName: "Comprehensive Care",
+    numberOfUnits: 3,
     unitsCovered: 3,
+    amcStartDate: "2026-01-15",
     startDate: "2026-01-15",
+    amcEndDate: "2027-01-14",
     expiryDate: "2027-01-14",
+    serviceFrequency: "Quarterly (4 Services/Year)",
+    lastServiceDate: "2026-07-20",
+    lastServiceDetails: "Deep Hydro Jet Clean & Gas Pressure Diagnostic",
+    lastServiceTechnician: "Arun Kumar",
+    nextServiceDate: "2026-10-27",
+    nextServiceSlot: "Morning Slot (9:00 AM - 12:00 PM)",
+    nextServiceStatus: "scheduled",
     servicesIncluded: 4,
     servicesCompleted: 2,
     status: "active",
     amount: 5999,
   },
   {
-    id: "amc-2",
-    contractNo: "AMC-2026-104",
-    customerName: "Apex Software Solutions",
-    phone: "+91 98956 77889",
-    city: "Ernakulam",
-    planName: "Commercial Pro",
-    unitsCovered: 12,
-    startDate: "2025-11-01",
-    expiryDate: "2026-10-31",
-    servicesIncluded: 6,
-    servicesCompleted: 5,
-    status: "expiring_soon",
-    amount: 34999,
-  },
-  {
     id: "amc-3",
     contractNo: "AMC-2026-118",
+    customerId: "CUST-2026-109",
     customerName: "Reshmi Rajeev",
     phone: "+91 97450 66778",
+    whatsapp: "+91 97450 66778",
+    email: "reshmi.rajeev@gmail.com",
     city: "Thiruvananthapuram",
+    address: "House 24, Kowdiar Gardens",
     planName: "Residential Saver",
+    numberOfUnits: 2,
     unitsCovered: 2,
+    amcStartDate: "2026-03-10",
     startDate: "2026-03-10",
+    amcEndDate: "2027-03-09",
     expiryDate: "2027-03-09",
+    serviceFrequency: "Quarterly (4 Services/Year)",
+    lastServiceDate: "2026-09-12",
+    lastServiceDetails: "Monsoon Drain Line Clean & Anti-bacterial Spray",
+    lastServiceTechnician: "Vipin Das",
+    nextServiceDate: "2026-12-10",
+    nextServiceSlot: "Afternoon Slot (12:00 PM - 3:00 PM)",
+    nextServiceStatus: "scheduled",
     servicesIncluded: 3,
     servicesCompleted: 1,
     status: "active",
     amount: 3499,
+  },
+  {
+    id: "amc-4",
+    contractNo: "AMC-2025-062",
+    customerId: "CUST-2026-110",
+    customerName: "Hotel Malabar Residency",
+    phone: "+91 98470 33221",
+    whatsapp: "+91 98470 33221",
+    email: "manager@malabarresidency.com",
+    city: "Thrissur",
+    address: "Malabar Complex, Round South",
+    planName: "Commercial Pro",
+    numberOfUnits: 8,
+    unitsCovered: 8,
+    amcStartDate: "2025-09-15",
+    startDate: "2025-09-15",
+    amcEndDate: "2026-09-14",
+    expiryDate: "2026-09-14",
+    serviceFrequency: "Bi-Monthly (6 Services/Year)",
+    lastServiceDate: "2026-08-10",
+    lastServiceDetails: "Restaurant Ceiling Cassette Jet Power Flush",
+    lastServiceTechnician: "Sujith Nair",
+    nextServiceDate: "Pending AMC Renewal",
+    nextServiceSlot: "Immediate on Renewal",
+    nextServiceStatus: "scheduled",
+    servicesIncluded: 6,
+    servicesCompleted: 6,
+    status: "expired", // Expired! Needs urgent renewal follow-up
+    amount: 24999,
+  },
+  {
+    id: "amc-5",
+    contractNo: "AMC-2026-015",
+    customerId: "CUST-2026-104",
+    customerName: "Priya Soman",
+    phone: "+91 98952 44332",
+    whatsapp: "+91 98952 44332",
+    email: "priya.soman@gmail.com",
+    city: "Thrissur",
+    address: "Soman Arcade, Round South",
+    planName: "Comprehensive Care",
+    numberOfUnits: 2,
+    unitsCovered: 2,
+    amcStartDate: "2026-02-01",
+    startDate: "2026-02-01",
+    amcEndDate: "2027-01-31",
+    expiryDate: "2027-01-31",
+    serviceFrequency: "Quarterly (4 Services/Year)",
+    lastServiceDate: "2026-08-04",
+    lastServiceDetails: "Cassette Jet Clean & Air Filter Replacement",
+    lastServiceTechnician: "Sujith Nair",
+    nextServiceDate: "2026-11-05",
+    nextServiceSlot: "Afternoon Slot (12:00 PM - 3:00 PM)",
+    nextServiceStatus: "scheduled",
+    servicesIncluded: 4,
+    servicesCompleted: 2,
+    status: "active",
+    amount: 3999,
+  },
+  {
+    id: "amc-6",
+    contractNo: "AMC-2025-044",
+    customerId: "CUST-2026-111",
+    customerName: "Kovalam Grand Beach Resort",
+    phone: "+91 94470 88112",
+    whatsapp: "+91 94470 88112",
+    email: "engineering@kovalambeachresort.com",
+    city: "Thiruvananthapuram",
+    address: "Lighthouse Beach Road, Kovalam",
+    planName: "Commercial Pro",
+    numberOfUnits: 16,
+    unitsCovered: 16,
+    amcStartDate: "2025-10-20",
+    startDate: "2025-10-20",
+    amcEndDate: "2026-10-19",
+    expiryDate: "2026-10-19",
+    serviceFrequency: "Monthly (12 Services/Year)",
+    lastServiceDate: "2026-10-02",
+    lastServiceDetails: "Coastal Salt Anti-Corrosion Treatment & Chemical Wash",
+    lastServiceTechnician: "Vipin Das",
+    nextServiceDate: "Pending Renewal Confirmation",
+    nextServiceSlot: "Express Scheduled",
+    nextServiceStatus: "scheduled",
+    servicesIncluded: 12,
+    servicesCompleted: 12,
+    status: "expired",
+    amount: 48000,
   },
 ];
 
@@ -809,18 +986,192 @@ export function getTechnicians(): Technician[] {
   }
 }
 
-export function getAMCContracts(): AMCContract[] {
-  if (typeof window === "undefined") return SEED_AMC;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.AMC);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.AMC, JSON.stringify(SEED_AMC));
-      return SEED_AMC;
+export function normalizeAMCContract(c: AMCContract): AMCContract {
+  const amcStartDate = c.amcStartDate || c.startDate || "2026-01-15";
+  const amcEndDate = c.amcEndDate || c.expiryDate || "2027-01-14";
+  const numberOfUnits = c.numberOfUnits || c.unitsCovered || 1;
+  const serviceFrequency = c.serviceFrequency || "Quarterly (4 Services/Year)";
+  const lastServiceDate = c.lastServiceDate || "2026-08-01";
+  const nextServiceDate = c.nextServiceDate || "2026-11-01";
+
+  // Real-time expiry calculation
+  let status: AMCStatus = c.status || "active";
+  if (status !== "renewed") {
+    const now = new Date();
+    const end = new Date(amcEndDate);
+    const diffDays = Math.ceil((end.getTime() - now.getTime()) / (1000 * 3600 * 24));
+    if (diffDays < 0) {
+      status = "expired";
+    } else if (diffDays <= 30) {
+      status = "expiring_soon";
+    } else {
+      status = "active";
     }
-    return JSON.parse(raw);
-  } catch {
-    return SEED_AMC;
   }
+
+  return {
+    ...c,
+    amcStartDate,
+    startDate: amcStartDate,
+    amcEndDate,
+    expiryDate: amcEndDate,
+    numberOfUnits,
+    unitsCovered: numberOfUnits,
+    serviceFrequency,
+    lastServiceDate,
+    nextServiceDate,
+    status,
+  };
+}
+
+export function getAMCContracts(): AMCContract[] {
+  let list: AMCContract[] = SEED_AMC;
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.AMC);
+      if (!raw) {
+        localStorage.setItem(STORAGE_KEYS.AMC, JSON.stringify(SEED_AMC));
+        list = SEED_AMC;
+      } else {
+        list = JSON.parse(raw);
+      }
+    } catch {
+      list = SEED_AMC;
+    }
+  }
+  return list.map(normalizeAMCContract);
+}
+
+export function saveAMCContract(contract: AMCContract): AMCContract {
+  const all = getAMCContracts();
+  const index = all.findIndex((c) => c.id === contract.id || c.contractNo === contract.contractNo);
+  const normalized = normalizeAMCContract(contract);
+  let updatedList: AMCContract[];
+  if (index >= 0) {
+    updatedList = all.map((c, i) => (i === index ? normalized : c));
+  } else {
+    updatedList = [normalized, ...all];
+  }
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEYS.AMC, JSON.stringify(updatedList));
+    window.dispatchEvent(new Event("egs_amc_updated"));
+  }
+  return normalized;
+}
+
+export function renewAMCContract(
+  contractId: string,
+  options: {
+    durationMonths?: number;
+    amountPaid?: number;
+    paymentMode?: string;
+    newPlanName?: string;
+    notes?: string;
+  } = {}
+): AMCContract | undefined {
+  const all = getAMCContracts();
+  const target = all.find((c) => c.id === contractId || c.contractNo === contractId);
+  if (!target) return undefined;
+
+  const durationMonths = options.durationMonths || 12;
+  const oldEndDate = new Date(target.amcEndDate || target.expiryDate || new Date());
+  const now = new Date();
+  
+  // If already expired, start renewal from today; if still active, extend from current end date
+  const newStartDate = oldEndDate < now ? now : oldEndDate;
+  const newEndDate = new Date(newStartDate);
+  newEndDate.setMonth(newEndDate.getMonth() + durationMonths);
+
+  const renewalEntry = {
+    renewedOn: new Date().toISOString(),
+    previousEndDate: target.amcEndDate || target.expiryDate || "",
+    newEndDate: newEndDate.toISOString().split("T")[0],
+    amountPaid: options.amountPaid || target.amount,
+    paymentMode: options.paymentMode || "UPI / GPay",
+    notes: options.notes || `Renewed for ${durationMonths} months.`,
+  };
+
+  const updated: AMCContract = {
+    ...target,
+    amcStartDate: newStartDate.toISOString().split("T")[0],
+    startDate: newStartDate.toISOString().split("T")[0],
+    amcEndDate: newEndDate.toISOString().split("T")[0],
+    expiryDate: newEndDate.toISOString().split("T")[0],
+    status: "active",
+    amount: options.amountPaid || target.amount,
+    planName: options.newPlanName || target.planName,
+    servicesCompleted: 0,
+    servicesIncluded: target.servicesIncluded || (target.serviceFrequency.includes("Bi-Monthly") ? 6 : target.serviceFrequency.includes("Monthly") ? 12 : 4),
+    lastRenewedDate: new Date().toISOString(),
+    nextServiceDate: new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString().split("T")[0],
+    nextServiceSlot: "Morning Slot (9:00 AM - 12:00 PM)",
+    nextServiceStatus: "scheduled",
+    renewalHistory: [...(target.renewalHistory || []), renewalEntry],
+  };
+
+  saveAMCContract(updated);
+  return updated;
+}
+
+export function scheduleAMCNextService(
+  contractId: string,
+  options: {
+    date: string;
+    slot?: string;
+    technicianId?: string;
+    technicianName?: string;
+    serviceNotes?: string;
+  }
+): { contract: AMCContract; booking: Booking } | undefined {
+  const all = getAMCContracts();
+  const target = all.find((c) => c.id === contractId || c.contractNo === contractId);
+  if (!target) return undefined;
+
+  // 1. Create a Booking in the system for this AMC visit (₹0 charged as it is included)
+  const newBooking = saveBooking({
+    serviceCategory: "ac-amc",
+    serviceName: `📋 AMC Routine Service (${target.planName})`,
+    subService: `Periodic Scheduled Maintenance - ${target.numberOfUnits} Unit(s)`,
+    acType: "Split AC",
+    unitCount: target.numberOfUnits,
+    preferredDate: options.date,
+    preferredSlot: options.slot || "Morning Slot (9:00 AM - 12:00 PM)",
+    customerName: target.customerName,
+    phone: target.phone,
+    whatsappNumber: target.whatsapp || target.phone,
+    email: target.email,
+    city: target.city,
+    address: target.address || target.city,
+    pincode: "682020",
+    estimatedAmount: 0, // AMC Covered
+    assignedTechnicianId: options.technicianId || "tech-1",
+    assignedTechnicianName: options.technicianName || "Arun Kumar",
+    issueDescription: options.serviceNotes || `Periodic AMC Preventative Service visit under ${target.contractNo}.`,
+  });
+
+  // 2. Advance the Next Service date on the contract based on frequency
+  let nextDateMonths = 3;
+  if (target.serviceFrequency.includes("Bi-Monthly")) nextDateMonths = 2;
+  else if (target.serviceFrequency.includes("Monthly")) nextDateMonths = 1;
+  else if (target.serviceFrequency.includes("Half-Yearly")) nextDateMonths = 6;
+
+  const nextDateObj = new Date(options.date);
+  nextDateObj.setMonth(nextDateObj.getMonth() + nextDateMonths);
+
+  const updatedContract: AMCContract = {
+    ...target,
+    lastServiceDate: options.date,
+    lastServiceDetails: `AMC Maintenance Service - Routine Cleaning & Diagnostics`,
+    lastServiceTechnician: options.technicianName || "Arun Kumar",
+    nextServiceDate: nextDateObj.toISOString().split("T")[0],
+    nextServiceSlot: options.slot || "Morning Slot (9:00 AM - 12:00 PM)",
+    servicesCompleted: (target.servicesCompleted || 0) + 1,
+    nextServiceStatus: "scheduled",
+  };
+
+  saveAMCContract(updatedContract);
+  return { contract: updatedContract, booking: newBooking };
 }
 
 export const SEED_CUSTOMERS: Customer[] = [
@@ -1361,4 +1712,52 @@ Thank you for choosing EGS INDIA!`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
+
+export function generateAMCRenewalWhatsAppURL(contract: AMCContract): string {
+  const cleanPhone = (contract.whatsapp || contract.phone).replace(/[^0-9]/g, "");
+  const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+  const text = `*HVAC AMC Renewal Reminder - EGS INDIA* ❄️
+━━━━━━━━━━━━━━━━━━
+Dear *${contract.customerName}*,
+Your Annual Maintenance Contract (*${contract.contractNo}*) for *${contract.numberOfUnits} AC Unit(s)* is due for renewal!
+
+📋 *Contract Details:*
+• Plan: ${contract.planName}
+• Current Start Date: ${contract.amcStartDate}
+• Expiry Date: ${contract.amcEndDate}
+• Maintenance Frequency: ${contract.serviceFrequency}
+• Renewal Fee: ₹${contract.amount.toLocaleString("en-IN")}/year
+
+🛡️ *Continuous AMC Benefits:*
+✅ 0 Breakdown Guarantee with Free Labor
+✅ Free Spare Parts Coverage & Gas Top-ups
+✅ 90-Min Priority Emergency Dispatch
+✅ Pre-Scheduled Seasonal Deep Jet Power Cleanings
+
+Please reply *RENEW* to confirm your continuous coverage or call us directly at +91 98956 88833. Thank you!`;
+
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+
+export function generateAMCRenewalConfirmationWhatsAppURL(contract: AMCContract): string {
+  const cleanPhone = (contract.whatsapp || contract.phone).replace(/[^0-9]/g, "");
+  const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+  const text = `*AMC Renewal Confirmation - EGS INDIA* ✅
+━━━━━━━━━━━━━━━━━━
+Thank you *${contract.customerName}*!
+Your HVAC AMC Contract (*${contract.contractNo}*) has been *RENEWED* successfully!
+
+🎉 *New Extended Validity:*
+• AMC Start Date: ${contract.amcStartDate}
+• AMC End Date: ${contract.amcEndDate}
+• Units Protected: ${contract.numberOfUnits} Unit(s)
+• Next Scheduled Service: ${contract.nextServiceDate} (${contract.nextServiceSlot || "Morning Slot"})
+• Amount Paid: ₹${contract.amount.toLocaleString("en-IN")}
+
+Your digital AMC Warranty Certificate & Invoicing have been archived.
+Support Helpline: +91 98956 88833.`;
+
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+
 
