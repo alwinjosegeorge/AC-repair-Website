@@ -134,16 +134,28 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-background/50 md:flex-row">
-          <span>© {currentYear} Expert Goods & Services (EGS INDIA). All rights reserved.</span>
-          <div className="flex flex-wrap gap-4">
-            <Link to="/" className="hover:text-white">Home</Link>
-            <Link to="/services/ac-service" className="hover:text-white">AC Service</Link>
-            <Link to="/services/ac-repair" className="hover:text-white">AC Repair</Link>
-            <Link to="/service-areas" className="hover:text-white">Service Areas</Link>
-            <Link to="/about" className="hover:text-white">About Us</Link>
-            <Link to="/contact" className="hover:text-white">Contact</Link>
-            <Link to="/book" className="text-white font-bold hover:underline">Book a Service</Link>
+        <div className="mt-12 border-t border-white/10 pt-8 space-y-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-white/60">
+            <p className="font-medium">
+              © {currentYear} EGS INDIA. Copyright and design by @Mezario
+            </p>
+            <div className="flex flex-wrap gap-4 text-white/60">
+              <Link to="/" className="hover:text-white transition-colors">Home</Link>
+              <Link to="/services/ac-service" className="hover:text-white transition-colors">AC Service</Link>
+              <Link to="/services/ac-repair" className="hover:text-white transition-colors">AC Repair</Link>
+              <Link to="/service-areas" className="hover:text-white transition-colors">Service Areas</Link>
+              <Link to="/about" className="hover:text-white transition-colors">About Us</Link>
+              <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
+              <Link to="/book" className="text-white font-bold hover:underline">Book a Service</Link>
+            </div>
+          </div>
+
+          {/* Large Brand Statement Watermark */}
+          <div className="pt-2 sm:pt-4 select-none pointer-events-none overflow-hidden" aria-hidden="true">
+            <div className="font-black uppercase tracking-tight leading-[0.88] text-white/[0.08] text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[8rem] 2xl:text-[9.25rem]">
+              <div>EXPERT</div>
+              <div className="whitespace-nowrap">GOODS AND SERVICES</div>
+            </div>
           </div>
         </div>
       </div>
