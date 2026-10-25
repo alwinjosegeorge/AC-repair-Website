@@ -91,8 +91,8 @@ export function Footer() {
             </ul>
 
             <div className="mt-4">
-              <Link to="/contact" className="text-xs font-semibold text-sky-300 hover:underline">
-                View all branches & map →
+              <Link to="/service-areas" className="text-xs font-semibold text-sky-300 hover:underline">
+                Explore All Service Areas & Hubs →
               </Link>
             </div>
           </div>
@@ -136,10 +136,14 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-background/50 md:flex-row">
           <span>© {currentYear} Expert Goods & Services (EGS INDIA). All rights reserved.</span>
-          <div className="flex gap-4">
-            <Link to="/about" className="hover:text-white">About</Link>
+          <div className="flex flex-wrap gap-4">
+            <Link to="/" className="hover:text-white">Home</Link>
+            <Link to="/services/ac-service" className="hover:text-white">AC Service</Link>
+            <Link to="/services/ac-repair" className="hover:text-white">AC Repair</Link>
+            <Link to="/service-areas" className="hover:text-white">Service Areas</Link>
+            <Link to="/about" className="hover:text-white">About Us</Link>
             <Link to="/contact" className="hover:text-white">Contact</Link>
-            <Link to="/book" className="hover:text-white">Book Now</Link>
+            <Link to="/book" className="text-white font-bold hover:underline">Book a Service</Link>
           </div>
         </div>
       </div>

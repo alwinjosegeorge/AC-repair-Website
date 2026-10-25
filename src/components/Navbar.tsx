@@ -124,17 +124,19 @@ export function Navbar() {
           </div>
 
           <Link
+            to="/service-areas"
+            className="text-sm font-semibold text-foreground/80 transition-colors hover:text-brand"
+          >
+            Service Areas
+          </Link>
+
+          <Link
             to="/about"
             className="text-sm font-semibold text-foreground/80 transition-colors hover:text-brand"
           >
             About Us
           </Link>
-          <Link
-            to="/projects"
-            className="text-sm font-semibold text-foreground/80 transition-colors hover:text-brand"
-          >
-            Projects
-          </Link>
+
           <Link
             to="/contact"
             className="text-sm font-semibold text-foreground/80 transition-colors hover:text-brand"
@@ -167,13 +169,13 @@ export function Navbar() {
             <span>WhatsApp</span>
           </a>
 
-          {/* Book Service CTA */}
+          {/* Book a Service CTA */}
           <Link
             to="/book"
             className="flex items-center gap-2 rounded-xl bg-brand px-4 py-2 text-xs font-black text-brand-foreground shadow-md shadow-brand/25 transition-all hover:opacity-95 hover:shadow-brand/40"
           >
             <Calendar className="size-3.5" />
-            <span>Book Service</span>
+            <span>Book a Service</span>
           </Link>
         </div>
 
@@ -218,27 +220,27 @@ export function Navbar() {
               </div>
             </div>
 
-            <div className="border-t border-border pt-3 space-y-2">
+            <div className="border-t border-border pt-3 space-y-2.5">
+              <Link
+                to="/service-areas"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-xs font-bold text-foreground"
+              >
+                Service Areas
+              </Link>
               <Link
                 to="/about"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block text-xs font-semibold text-muted-foreground"
               >
-                About EGS INDIA
-              </Link>
-              <Link
-                to="/projects"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-xs font-semibold text-muted-foreground"
-              >
-                Our HVAC Projects
+                About Us
               </Link>
               <Link
                 to="/contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block text-xs font-semibold text-muted-foreground"
               >
-                Contact & Branches
+                Contact
               </Link>
               <Link
                 to="/admin"
