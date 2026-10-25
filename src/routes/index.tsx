@@ -31,8 +31,7 @@ import { Footer } from "@/components/Footer";
 import { BookingWizard } from "@/components/BookingWizard";
 import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "@/lib/store";
 import { captureTrackingParams, trackCallClick, trackWhatsAppClick } from "@/lib/tracking";
-import acUnit from "@/assets/ac-unit.png";
-import acWaves from "@/assets/ac-waves.png";
+import { CoolAirFlow } from "@/components/CoolAirFlow";
 import heroInline from "@/assets/hero-inline.jpg";
 import aboutTech from "@/assets/about-tech.jpg";
 import projectResidential from "@/assets/project-residential.jpg";
@@ -262,22 +261,8 @@ function Hero() {
         value="12k+"
       />
 
-      <div className="relative mx-auto -mb-14 mt-14 h-56 max-w-5xl px-6 md:h-80 mask-bottom-fade">
-        {/* Original Animated Cool Air Waves */}
-        <img
-          src={acWaves}
-          alt="Cool air flow blowing out of the air conditioner"
-          className="absolute left-1/2 top-[36%] w-full max-w-3xl -translate-x-1/2 pointer-events-none z-0 animate-air-flow-pulse"
-        />
-
-        {/* Floating AC Unit */}
-        <img
-          src={acUnit}
-          alt="Wall mounted split air conditioner blowing cool air"
-          width={1408}
-          height={912}
-          className="absolute left-1/2 top-[-8%] w-full max-w-3xl drop-shadow-2xl animate-ac-float z-10"
-        />
+      <div className="relative mx-auto -mb-16 mt-16 max-w-5xl px-4 sm:px-6">
+        <CoolAirFlow />
       </div>
     </section>
   );
