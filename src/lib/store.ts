@@ -9,11 +9,21 @@ import { TrackingData, getStoredTracking } from "./tracking";
 export type ServiceCategory =
   | "ac-service"
   | "ac-repair"
+  | "ac-cleaning"
   | "ac-installation"
+  | "gas-charging"
+  | "commercial-hvac"
   | "ac-amc"
-  | "commercial-hvac";
+  | "buy-new-ac";
 
-export type ACType = "Split AC" | "Window AC" | "Cassette AC" | "Tower AC" | "Central / VRV";
+export type ACType =
+  | "Split AC"
+  | "Window AC"
+  | "Cassette AC"
+  | "Ductable AC"
+  | "VRF / VRV"
+  | "Central AC"
+  | "Other";
 
 export type BookingStatus =
   | "new"
@@ -31,25 +41,29 @@ export interface Booking {
   // Service info
   serviceCategory: ServiceCategory;
   serviceName: string;
-  subService: string;
+  subService?: string;
   acType: ACType;
-  acBrand: string;
-  unitCount: number;
+  acBrand?: string;
+  unitCount: number | string; // 1, 2, 3, 4, "5+"
   issueDescription?: string;
   
   // Schedule
-  preferredDate: string;
-  preferredSlot: string; // "Morning (9 AM - 12 PM)", "Afternoon (12 PM - 3 PM)", etc.
+  preferredDate?: string;
+  preferredSlot?: string; // "Morning (9 AM - 12 PM)", "Afternoon (12 PM - 3 PM)", etc.
   
   // Customer info
   customerName: string;
   phone: string;
+  whatsappNumber?: string;
   alternatePhone?: string;
   email?: string;
+  houseBuilding?: string;
+  area?: string;
   address: string;
   landmark?: string;
   city: string;
   pincode: string;
+  locationCoordinates?: { latitude: number; longitude: number };
   specialNotes?: string;
   
   // Pricing & Assignment
@@ -461,15 +475,19 @@ export function generateCustomerWhatsAppURL(booking: Booking): string {
   const text = `*New Service Booking - EGS INDIA* ❄️
 ━━━━━━━━━━━━━━━━━━
 *Booking ID:* ${booking.id}
-*Service:* ${booking.serviceName} (${booking.subService})
-*AC Type:* ${booking.acType} (${booking.unitCount} Unit${booking.unitCount > 1 ? "s" : ""}) ${booking.acBrand ? `- ${booking.acBrand}` : ""}
-*Date & Slot:* ${booking.preferredDate} | ${booking.preferredSlot}
+*Service:* ${booking.serviceName}
+*AC Type:* ${booking.acType}
+*No. of ACs:* ${booking.unitCount}
 *Customer Name:* ${booking.customerName}
-*Phone:* ${booking.phone}
-*Address:* ${booking.address}, ${booking.city} - ${booking.pincode}
-${booking.issueDescription ? `*Issue Note:* ${booking.issueDescription}\n` : ""}*Est. Amount:* ₹${booking.estimatedAmount}
+*Contact:* ${booking.phone}
+*WhatsApp:* ${booking.whatsappNumber || booking.phone}
+*Location Details:*
+${booking.houseBuilding ? `• House/Building: ${booking.houseBuilding}\n` : ""}• Area: ${booking.area || booking.address}
+• City: ${booking.city}
+• PIN Code: ${booking.pincode}
+${booking.landmark ? `• Landmark: ${booking.landmark}\n` : ""}${booking.locationCoordinates ? `• GPS Map: https://maps.google.com/?q=${booking.locationCoordinates.latitude},${booking.locationCoordinates.longitude}\n` : ""}${booking.issueDescription ? `*Note:* ${booking.issueDescription}\n` : ""}*Est. Amount:* ₹${booking.estimatedAmount}
 ━━━━━━━━━━━━━━━━━━
-Please confirm my booking slot and technician arrival time. Thank you!`;
+Please confirm my booking and dispatch technician. Thank you!`;
 
   return `https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }

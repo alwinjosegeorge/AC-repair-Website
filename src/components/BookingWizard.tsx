@@ -16,7 +16,11 @@ import {
   MessageSquare,
   Sparkles,
   AlertCircle,
-  HelpCircle,
+  LocateFixed,
+  Wind,
+  ShoppingBag,
+  Home,
+  Check,
 } from "lucide-react";
 import {
   Booking,
@@ -25,6 +29,7 @@ import {
   saveBooking,
   generateCustomerWhatsAppURL,
   EGS_CALL_NUMBER,
+  EGS_WHATSAPP_NUMBER,
 } from "../lib/store";
 import {
   trackBookingStep,
@@ -39,90 +44,156 @@ interface BookingWizardProps {
   isModal?: boolean;
 }
 
-const SERVICES_DATA = [
+// 8 Services for Step 1
+export const SERVICES_DATA: Array<{
+  id: ServiceCategory;
+  title: string;
+  emoji: string;
+  badge: string;
+  priceText: string;
+  icon: typeof AirVent;
+  desc: string;
+  subServices: string[];
+  defaultAmount: number;
+}> = [
   {
-    id: "ac-service" as ServiceCategory,
-    title: "AC Deep Service",
+    id: "ac-service",
+    title: "AC Service",
+    emoji: "❄",
     badge: "Most Popular",
     priceText: "From ₹499",
     icon: AirVent,
-    desc: "Jet pump wash, chemical foam cleaning, filter disinfection & 10-point checkup.",
+    desc: "Power jet pump wash, 10-point checkup, chemical disinfection & cooling test.",
     subServices: [
       "Deep Jet Power Cleaning (Indoor + Outdoor)",
       "Chemical Foam Wash & Coil Disinfection",
-      "Basic Filter & Drainage Pipe Flush",
+      "Filter & Drainage Pipe Flush",
       "Pre-Summer Complete Servicing",
     ],
     defaultAmount: 499,
   },
   {
-    id: "ac-repair" as ServiceCategory,
-    title: "AC Repair & Fix",
-    badge: "90-Min Response",
+    id: "ac-repair",
+    title: "AC Repair",
+    emoji: "🔧",
+    badge: "90-Min Arrival",
     priceText: "From ₹399",
     icon: Wrench,
-    desc: "Cooling issues, gas refill, water leaking, unusual noise, PCB & compressor repairs.",
+    desc: "Cooling issues, unusual noise, PCB diagnosis, water leak & electrical fixes.",
     subServices: [
-      "AC Not Cooling / Less Cooling Issue",
+      "AC Not Cooling / Less Cooling",
       "Water Leakage & Drainage Block",
-      "Gas Leakage Check & R32 / R410A Refill",
       "Compressor / Fan Motor Failure",
       "PCB Board Repair & Power Trip",
     ],
-    defaultAmount: 599,
+    defaultAmount: 399,
   },
   {
-    id: "ac-installation" as ServiceCategory,
-    title: "Installation & Shift",
-    badge: "Certified Pros",
+    id: "ac-cleaning",
+    title: "AC Cleaning",
+    emoji: "🧹",
+    badge: "Eco Foam",
+    priceText: "From ₹349",
+    icon: Sparkles,
+    desc: "Indoor & outdoor coil chemical foam clean, blower wipe & drain line flush.",
+    subServices: [
+      "Indoor Unit Deep Foam Wash",
+      "Outdoor Condenser Jet Flush",
+      "Filter Anti-Bacterial Sanitization",
+      "Blower & Air Vane Degreasing",
+    ],
+    defaultAmount: 349,
+  },
+  {
+    id: "ac-installation",
+    title: "AC Installation",
+    emoji: "⚙",
+    badge: "Zero Gas Loss",
     priceText: "From ₹1,199",
     icon: Cog,
-    desc: "Precision wall mounting, core drilling, vacuuming, copper piping & safe dismantling.",
+    desc: "Wall mounting, copper piping, core drilling, vacuuming & safe dismantling.",
     subServices: [
       "New Split AC Complete Installation",
       "Old AC Uninstallation / Dismantling",
-      "AC Relocation (Uninstallation + Re-fitting)",
-      "Window AC Fitting with Wooden/Iron Frame",
+      "AC Relocation (Dismantle + Re-fitting)",
+      "Window AC Fitting & Wooden Frame Setup",
     ],
     defaultAmount: 1199,
   },
   {
-    id: "ac-amc" as ServiceCategory,
-    title: "AC AMC Contract",
-    badge: "Save 40%",
-    priceText: "From ₹1,999/yr",
-    icon: ShieldCheck,
-    desc: "Annual maintenance contracts for homes & businesses with free unlimited breakdown visits.",
+    id: "gas-charging",
+    title: "Gas Charging",
+    emoji: "💨",
+    badge: "Leak Test Incl.",
+    priceText: "From ₹1,499",
+    icon: Wind,
+    desc: "Nitrogen pressure leak testing & pure R32 / R410A / R22 refrigerant refill.",
     subServices: [
-      "Residential Saver Plan (3 Free Wet Services + 1 Free Breakdown)",
-      "Comprehensive Care AMC (Wet Services + Spare Parts + Gas Top-up)",
-      "Multi-Unit Residential Society AMC",
+      "Full Gas Refill (R32 / R410A / R22)",
+      "Nitrogen Pressure Leak Detection & Brazing",
+      "Top-up Gas Charging (Partial)",
+      "Valve & Flare Nut Replacement",
     ],
-    defaultAmount: 1999,
+    defaultAmount: 1499,
   },
   {
-    id: "commercial-hvac" as ServiceCategory,
+    id: "commercial-hvac",
     title: "Commercial HVAC",
+    emoji: "🏢",
     badge: "B2B Solutions",
     priceText: "Custom Quote",
     icon: Building2,
-    desc: "VRV/VRF systems, ductable ACs, chillers, server room precision ACs & central plants.",
+    desc: "VRV/VRF systems, ductable splits, chillers, AHUs & server room precision cooling.",
     subServices: [
       "VRV / VRF System Installation & Diagnostic",
       "Ductable Split AC Servicing & Duct Cleaning",
-      "Chiller Plant & Air Handling Unit (AHU) Checkup",
+      "Chiller Plant & AHU Checkup",
       "Server Room Precision AC Maintenance",
     ],
     defaultAmount: 3500,
   },
+  {
+    id: "ac-amc",
+    title: "AMC",
+    emoji: "📋",
+    badge: "Save 40%",
+    priceText: "From ₹1,999/yr",
+    icon: ShieldCheck,
+    desc: "Annual maintenance contracts with scheduled deep services & free breakdown visits.",
+    subServices: [
+      "Residential Saver Plan (3 Wet Services + Free Visits)",
+      "Comprehensive Care AMC (Services + Spares + Gas)",
+      "Commercial Building Annual HVAC Contract",
+    ],
+    defaultAmount: 1999,
+  },
+  {
+    id: "buy-new-ac",
+    title: "Buy new ac",
+    emoji: "🛒",
+    badge: "Dealer Rates",
+    priceText: "Best Market Price",
+    icon: ShoppingBag,
+    desc: "Free room sizing consultation, top brand 5-star inverters & direct doorstep delivery.",
+    subServices: [
+      "1.5 Ton 5-Star Inverter Split AC Inquiry",
+      "1.0 Ton Bedroom Energy Saver AC Inquiry",
+      "2.0 Ton Large Living Room / Office AC Inquiry",
+      "Multi-Unit Bulk Purchase for Homes / Villas",
+    ],
+    defaultAmount: 0,
+  },
 ];
 
-const AC_TYPES: ACType[] = [
+// Step 2 AC Types
+export const AC_TYPES: ACType[] = [
   "Split AC",
   "Window AC",
   "Cassette AC",
-  "Tower AC",
-  "Central / VRV",
+  "Ductable AC",
+  "VRF / VRV",
+  "Central AC",
+  "Other",
 ];
 
 const TOP_BRANDS = [
@@ -132,9 +203,9 @@ const TOP_BRANDS = [
   "Blue Star",
   "Mitsubishi",
   "Panasonic",
+  "Carrier",
   "Lloyd",
   "Hitachi",
-  "Carrier",
   "O General",
   "Other",
 ];
@@ -151,9 +222,13 @@ const MAJOR_CITIES = [
   "Thiruvananthapuram",
   "Ernakulam / Cochin",
   "Thrissur",
-  "Chennai",
   "Kozhikode",
-  "Other Kerala City",
+  "Kottayam",
+  "Palakkad",
+  "Alappuzha",
+  "Kannur",
+  "Chennai",
+  "Other City",
 ];
 
 export function BookingWizard({
@@ -162,31 +237,51 @@ export function BookingWizard({
   className = "",
   isModal = false,
 }: BookingWizardProps) {
+  // Wizard Steps (1 -> 2 -> 3 -> 4 -> 5 Confirmation)
   const [step, setStep] = useState(1);
+
+  // Step 1: Service selection
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>(initialCategory);
   const [selectedSubService, setSelectedSubService] = useState<string>("");
+
+  // Step 2: Select ac type
   const [acType, setAcType] = useState<ACType>("Split AC");
   const [acBrand, setAcBrand] = useState("Daikin");
-  const [unitCount, setUnitCount] = useState(1);
   const [issueDescription, setIssueDescription] = useState("");
 
+  // Step 3: No of acs (1, 2, 3, 4, 5+)
+  const [unitSelection, setUnitSelection] = useState<"1" | "2" | "3" | "4" | "5+">("1");
+  const [customUnitCount, setCustomUnitCount] = useState<number>(5);
+
+  // Scheduling (accompanying Step 3)
   const [dateOption, setDateOption] = useState<"today" | "tomorrow" | "custom">("today");
   const [customDate, setCustomDate] = useState("");
   const [preferredSlot, setPreferredSlot] = useState(TIME_SLOTS[0]);
 
+  // Step 4: Customer details
   const [customerName, setCustomerName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [city, setCity] = useState("Kollam");
-  const [address, setAddress] = useState("");
-  const [landmark, setLandmark] = useState("");
-  const [pincode, setPincode] = useState("");
-  const [specialNotes, setSpecialNotes] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [whatsappSameAsContact, setWhatsappSameAsContact] = useState(true);
 
+  // Location fields
+  const [houseBuilding, setHouseBuilding] = useState("");
+  const [area, setArea] = useState("");
+  const [city, setCity] = useState("Kollam");
+  const [pincode, setPincode] = useState("");
+  const [landmark, setLandmark] = useState("");
+  const [locationCoordinates, setLocationCoordinates] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationStatus, setLocationStatus] = useState<string>("");
+
+  // Step 5: Created Booking result
   const [createdBooking, setCreatedBooking] = useState<Booking | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Update initial category if prop changes
+  // Sync initialCategory prop
   useEffect(() => {
     if (initialCategory) {
       setSelectedCategory(initialCategory);
@@ -197,7 +292,26 @@ export function BookingWizard({
     }
   }, [initialCategory]);
 
-  // Set default sub-service on category select
+  // Auto-sync WhatsApp number when checkbox is checked
+  useEffect(() => {
+    if (whatsappSameAsContact) {
+      setWhatsappNumber(contactPhone);
+    }
+  }, [contactPhone, whatsappSameAsContact]);
+
+  const currentServiceObj =
+    SERVICES_DATA.find((s) => s.id === selectedCategory) || SERVICES_DATA[0];
+
+  const effectiveUnits =
+    unitSelection === "5+" ? Math.max(5, customUnitCount) : parseInt(unitSelection, 10);
+
+  // Estimated Total calculation
+  const estimatedTotal =
+    selectedCategory === "commercial-hvac" || selectedCategory === "buy-new-ac"
+      ? currentServiceObj.defaultAmount
+      : currentServiceObj.defaultAmount * effectiveUnits;
+
+  // Handle Category Click
   const handleCategorySelect = (catId: ServiceCategory) => {
     setSelectedCategory(catId);
     const svc = SERVICES_DATA.find((s) => s.id === catId);
@@ -206,43 +320,103 @@ export function BookingWizard({
     }
   };
 
-  const currentServiceObj =
-    SERVICES_DATA.find((s) => s.id === selectedCategory) || SERVICES_DATA[0];
-
-  const estimatedTotal =
-    selectedCategory === "commercial-hvac"
-      ? currentServiceObj.defaultAmount
-      : currentServiceObj.defaultAmount * unitCount;
-
-  // Step 1 -> 2
-  const goToStep2 = () => {
-    if (!selectedSubService) {
-      setSelectedSubService(currentServiceObj.subServices[0]);
+  // GPS "Use My Location" Geolocation Handler
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus("Geolocation is not supported by your browser.");
+      return;
     }
-    trackBookingStep(2, "Appliance Details", selectedCategory);
+
+    setIsLocating(true);
+    setLocationStatus("Detecting your GPS location...");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocationCoordinates({ latitude, longitude });
+
+        try {
+          // Attempt reverse geocoding via OpenStreetMap Nominatim
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            { signal: controller.signal }
+          );
+          clearTimeout(timeoutId);
+
+          if (res.ok) {
+            const data = await res.json();
+            const addr = data.address || {};
+            const detectedArea =
+              addr.suburb || addr.neighbourhood || addr.road || addr.village || "";
+            const detectedCity =
+              addr.city || addr.town || addr.county || addr.state_district || "";
+            const detectedPin = addr.postcode || "";
+
+            if (detectedArea && !area) setArea(detectedArea);
+            if (detectedCity) {
+              const matched = MAJOR_CITIES.find((c) =>
+                c.toLowerCase().includes(detectedCity.toLowerCase())
+              );
+              if (matched) setCity(matched);
+              else setCity(detectedCity);
+            }
+            if (detectedPin && !pincode) setPincode(detectedPin);
+
+            setLocationStatus(
+              `Live location captured: ${detectedArea ? detectedArea + ", " : ""}${detectedCity || "Coords saved"}`
+            );
+          } else {
+            setLocationStatus(
+              `GPS location locked (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
+            );
+          }
+        } catch {
+          setLocationStatus(
+            `GPS location locked (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
+          );
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        setIsLocating(false);
+        if (error.code === error.PERMISSION_DENIED) {
+          setLocationStatus("Location access was denied. Please enter address manually.");
+        } else {
+          setLocationStatus("Could not fetch location. Please enter manually.");
+        }
+      },
+      { timeout: 8000, enableHighAccuracy: true }
+    );
+  };
+
+  // Step Navigation Handlers
+  const goToStep2 = () => {
+    trackBookingStep(2, "Select AC Type", selectedCategory);
     setStep(2);
     setErrorMsg("");
   };
 
-  // Step 2 -> 3
   const goToStep3 = () => {
-    trackBookingStep(3, "Schedule Slot", selectedCategory);
+    trackBookingStep(3, "No of ACs", selectedCategory);
     setStep(3);
     setErrorMsg("");
   };
 
-  // Step 3 -> 4
   const goToStep4 = () => {
     if (dateOption === "custom" && !customDate) {
       setErrorMsg("Please select your preferred service date.");
       return;
     }
-    trackBookingStep(4, "Contact & Location", selectedCategory);
+    trackBookingStep(4, "Customer Details", selectedCategory);
     setStep(4);
     setErrorMsg("");
   };
 
-  // Step 4 -> 5 (Submit)
+  // Step 4 Submit -> Step 5
   const handleSubmitBooking = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -251,15 +425,28 @@ export function BookingWizard({
       setErrorMsg("Please enter your name.");
       return;
     }
-    const cleanPhone = phone.replace(/\D/g, "");
-    if (cleanPhone.length < 10) {
-      setErrorMsg("Please enter a valid 10-digit mobile number.");
+
+    const cleanContact = contactPhone.replace(/\D/g, "");
+    if (cleanContact.length < 10) {
+      setErrorMsg("Please enter a valid 10-digit contact mobile number.");
       return;
     }
-    if (!address.trim()) {
-      setErrorMsg("Please enter your service address.");
+
+    const cleanWhatsApp = (whatsappSameAsContact ? contactPhone : whatsappNumber).replace(
+      /\D/g,
+      ""
+    );
+    if (cleanWhatsApp.length < 10) {
+      setErrorMsg("Please enter a valid 10-digit WhatsApp number.");
       return;
     }
+
+    if (!area.trim()) {
+      setErrorMsg("Please enter your Area/Locality name.");
+      return;
+    }
+
+    const fullAddress = [houseBuilding.trim(), area.trim()].filter(Boolean).join(", ");
 
     const preferredDateString =
       dateOption === "today"
@@ -270,22 +457,24 @@ export function BookingWizard({
 
     const booking = saveBooking({
       serviceCategory: selectedCategory,
-      serviceName: currentServiceObj.title,
-      subService: selectedSubService || currentServiceObj.subServices[0],
+      serviceName: `${currentServiceObj.emoji} ${currentServiceObj.title}`,
+      subService: selectedSubService || currentServiceObj.title,
       acType,
       acBrand,
-      unitCount,
+      unitCount: unitSelection === "5+" ? `${customUnitCount}+` : unitSelection,
       issueDescription: issueDescription.trim() || undefined,
       preferredDate: preferredDateString,
       preferredSlot,
       customerName: customerName.trim(),
-      phone: phone.trim(),
-      email: email.trim() || undefined,
-      address: address.trim(),
+      phone: contactPhone.trim(),
+      whatsappNumber: (whatsappSameAsContact ? contactPhone : whatsappNumber).trim(),
+      houseBuilding: houseBuilding.trim() || undefined,
+      area: area.trim(),
+      address: fullAddress,
       landmark: landmark.trim() || undefined,
       city,
       pincode: pincode.trim() || "691001",
-      specialNotes: specialNotes.trim() || undefined,
+      locationCoordinates: locationCoordinates || undefined,
       estimatedAmount: estimatedTotal,
     });
 
@@ -301,26 +490,46 @@ export function BookingWizard({
     if (onSuccess) onSuccess(booking);
   };
 
+  // Reset booking form
+  const handleReset = () => {
+    setStep(1);
+    setCreatedBooking(null);
+    setCustomerName("");
+    setContactPhone("");
+    setWhatsappNumber("");
+    setHouseBuilding("");
+    setArea("");
+    setLandmark("");
+    setPincode("");
+    setLocationCoordinates(null);
+    setLocationStatus("");
+    setIssueDescription("");
+    setErrorMsg("");
+  };
+
   return (
     <div
       className={`rounded-3xl border border-border bg-card p-5 md:p-8 shadow-2xl transition-all ${className}`}
     >
-      {/* Progress Header */}
+      {/* Step Header & Progress Indicator */}
       {step < 5 && (
         <div className="mb-6 border-b border-border/80 pb-5">
           <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             <span>
               Step {step} of 4:{" "}
-              {step === 1 && "Choose Service"}
-              {step === 2 && "Appliance Details"}
-              {step === 3 && "Date & Time"}
-              {step === 4 && "Contact & Address"}
+              {step === 1 && "Service Selection"}
+              {step === 2 && "Select AC Type"}
+              {step === 3 && "No of ACs"}
+              {step === 4 && "Customer Details"}
             </span>
-            <span className="text-brand font-bold">
-              Est: ₹{estimatedTotal.toLocaleString("en-IN")}
+            <span className="text-brand font-black text-sm">
+              {estimatedTotal > 0
+                ? `Est: ₹${estimatedTotal.toLocaleString("en-IN")}`
+                : currentServiceObj.priceText}
             </span>
           </div>
-          {/* Visual Step Bar */}
+
+          {/* 4-Step Progress Bar */}
           <div className="mt-3 grid grid-cols-4 gap-2">
             {[1, 2, 3, 4].map((i) => (
               <div
@@ -341,50 +550,50 @@ export function BookingWizard({
         </div>
       )}
 
-      {/* STEP 1: SELECT SERVICE */}
+      {/* ============================================================ */}
+      {/* STEP 1: SERVICE SELECTION */}
+      {/* ============================================================ */}
       {step === 1 && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
-              Select HVAC Service Required
+            <div className="inline-block rounded-md bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
+              Step 1 • Service Selection
+            </div>
+            <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+              Choose the HVAC Service You Need
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Choose your service category to see instant pricing and verified technician slots.
+              Instant pricing, verified technicians, and guaranteed 90-minute doorstep arrival.
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {/* 8 Requested Services Grid */}
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {SERVICES_DATA.map((svc) => {
-              const Icon = svc.icon;
               const isSelected = selectedCategory === svc.id;
+              const Icon = svc.icon;
               return (
                 <button
                   key={svc.id}
                   type="button"
                   onClick={() => handleCategorySelect(svc.id)}
-                  className={`group relative flex flex-col items-start justify-between rounded-2xl border p-4 text-left transition-all ${
+                  className={`group relative flex flex-col justify-between rounded-2xl border p-4 text-left transition-all cursor-pointer ${
                     isSelected
                       ? "border-brand bg-brand/5 shadow-md ring-2 ring-brand/30"
                       : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
                   }`}
                 >
-                  <div className="flex w-full items-start justify-between">
-                    <div
-                      className={`flex size-11 items-center justify-center rounded-xl transition-colors ${
-                        isSelected
-                          ? "bg-brand text-brand-foreground shadow-sm"
-                          : "bg-background text-foreground group-hover:bg-brand/10 group-hover:text-brand"
-                      }`}
-                    >
-                      <Icon className="size-6" />
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl">{svc.emoji}</span>
+                      <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-black uppercase text-brand">
+                        {svc.badge}
+                      </span>
                     </div>
-                    <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-[11px] font-bold text-brand">
-                      {svc.badge}
-                    </span>
-                  </div>
 
-                  <div className="mt-4">
-                    <h3 className="font-bold text-foreground text-base">{svc.title}</h3>
+                    <h3 className="mt-3 font-extrabold text-foreground text-base flex items-center gap-1.5">
+                      <span>{svc.title}</span>
+                    </h3>
                     <p className="mt-1 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                       {svc.desc}
                     </p>
@@ -393,11 +602,17 @@ export function BookingWizard({
                   <div className="mt-4 flex w-full items-center justify-between border-t border-border/60 pt-3">
                     <span className="text-xs font-black text-brand">{svc.priceText}</span>
                     <span
-                      className={`text-xs font-semibold ${
+                      className={`text-xs font-bold flex items-center gap-1 ${
                         isSelected ? "text-brand" : "text-muted-foreground"
                       }`}
                     >
-                      {isSelected ? "Selected ✓" : "Select"}
+                      {isSelected ? (
+                        <>
+                          <Check className="size-3.5" /> Selected
+                        </>
+                      ) : (
+                        "Select"
+                      )}
                     </span>
                   </div>
                 </button>
@@ -405,92 +620,109 @@ export function BookingWizard({
             })}
           </div>
 
-          {/* Sub Service Checklist */}
-          <div className="rounded-2xl border border-border bg-surface/40 p-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Specific Requirement:
-            </h4>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {currentServiceObj.subServices.map((sub) => (
-                <button
-                  key={sub}
-                  type="button"
-                  onClick={() => setSelectedSubService(sub)}
-                  className={`flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-left text-sm font-medium transition-all ${
-                    selectedSubService === sub
-                      ? "border-brand bg-brand text-brand-foreground shadow-sm"
-                      : "border-border bg-card text-foreground hover:border-brand/40"
-                  }`}
-                >
-                  <div
-                    className={`size-4 rounded-full border flex items-center justify-center shrink-0 ${
+          {/* Sub Service Checklist for extra detail */}
+          {currentServiceObj.subServices.length > 0 && (
+            <div className="rounded-2xl border border-border bg-surface/40 p-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Specific Work Requirement ({currentServiceObj.title}):
+              </h4>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {currentServiceObj.subServices.map((sub) => (
+                  <button
+                    key={sub}
+                    type="button"
+                    onClick={() => setSelectedSubService(sub)}
+                    className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left text-xs font-medium transition-all ${
                       selectedSubService === sub
-                        ? "border-white bg-white"
-                        : "border-muted-foreground"
+                        ? "border-brand bg-brand text-brand-foreground shadow-sm"
+                        : "border-border bg-card text-foreground hover:border-brand/40"
                     }`}
                   >
-                    {selectedSubService === sub && (
-                      <div className="size-2 rounded-full bg-brand" />
-                    )}
-                  </div>
-                  <span className="text-xs sm:text-sm">{sub}</span>
-                </button>
-              ))}
+                    <div
+                      className={`size-3.5 rounded-full border flex items-center justify-center shrink-0 ${
+                        selectedSubService === sub
+                          ? "border-white bg-white"
+                          : "border-muted-foreground"
+                      }`}
+                    >
+                      {selectedSubService === sub && (
+                        <div className="size-1.5 rounded-full bg-brand" />
+                      )}
+                    </div>
+                    <span>{sub}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex justify-end pt-2">
             <button
               type="button"
               onClick={goToStep2}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3.5 text-sm font-bold text-brand-foreground shadow-lg shadow-brand/25 transition-all hover:opacity-95 hover:shadow-brand/35"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3.5 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 transition-all hover:scale-105 hover:bg-brand/90"
             >
-              Continue to AC Details
+              <span>Continue to AC Type</span>
               <ArrowRight className="size-4" />
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 2: APPLIANCE DETAILS */}
+      {/* ============================================================ */}
+      {/* STEP 2: SELECT AC TYPE */}
+      {/* ============================================================ */}
       {step === 2 && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
-              Air Conditioner Specifications
+            <div className="inline-block rounded-md bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
+              Step 2 • Select AC Type
+            </div>
+            <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+              What Type of Air Conditioner?
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Helps our technicians carry the exact diagnostic tools, gas cylinders, or spares.
+              Helps our technicians carry the exact diagnostic tools, manifold gauges, and replacement spares.
             </p>
           </div>
 
-          {/* AC Type */}
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              AC Type
-            </label>
-            <div className="mt-2.5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-              {AC_TYPES.map((t) => (
+          {/* 7 Requested AC Types */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {AC_TYPES.map((type) => {
+              const isSelected = acType === type;
+              return (
                 <button
-                  key={t}
+                  key={type}
                   type="button"
-                  onClick={() => setAcType(t)}
-                  className={`rounded-xl border px-3 py-3 text-center text-xs font-bold transition-all ${
-                    acType === t
-                      ? "border-brand bg-brand text-brand-foreground shadow-sm"
-                      : "border-border bg-surface/50 text-foreground hover:border-brand/40"
+                  onClick={() => setAcType(type)}
+                  className={`group flex flex-col items-center justify-center rounded-2xl border p-4 text-center transition-all cursor-pointer ${
+                    isSelected
+                      ? "border-brand bg-brand text-brand-foreground shadow-lg ring-2 ring-brand/30"
+                      : "border-border bg-surface/50 text-foreground hover:border-brand/40 hover:bg-surface"
                   }`}
                 >
-                  {t}
+                  <AirVent
+                    className={`size-7 mb-2 transition-transform group-hover:scale-110 ${
+                      isSelected ? "text-brand-foreground" : "text-brand"
+                    }`}
+                  />
+                  <span className="text-sm font-bold">{type}</span>
+                  <span
+                    className={`text-[10px] mt-1 ${
+                      isSelected ? "text-brand-foreground/80" : "text-muted-foreground"
+                    }`}
+                  >
+                    {isSelected ? "Selected ✓" : "Tap to pick"}
+                  </span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
 
-          {/* Brand */}
+          {/* Brand Selection */}
           <div>
             <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              AC Brand / Manufacturer
+              AC Brand / Manufacturer (Optional)
             </label>
             <div className="mt-2.5 flex flex-wrap gap-2">
               {TOP_BRANDS.map((b) => (
@@ -510,45 +742,16 @@ export function BookingWizard({
             </div>
           </div>
 
-          {/* Quantity Stepper */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-border bg-surface/50 p-4">
-            <div>
-              <span className="font-bold text-foreground text-sm block">Number of AC Units</span>
-              <span className="text-xs text-muted-foreground">
-                Get up to 15% discount on 2 or more units booked together.
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setUnitCount((prev) => Math.max(1, prev - 1))}
-                className="flex size-9 items-center justify-center rounded-xl border border-border bg-card text-foreground font-bold hover:bg-surface"
-              >
-                -
-              </button>
-              <span className="w-8 text-center text-base font-black text-brand">
-                {unitCount}
-              </span>
-              <button
-                type="button"
-                onClick={() => setUnitCount((prev) => prev + 1)}
-                className="flex size-9 items-center justify-center rounded-xl border border-border bg-card text-foreground font-bold hover:bg-surface"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          {/* Problem description */}
+          {/* Optional Issue description */}
           <div>
             <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Describe Any Specific Issue (Optional)
+              Describe Any Specific Issue or Need (Optional)
             </label>
             <textarea
               rows={2}
               value={issueDescription}
               onChange={(e) => setIssueDescription(e.target.value)}
-              placeholder="e.g. Water leaking inside bedroom, strange humming sound, not cooling since yesterday..."
+              placeholder="e.g. Less cooling, water dripping on floor, bad odor, remote not working..."
               className="mt-2 w-full rounded-xl border border-border bg-card p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
@@ -560,123 +763,172 @@ export function BookingWizard({
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground hover:bg-border/40"
             >
               <ArrowLeft className="size-4" />
-              Back
+              <span>Back</span>
             </button>
             <button
               type="button"
               onClick={goToStep3}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3 text-sm font-bold text-brand-foreground shadow-lg shadow-brand/25 hover:opacity-95"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 hover:scale-105 hover:bg-brand/90"
             >
-              Select Schedule
+              <span>Continue to No of ACs</span>
               <ArrowRight className="size-4" />
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 3: DATE & TIME */}
+      {/* ============================================================ */}
+      {/* STEP 3: NO OF ACS (1, 2, 3, 4, 5+) */}
+      {/* ============================================================ */}
       {step === 3 && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
-              Select Date & Preferred Time Slot
+            <div className="inline-block rounded-md bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
+              Step 3 • Number of ACs
+            </div>
+            <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+              How Many AC Units Need Service?
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Our technicians operate 7 days a week, 8:00 AM – 9:00 PM across all service locations.
+              Select the total number of air conditioners. Multi-unit bookings receive up to 15% discount!
             </p>
           </div>
 
-          {/* Quick Date Options */}
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Service Day
-            </label>
-            <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Requested 1, 2, 3, 4, 5+ Selection */}
+          <div className="grid grid-cols-5 gap-2.5 sm:gap-4">
+            {(["1", "2", "3", "4", "5+"] as const).map((count) => {
+              const isSelected = unitSelection === count;
+              return (
+                <button
+                  key={count}
+                  type="button"
+                  onClick={() => setUnitSelection(count)}
+                  className={`flex flex-col items-center justify-center rounded-2xl border py-4 sm:py-6 text-center transition-all cursor-pointer ${
+                    isSelected
+                      ? "border-brand bg-brand text-brand-foreground shadow-xl ring-4 ring-brand/20 scale-105"
+                      : "border-border bg-surface/50 text-foreground hover:border-brand/40 hover:bg-surface"
+                  }`}
+                >
+                  <span className="text-2xl sm:text-3xl font-black">{count}</span>
+                  <span
+                    className={`mt-1 text-[11px] font-semibold uppercase ${
+                      isSelected ? "text-brand-foreground/85" : "text-muted-foreground"
+                    }`}
+                  >
+                    {count === "1" ? "AC Unit" : "Units"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* If 5+ selected, allow custom count entry */}
+          {unitSelection === "5+" && (
+            <div className="rounded-2xl border border-brand/30 bg-brand/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-sm font-bold text-foreground">Enter Exact Unit Count:</span>
+                <span className="text-xs text-muted-foreground block">
+                  For corporate, school, or multi-villa bulk requests.
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCustomUnitCount((prev) => Math.max(5, prev - 1))}
+                  className="flex size-9 items-center justify-center rounded-xl border border-border bg-card font-bold hover:bg-surface"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  min={5}
+                  value={customUnitCount}
+                  onChange={(e) => setCustomUnitCount(Math.max(5, parseInt(e.target.value, 10) || 5))}
+                  className="w-16 text-center font-black text-brand text-lg bg-card rounded-xl border border-border p-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => setCustomUnitCount((prev) => prev + 1)}
+                  className="flex size-9 items-center justify-center rounded-xl border border-border bg-card font-bold hover:bg-surface"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Schedule Window (Date & Time) */}
+          <div className="rounded-2xl border border-border bg-surface/40 p-4 space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Select Preferred Arrival Time:
+            </h4>
+
+            {/* Quick Date Options */}
+            <div className="grid grid-cols-3 gap-2.5">
               <button
                 type="button"
                 onClick={() => setDateOption("today")}
-                className={`flex flex-col items-start rounded-2xl border p-4 text-left transition-all ${
+                className={`rounded-xl border p-3 text-center transition-all ${
                   dateOption === "today"
-                    ? "border-brand bg-brand/5 shadow-md ring-2 ring-brand/30"
-                    : "border-border bg-surface/50 hover:border-brand/40"
+                    ? "border-brand bg-brand/10 font-bold text-brand ring-1 ring-brand"
+                    : "border-border bg-card text-foreground hover:border-brand/40"
                 }`}
               >
-                <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-extrabold text-emerald-600">
-                  ⚡ Express Available
-                </span>
-                <span className="mt-2 text-base font-bold text-foreground">Today</span>
-                <span className="text-xs text-muted-foreground">
-                  Arrival within 90-120 mins
-                </span>
+                <div className="text-xs font-black">Today</div>
+                <div className="text-[10px] text-emerald-600 font-semibold">⚡ 90-Min Arrival</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setDateOption("tomorrow")}
-                className={`flex flex-col items-start rounded-2xl border p-4 text-left transition-all ${
+                className={`rounded-xl border p-3 text-center transition-all ${
                   dateOption === "tomorrow"
-                    ? "border-brand bg-brand/5 shadow-md ring-2 ring-brand/30"
-                    : "border-border bg-surface/50 hover:border-brand/40"
+                    ? "border-brand bg-brand/10 font-bold text-brand ring-1 ring-brand"
+                    : "border-border bg-card text-foreground hover:border-brand/40"
                 }`}
               >
-                <span className="rounded-md bg-brand-soft px-2 py-0.5 text-[10px] font-extrabold text-brand">
-                  Guaranteed Slot
-                </span>
-                <span className="mt-2 text-base font-bold text-foreground">Tomorrow</span>
-                <span className="text-xs text-muted-foreground">Full day choice</span>
+                <div className="text-xs font-black">Tomorrow</div>
+                <div className="text-[10px] text-muted-foreground">Flexible Slot</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setDateOption("custom")}
-                className={`flex flex-col items-start rounded-2xl border p-4 text-left transition-all ${
+                className={`rounded-xl border p-3 text-center transition-all ${
                   dateOption === "custom"
-                    ? "border-brand bg-brand/5 shadow-md ring-2 ring-brand/30"
-                    : "border-border bg-surface/50 hover:border-brand/40"
+                    ? "border-brand bg-brand/10 font-bold text-brand ring-1 ring-brand"
+                    : "border-border bg-card text-foreground hover:border-brand/40"
                 }`}
               >
-                <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-extrabold text-muted-foreground">
-                  Advance Schedule
-                </span>
-                <span className="mt-2 text-base font-bold text-foreground">Pick a Date</span>
-                <span className="text-xs text-muted-foreground">Choose upcoming date</span>
+                <div className="text-xs font-black">Pick Date</div>
+                <div className="text-[10px] text-muted-foreground">Future Visit</div>
               </button>
             </div>
-          </div>
 
-          {dateOption === "custom" && (
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Choose Specific Date
-              </label>
+            {dateOption === "custom" && (
               <input
                 type="date"
                 min={new Date().toISOString().split("T")[0]}
                 value={customDate}
                 onChange={(e) => setCustomDate(e.target.value)}
-                className="mt-2 w-full rounded-xl border border-border bg-card p-3 text-sm text-foreground focus:border-brand focus:outline-none"
+                className="w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground focus:border-brand focus:outline-none"
               />
-            </div>
-          )}
+            )}
 
-          {/* Time Slot */}
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Preferred Arrival Window
-            </label>
-            <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {/* Time Slot */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {TIME_SLOTS.map((slot) => (
                 <button
                   key={slot}
                   type="button"
                   onClick={() => setPreferredSlot(slot)}
-                  className={`flex items-center gap-3 rounded-xl border p-3 text-left text-xs sm:text-sm font-semibold transition-all ${
+                  className={`flex items-center gap-2 rounded-xl border p-2.5 text-left text-xs font-semibold transition-all ${
                     preferredSlot === slot
                       ? "border-brand bg-brand text-brand-foreground shadow-sm"
-                      : "border-border bg-surface/50 text-foreground hover:border-brand/40"
+                      : "border-border bg-card text-foreground hover:border-brand/40"
                   }`}
                 >
-                  <Clock className="size-4 shrink-0" />
+                  <Clock className="size-3.5 shrink-0" />
                   <span>{slot}</span>
                 </button>
               ))}
@@ -690,36 +942,43 @@ export function BookingWizard({
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground hover:bg-border/40"
             >
               <ArrowLeft className="size-4" />
-              Back
+              <span>Back</span>
             </button>
             <button
               type="button"
               onClick={goToStep4}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3 text-sm font-bold text-brand-foreground shadow-lg shadow-brand/25 hover:opacity-95"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 hover:scale-105 hover:bg-brand/90"
             >
-              Enter Contact Info
+              <span>Continue to Customer Details</span>
               <ArrowRight className="size-4" />
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 4: CONTACT & LOCATION */}
+      {/* ============================================================ */}
+      {/* STEP 4: CUSTOMER DETAILS */}
+      {/* ============================================================ */}
       {step === 4 && (
-        <form onSubmit={handleSubmitBooking} className="space-y-5">
+        <form onSubmit={handleSubmitBooking} className="space-y-6">
           <div>
-            <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
-              Service Location & Contact Details
+            <div className="inline-block rounded-md bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
+              Step 4 • Customer Details
+            </div>
+            <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+              Contact &amp; Service Location
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              You will receive an instant WhatsApp confirmation with technician live status.
+              Instant WhatsApp confirmation with live technician arrival status will be sent to your mobile.
             </p>
           </div>
 
+          {/* Contact Details */}
           <div className="grid gap-4 sm:grid-cols-2">
+            {/* Name */}
             <div>
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Your Full Name *
+                Name *
               </label>
               <div className="relative mt-1.5">
                 <User className="absolute left-3.5 top-3.5 size-4 text-muted-foreground" />
@@ -734,9 +993,10 @@ export function BookingWizard({
               </div>
             </div>
 
+            {/* Contact */}
             <div>
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Mobile Number (WhatsApp) *
+                Contact (Mobile Number) *
               </label>
               <div className="relative mt-1.5">
                 <Phone className="absolute left-3.5 top-3.5 size-4 text-muted-foreground" />
@@ -745,105 +1005,187 @@ export function BookingWizard({
                   required
                   maxLength={10}
                   placeholder="e.g. 9895688833"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  value={contactPhone}
+                  onChange={(e) => setContactPhone(e.target.value)}
                   className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Service City *
+          {/* WhatsApp Number with Sync Checkbox */}
+          <div className="rounded-2xl border border-border bg-surface/40 p-4">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <MessageSquare className="size-3.5 text-[#25D366]" />
+                WhatsApp Number *
               </label>
-              <select
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground focus:border-brand focus:outline-none"
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-foreground">
+                <input
+                  type="checkbox"
+                  checked={whatsappSameAsContact}
+                  onChange={(e) => setWhatsappSameAsContact(e.target.checked)}
+                  className="rounded border-border text-brand focus:ring-brand"
+                />
+                <span>Same as contact number</span>
+              </label>
+            </div>
+
+            {!whatsappSameAsContact && (
+              <div className="relative mt-2.5">
+                <MessageSquare className="absolute left-3.5 top-3.5 size-4 text-[#25D366]" />
+                <input
+                  type="tel"
+                  required
+                  maxLength={10}
+                  placeholder="e.g. 9895688833"
+                  value={whatsappNumber}
+                  onChange={(e) => setWhatsappNumber(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Location Section */}
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Location
+              </label>
+
+              {/* "Use My Location" GPS Button */}
+              <button
+                type="button"
+                onClick={handleUseMyLocation}
+                disabled={isLocating}
+                className="inline-flex items-center gap-2 rounded-xl border-2 border-brand/30 bg-brand/10 px-4 py-2 text-xs font-black text-brand transition-all hover:bg-brand/20 active:scale-95"
               >
-                {MAJOR_CITIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+                <LocateFixed className={`size-4 ${isLocating ? "animate-spin" : ""}`} />
+                <span>{isLocating ? "Detecting GPS..." : "📍 Use my location"}</span>
+              </button>
             </div>
 
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Pincode
-              </label>
-              <input
-                type="text"
-                maxLength={6}
-                placeholder="e.g. 691001"
-                value={pincode}
-                onChange={(e) => setPincode(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none"
-              />
-            </div>
-          </div>
+            {locationStatus && (
+              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+                <CheckCircle2 className="size-4 shrink-0" />
+                <span>{locationStatus}</span>
+              </div>
+            )}
 
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              House / Flat / Building Address *
-            </label>
-            <div className="relative mt-1.5">
-              <MapPin className="absolute left-3.5 top-3.5 size-4 text-muted-foreground" />
-              <input
-                type="text"
-                required
-                placeholder="e.g. Flat 3A, Green Valley Heights, MG Road"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Landmark (Optional)
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Near Metro Station / District Hospital"
-                value={landmark}
-                onChange={(e) => setLandmark(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Email Address (Optional)
-              </label>
-              <input
-                type="email"
-                placeholder="For invoice and warranty card"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Quick Summary Pill before Confirm */}
-          <div className="rounded-2xl border border-brand/20 bg-brand/5 p-4 text-xs text-foreground flex items-center justify-between">
-            <div>
-              <span className="font-bold block text-sm text-brand">
-                {currentServiceObj.title} ({unitCount} Unit{unitCount > 1 ? "s" : ""})
+            <div className="relative flex py-1 items-center">
+              <div className="flex-grow border-t border-border"></div>
+              <span className="flex-shrink mx-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                or enter manually
               </span>
-              <span className="text-muted-foreground">
-                {dateOption === "today" ? "Today" : dateOption === "tomorrow" ? "Tomorrow" : customDate} | {preferredSlot}
+              <div className="flex-grow border-t border-border"></div>
+            </div>
+
+            {/* House / Building */}
+            <div>
+              <label className="text-xs font-semibold text-foreground">
+                House / Building
+              </label>
+              <div className="relative mt-1">
+                <Home className="absolute left-3.5 top-3.5 size-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="e.g. TC 14/120, Rose Villa / Flat 4B, Blue Horizon"
+                  value={houseBuilding}
+                  onChange={(e) => setHouseBuilding(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                />
+              </div>
+            </div>
+
+            {/* Area & City */}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="text-xs font-semibold text-foreground">Area *</label>
+                <div className="relative mt-1">
+                  <MapPin className="absolute left-3.5 top-3.5 size-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Kadappakada / MG Road / Kakkanad"
+                    value={area}
+                    onChange={(e) => setArea(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-foreground">City *</label>
+                <input
+                  list="city-suggestions"
+                  type="text"
+                  required
+                  placeholder="e.g. Kollam / Thiruvananthapuram"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                />
+                <datalist id="city-suggestions">
+                  {MAJOR_CITIES.map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
+              </div>
+            </div>
+
+            {/* PIN Code & Landmark */}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="text-xs font-semibold text-foreground">PIN Code *</label>
+                <input
+                  type="text"
+                  required
+                  maxLength={6}
+                  placeholder="e.g. 691001"
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-foreground">Landmark</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Near SBI Bank / Opp. Metro Pillar 32"
+                  value={landmark}
+                  onChange={(e) => setLandmark(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Live Order Summary Card */}
+          <div className="rounded-2xl border border-brand/20 bg-brand/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="font-black text-sm text-brand block">
+                {currentServiceObj.emoji} {currentServiceObj.title} • {acType} ({unitSelection}{" "}
+                {unitSelection === "1" ? "Unit" : "Units"})
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {dateOption === "today"
+                  ? "Today (Express)"
+                  : dateOption === "tomorrow"
+                  ? "Tomorrow"
+                  : customDate}{" "}
+                • {preferredSlot}
               </span>
             </div>
-            <div className="text-right">
-              <span className="text-muted-foreground block text-[11px]">Pay After Service</span>
-              <span className="text-base font-black text-brand">
-                ₹{estimatedTotal.toLocaleString("en-IN")}
+            <div className="sm:text-right">
+              <span className="text-[11px] text-muted-foreground block font-bold">
+                Pay After Service
+              </span>
+              <span className="text-lg font-black text-brand">
+                {estimatedTotal > 0
+                  ? `₹${estimatedTotal.toLocaleString("en-IN")}`
+                  : currentServiceObj.priceText}
               </span>
             </div>
           </div>
@@ -855,20 +1197,22 @@ export function BookingWizard({
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground hover:bg-border/40"
             >
               <ArrowLeft className="size-4" />
-              Back
+              <span>Back</span>
             </button>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-sm font-extrabold text-brand-foreground shadow-xl shadow-brand/30 transition-all hover:opacity-95"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-xl shadow-brand/30 transition-all hover:scale-105 hover:bg-brand/90"
             >
-              Confirm Booking (Free Cancellation)
+              <span>Confirm &amp; Book Service</span>
               <CheckCircle2 className="size-4" />
             </button>
           </div>
         </form>
       )}
 
-      {/* STEP 5: SUCCESS / CONFIRMATION */}
+      {/* ============================================================ */}
+      {/* STEP 5: BOOKING CONFIRMATION & WHATSAPP DISPATCH */}
+      {/* ============================================================ */}
       {step === 5 && createdBooking && (
         <div className="text-center py-4 space-y-6">
           <div className="inline-flex size-16 items-center justify-center rounded-3xl bg-emerald-500/10 text-emerald-500 ring-8 ring-emerald-500/5">
@@ -876,11 +1220,11 @@ export function BookingWizard({
           </div>
 
           <div>
-            <span className="inline-block rounded-full bg-brand-soft px-3 py-1 text-xs font-bold text-brand">
-              Booking Ref: {createdBooking.id}
+            <span className="inline-block rounded-full bg-brand-soft px-3.5 py-1 text-xs font-black text-brand">
+              Booking ID: {createdBooking.id}
             </span>
             <h2 className="mt-2 text-2xl md:text-3xl font-black text-foreground">
-              Service Booking Confirmed!
+              Booking Received Successfully!
             </h2>
             <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
               Thank you, <strong className="text-foreground">{createdBooking.customerName}</strong>. Our service manager in{" "}
@@ -888,67 +1232,79 @@ export function BookingWizard({
             </p>
           </div>
 
-          {/* Booking Summary Box */}
+          {/* Full Breakdown Summary Card */}
           <div className="rounded-2xl border border-border bg-surface/50 p-5 text-left max-w-lg mx-auto text-sm space-y-2.5">
             <div className="flex justify-between border-b border-border/80 pb-2">
               <span className="text-muted-foreground">Service:</span>
               <span className="font-bold text-foreground">{createdBooking.serviceName}</span>
             </div>
             <div className="flex justify-between border-b border-border/80 pb-2">
-              <span className="text-muted-foreground">Specific Work:</span>
-              <span className="font-medium text-foreground">{createdBooking.subService}</span>
-            </div>
-            <div className="flex justify-between border-b border-border/80 pb-2">
-              <span className="text-muted-foreground">Appliance:</span>
+              <span className="text-muted-foreground">AC Type &amp; Units:</span>
               <span className="font-medium text-foreground">
-                {createdBooking.acBrand} {createdBooking.acType} ({createdBooking.unitCount} Unit)
+                {createdBooking.acType} ({createdBooking.unitCount}{" "}
+                {createdBooking.unitCount === "1" ? "Unit" : "Units"})
               </span>
             </div>
             <div className="flex justify-between border-b border-border/80 pb-2">
-              <span className="text-muted-foreground">Slot:</span>
-              <span className="font-semibold text-brand">
+              <span className="text-muted-foreground">Date &amp; Slot:</span>
+              <span className="font-medium text-foreground">
                 {createdBooking.preferredDate} ({createdBooking.preferredSlot})
               </span>
             </div>
             <div className="flex justify-between border-b border-border/80 pb-2">
-              <span className="text-muted-foreground">Location:</span>
+              <span className="text-muted-foreground">Contact &amp; WhatsApp:</span>
               <span className="font-medium text-foreground">
-                {createdBooking.address}, {createdBooking.city}
+                {createdBooking.phone} / {createdBooking.whatsappNumber || createdBooking.phone}
+              </span>
+            </div>
+            <div className="flex justify-between border-b border-border/80 pb-2">
+              <span className="text-muted-foreground">Location:</span>
+              <span className="font-medium text-foreground text-right max-w-xs">
+                {createdBooking.address}, {createdBooking.city} - {createdBooking.pincode}
+                {createdBooking.landmark ? ` (Landmark: ${createdBooking.landmark})` : ""}
               </span>
             </div>
             <div className="flex justify-between pt-1">
-              <span className="text-muted-foreground">Est. Total (Pay after check):</span>
-              <span className="font-black text-base text-foreground">
-                ₹{createdBooking.estimatedAmount.toLocaleString("en-IN")}
+              <span className="font-bold text-foreground">Estimated Total:</span>
+              <span className="font-black text-brand text-base">
+                {createdBooking.estimatedAmount > 0
+                  ? `₹${createdBooking.estimatedAmount.toLocaleString("en-IN")}`
+                  : "Pay After Inspection"}
               </span>
             </div>
           </div>
 
-          {/* Primary Action: Direct WhatsApp Confirmation */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          {/* Actions: Send WhatsApp & Call */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-lg mx-auto pt-2">
             <a
               href={generateCustomerWhatsAppURL(createdBooking)}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => trackWhatsAppClick("booking_success_screen", createdBooking.serviceName)}
-              className="inline-flex w-full sm:w-auto items-center justify-center gap-2.5 rounded-2xl bg-[#25D366] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#25D366]/25 transition-transform hover:scale-[1.02]"
+              onClick={() => trackWhatsAppClick("booking_success_dispatch")}
+              className="flex w-full sm:w-auto flex-1 items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-6 py-4 text-sm font-black uppercase tracking-wider text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
             >
-              <MessageSquare className="size-5" />
-              Open WhatsApp for Fast Track Update
+              <MessageSquare className="size-5 fill-current" />
+              <span>Send on WhatsApp</span>
             </a>
 
             <a
               href={`tel:${EGS_CALL_NUMBER}`}
-              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-border bg-card px-5 py-3.5 text-sm font-bold text-foreground hover:bg-surface"
+              className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border-2 border-border bg-card px-6 py-4 text-sm font-bold text-foreground shadow-sm transition-all hover:border-brand/40 hover:bg-surface"
             >
-              <Phone className="size-4" />
-              Call Support Directly
+              <Phone className="size-4 text-brand" />
+              <span>Call Helpline</span>
             </a>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            🛡️ 30-Day Post-Service Warranty included • Verified Technicians with ID Card
-          </p>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-muted-foreground hover:text-brand underline cursor-pointer"
+            >
+              Book Another AC Service
+            </button>
+          </div>
         </div>
       )}
     </div>
