@@ -21,6 +21,7 @@ import {
   ShoppingBag,
   Home,
   Check,
+  Zap,
 } from "lucide-react";
 import {
   Booking,
@@ -44,7 +45,7 @@ interface BookingWizardProps {
   isModal?: boolean;
 }
 
-// 8 Services for Step 1
+// Step 1: 8 Services
 export const SERVICES_DATA: Array<{
   id: ServiceCategory;
   title: string;
@@ -185,7 +186,7 @@ export const SERVICES_DATA: Array<{
   },
 ];
 
-// Step 2 AC Types
+// Step 2: 7 AC Types
 export const AC_TYPES: ACType[] = [
   "Split AC",
   "Window AC",
@@ -210,11 +211,13 @@ const TOP_BRANDS = [
   "Other",
 ];
 
+// Step 5: Time Slots
 const TIME_SLOTS = [
-  "Morning (9:00 AM - 12:00 PM)",
-  "Afternoon (12:00 PM - 3:00 PM)",
-  "Evening (3:00 PM - 7:00 PM)",
-  "Night Express (7:00 PM - 9:00 PM)",
+  { id: "slot-emergency", label: "⚡ Emergency Now (Within 90 Mins)", note: "Rapid dispatch" },
+  { id: "slot-morning", label: "🌅 Morning (9:00 AM - 12:00 PM)", note: "First slot of the day" },
+  { id: "slot-afternoon", label: "☀️ Afternoon (12:00 PM - 3:00 PM)", note: "Mid-day visit" },
+  { id: "slot-evening", label: "🌇 Evening (3:00 PM - 7:00 PM)", note: "Most popular" },
+  { id: "slot-night", label: "🌙 Night Express (7:00 PM - 9:00 PM)", note: "After work hours" },
 ];
 
 const MAJOR_CITIES = [
@@ -237,7 +240,7 @@ export function BookingWizard({
   className = "",
   isModal = false,
 }: BookingWizardProps) {
-  // Wizard Steps (1 -> 2 -> 3 -> 4 -> 5 Confirmation)
+  // Wizard Steps (1 -> 2 -> 3 -> 4 -> 5 -> 6 Confirmation)
   const [step, setStep] = useState(1);
 
   // Step 1: Service selection
@@ -252,11 +255,6 @@ export function BookingWizard({
   // Step 3: No of acs (1, 2, 3, 4, 5+)
   const [unitSelection, setUnitSelection] = useState<"1" | "2" | "3" | "4" | "5+">("1");
   const [customUnitCount, setCustomUnitCount] = useState<number>(5);
-
-  // Scheduling (accompanying Step 3)
-  const [dateOption, setDateOption] = useState<"today" | "tomorrow" | "custom">("today");
-  const [customDate, setCustomDate] = useState("");
-  const [preferredSlot, setPreferredSlot] = useState(TIME_SLOTS[0]);
 
   // Step 4: Customer details
   const [customerName, setCustomerName] = useState("");
@@ -277,7 +275,13 @@ export function BookingWizard({
   const [isLocating, setIsLocating] = useState(false);
   const [locationStatus, setLocationStatus] = useState<string>("");
 
-  // Step 5: Created Booking result
+  // Step 5: Preferred time
+  const [dateOption, setDateOption] = useState<"today" | "tomorrow" | "custom">("today");
+  const [customDate, setCustomDate] = useState("");
+  const [preferredSlot, setPreferredSlot] = useState(TIME_SLOTS[0].label);
+  const [specialTimingNotes, setSpecialTimingNotes] = useState("");
+
+  // Step 6: Created Booking result
   const [createdBooking, setCreatedBooking] = useState<Booking | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -336,7 +340,6 @@ export function BookingWizard({
         setLocationCoordinates({ latitude, longitude });
 
         try {
-          // Attempt reverse geocoding via OpenStreetMap Nominatim
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 4000);
 
@@ -366,7 +369,7 @@ export function BookingWizard({
             if (detectedPin && !pincode) setPincode(detectedPin);
 
             setLocationStatus(
-              `Live location captured: ${detectedArea ? detectedArea + ", " : ""}${detectedCity || "Coords saved"}`
+              `Live location captured: ${detectedArea ? detectedArea + ", " : ""}${detectedCity || "Coordinates saved"}`
             );
           } else {
             setLocationStatus(
@@ -393,32 +396,29 @@ export function BookingWizard({
     );
   };
 
-  // Step Navigation Handlers
+  // Step 1 -> Step 2
   const goToStep2 = () => {
     trackBookingStep(2, "Select AC Type", selectedCategory);
     setStep(2);
     setErrorMsg("");
   };
 
+  // Step 2 -> Step 3
   const goToStep3 = () => {
     trackBookingStep(3, "No of ACs", selectedCategory);
     setStep(3);
     setErrorMsg("");
   };
 
+  // Step 3 -> Step 4
   const goToStep4 = () => {
-    if (dateOption === "custom" && !customDate) {
-      setErrorMsg("Please select your preferred service date.");
-      return;
-    }
     trackBookingStep(4, "Customer Details", selectedCategory);
     setStep(4);
     setErrorMsg("");
   };
 
-  // Step 4 Submit -> Step 5
-  const handleSubmitBooking = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Step 4 -> Step 5 (Preferred Time)
+  const goToStep5 = () => {
     setErrorMsg("");
 
     if (!customerName.trim()) {
@@ -442,7 +442,22 @@ export function BookingWizard({
     }
 
     if (!area.trim()) {
-      setErrorMsg("Please enter your Area/Locality name.");
+      setErrorMsg("Please enter your Area / Locality name.");
+      return;
+    }
+
+    trackBookingStep(5, "Preferred Time", selectedCategory);
+    setStep(5);
+    setErrorMsg("");
+  };
+
+  // Step 5 Submit -> Step 6 Confirmation
+  const handleSubmitBooking = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg("");
+
+    if (dateOption === "custom" && !customDate) {
+      setErrorMsg("Please pick your preferred service date.");
       return;
     }
 
@@ -450,7 +465,7 @@ export function BookingWizard({
 
     const preferredDateString =
       dateOption === "today"
-        ? "Today (Express Slot)"
+        ? "Today (Express 90-Min Slot)"
         : dateOption === "tomorrow"
         ? "Tomorrow"
         : customDate || "Earliest Available";
@@ -465,6 +480,7 @@ export function BookingWizard({
       issueDescription: issueDescription.trim() || undefined,
       preferredDate: preferredDateString,
       preferredSlot,
+      specialNotes: specialTimingNotes.trim() || undefined,
       customerName: customerName.trim(),
       phone: contactPhone.trim(),
       whatsappNumber: (whatsappSameAsContact ? contactPhone : whatsappNumber).trim(),
@@ -486,7 +502,7 @@ export function BookingWizard({
     });
 
     setCreatedBooking(booking);
-    setStep(5);
+    setStep(6);
     if (onSuccess) onSuccess(booking);
   };
 
@@ -504,6 +520,7 @@ export function BookingWizard({
     setLocationCoordinates(null);
     setLocationStatus("");
     setIssueDescription("");
+    setSpecialTimingNotes("");
     setErrorMsg("");
   };
 
@@ -511,16 +528,17 @@ export function BookingWizard({
     <div
       className={`rounded-3xl border border-border bg-card p-5 md:p-8 shadow-2xl transition-all ${className}`}
     >
-      {/* Step Header & Progress Indicator */}
-      {step < 5 && (
+      {/* Step Header & Progress Indicator (Steps 1 to 5) */}
+      {step < 6 && (
         <div className="mb-6 border-b border-border/80 pb-5">
           <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             <span>
-              Step {step} of 4:{" "}
+              Step {step} of 5:{" "}
               {step === 1 && "Service Selection"}
               {step === 2 && "Select AC Type"}
               {step === 3 && "No of ACs"}
               {step === 4 && "Customer Details"}
+              {step === 5 && "Preferred Time"}
             </span>
             <span className="text-brand font-black text-sm">
               {estimatedTotal > 0
@@ -529,9 +547,9 @@ export function BookingWizard({
             </span>
           </div>
 
-          {/* 4-Step Progress Bar */}
-          <div className="mt-3 grid grid-cols-4 gap-2">
-            {[1, 2, 3, 4].map((i) => (
+          {/* 5-Step Progress Bar */}
+          <div className="mt-3 grid grid-cols-5 gap-2">
+            {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
                 className={`h-2 rounded-full transition-all duration-300 ${
@@ -571,7 +589,6 @@ export function BookingWizard({
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {SERVICES_DATA.map((svc) => {
               const isSelected = selectedCategory === svc.id;
-              const Icon = svc.icon;
               return (
                 <button
                   key={svc.id}
@@ -620,7 +637,7 @@ export function BookingWizard({
             })}
           </div>
 
-          {/* Sub Service Checklist for extra detail */}
+          {/* Sub Service Checklist */}
           {currentServiceObj.subServices.length > 0 && (
             <div className="rounded-2xl border border-border bg-surface/40 p-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -857,81 +874,23 @@ export function BookingWizard({
             </div>
           )}
 
-          {/* Schedule Window (Date & Time) */}
-          <div className="rounded-2xl border border-border bg-surface/40 p-4 space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Select Preferred Arrival Time:
-            </h4>
-
-            {/* Quick Date Options */}
-            <div className="grid grid-cols-3 gap-2.5">
-              <button
-                type="button"
-                onClick={() => setDateOption("today")}
-                className={`rounded-xl border p-3 text-center transition-all ${
-                  dateOption === "today"
-                    ? "border-brand bg-brand/10 font-bold text-brand ring-1 ring-brand"
-                    : "border-border bg-card text-foreground hover:border-brand/40"
-                }`}
-              >
-                <div className="text-xs font-black">Today</div>
-                <div className="text-[10px] text-emerald-600 font-semibold">⚡ 90-Min Arrival</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setDateOption("tomorrow")}
-                className={`rounded-xl border p-3 text-center transition-all ${
-                  dateOption === "tomorrow"
-                    ? "border-brand bg-brand/10 font-bold text-brand ring-1 ring-brand"
-                    : "border-border bg-card text-foreground hover:border-brand/40"
-                }`}
-              >
-                <div className="text-xs font-black">Tomorrow</div>
-                <div className="text-[10px] text-muted-foreground">Flexible Slot</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setDateOption("custom")}
-                className={`rounded-xl border p-3 text-center transition-all ${
-                  dateOption === "custom"
-                    ? "border-brand bg-brand/10 font-bold text-brand ring-1 ring-brand"
-                    : "border-border bg-card text-foreground hover:border-brand/40"
-                }`}
-              >
-                <div className="text-xs font-black">Pick Date</div>
-                <div className="text-[10px] text-muted-foreground">Future Visit</div>
-              </button>
+          {/* Pricing Highlight */}
+          <div className="rounded-2xl border border-brand/20 bg-brand/5 p-4 flex items-center justify-between">
+            <div>
+              <span className="font-bold text-sm text-foreground block">
+                {currentServiceObj.emoji} {currentServiceObj.title} ({unitSelection}{" "}
+                {unitSelection === "1" ? "Unit" : "Units"})
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {effectiveUnits >= 2 ? "Multi-unit discount included • Pay after service" : "Upfront standard rate • Pay after service"}
+              </span>
             </div>
-
-            {dateOption === "custom" && (
-              <input
-                type="date"
-                min={new Date().toISOString().split("T")[0]}
-                value={customDate}
-                onChange={(e) => setCustomDate(e.target.value)}
-                className="w-full rounded-xl border border-border bg-card p-2.5 text-sm text-foreground focus:border-brand focus:outline-none"
-              />
-            )}
-
-            {/* Time Slot */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {TIME_SLOTS.map((slot) => (
-                <button
-                  key={slot}
-                  type="button"
-                  onClick={() => setPreferredSlot(slot)}
-                  className={`flex items-center gap-2 rounded-xl border p-2.5 text-left text-xs font-semibold transition-all ${
-                    preferredSlot === slot
-                      ? "border-brand bg-brand text-brand-foreground shadow-sm"
-                      : "border-border bg-card text-foreground hover:border-brand/40"
-                  }`}
-                >
-                  <Clock className="size-3.5 shrink-0" />
-                  <span>{slot}</span>
-                </button>
-              ))}
+            <div className="text-right">
+              <span className="text-lg font-black text-brand">
+                {estimatedTotal > 0
+                  ? `₹${estimatedTotal.toLocaleString("en-IN")}`
+                  : currentServiceObj.priceText}
+              </span>
             </div>
           </div>
 
@@ -960,7 +919,7 @@ export function BookingWizard({
       {/* STEP 4: CUSTOMER DETAILS */}
       {/* ============================================================ */}
       {step === 4 && (
-        <form onSubmit={handleSubmitBooking} className="space-y-6">
+        <div className="space-y-6">
           <div>
             <div className="inline-block rounded-md bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
               Step 4 • Customer Details
@@ -969,7 +928,7 @@ export function BookingWizard({
               Contact &amp; Service Location
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Instant WhatsApp confirmation with live technician arrival status will be sent to your mobile.
+              Tell us where and who we are serving. Next step: pick your preferred arrival time.
             </p>
           </div>
 
@@ -1162,34 +1121,6 @@ export function BookingWizard({
             </div>
           </div>
 
-          {/* Live Order Summary Card */}
-          <div className="rounded-2xl border border-brand/20 bg-brand/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <span className="font-black text-sm text-brand block">
-                {currentServiceObj.emoji} {currentServiceObj.title} • {acType} ({unitSelection}{" "}
-                {unitSelection === "1" ? "Unit" : "Units"})
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {dateOption === "today"
-                  ? "Today (Express)"
-                  : dateOption === "tomorrow"
-                  ? "Tomorrow"
-                  : customDate}{" "}
-                • {preferredSlot}
-              </span>
-            </div>
-            <div className="sm:text-right">
-              <span className="text-[11px] text-muted-foreground block font-bold">
-                Pay After Service
-              </span>
-              <span className="text-lg font-black text-brand">
-                {estimatedTotal > 0
-                  ? `₹${estimatedTotal.toLocaleString("en-IN")}`
-                  : currentServiceObj.priceText}
-              </span>
-            </div>
-          </div>
-
           <div className="flex items-center justify-between pt-2">
             <button
               type="button"
@@ -1200,8 +1131,226 @@ export function BookingWizard({
               <span>Back</span>
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={goToStep5}
               className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-xl shadow-brand/30 transition-all hover:scale-105 hover:bg-brand/90"
+            >
+              <span>Continue to Preferred Time</span>
+              <ArrowRight className="size-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* STEP 5: PREFERRED TIME */}
+      {/* ============================================================ */}
+      {step === 5 && (
+        <form onSubmit={handleSubmitBooking} className="space-y-6">
+          <div>
+            <div className="inline-block rounded-md bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
+              Step 5 • Preferred Time
+            </div>
+            <h2 className="mt-2 text-xl md:text-2xl font-black tracking-tight text-foreground">
+              When Should Our Technician Arrive?
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Select your preferred service day and arrival slot. Our certified team works 7 days a week, 8:00 AM – 9:00 PM.
+            </p>
+          </div>
+
+          {/* Service Day Selection */}
+          <div className="space-y-3">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Service Day *
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => setDateOption("today")}
+                className={`flex flex-col items-start rounded-2xl border p-4 text-left transition-all cursor-pointer ${
+                  dateOption === "today"
+                    ? "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
+                    : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
+                }`}
+              >
+                <div className="flex w-full items-center justify-between">
+                  <span className="text-base font-black text-foreground">Today</span>
+                  <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+                    ⚡ 90-Min Arrival
+                  </span>
+                </div>
+                <span className="mt-1 text-xs text-muted-foreground">
+                  Immediate breakdown &amp; express arrival
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDateOption("tomorrow")}
+                className={`flex flex-col items-start rounded-2xl border p-4 text-left transition-all cursor-pointer ${
+                  dateOption === "tomorrow"
+                    ? "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
+                    : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
+                }`}
+              >
+                <div className="flex w-full items-center justify-between">
+                  <span className="text-base font-black text-foreground">Tomorrow</span>
+                  <span className="rounded-md bg-brand-soft px-2 py-0.5 text-[10px] font-black text-brand">
+                    Guaranteed Slot
+                  </span>
+                </div>
+                <span className="mt-1 text-xs text-muted-foreground">
+                  Scheduled regular service visit
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDateOption("custom")}
+                className={`flex flex-col items-start rounded-2xl border p-4 text-left transition-all cursor-pointer ${
+                  dateOption === "custom"
+                    ? "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
+                    : "border-border bg-surface/50 hover:border-brand/40 hover:bg-surface"
+                }`}
+              >
+                <div className="flex w-full items-center justify-between">
+                  <span className="text-base font-black text-foreground">Pick Date</span>
+                  <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                    Advance
+                  </span>
+                </div>
+                <span className="mt-1 text-xs text-muted-foreground">
+                  Choose specific upcoming date
+                </span>
+              </button>
+            </div>
+
+            {dateOption === "custom" && (
+              <div className="pt-1">
+                <label className="text-xs font-semibold text-foreground">
+                  Select Specific Calendar Date:
+                </label>
+                <input
+                  type="date"
+                  required
+                  min={new Date().toISOString().split("T")[0]}
+                  value={customDate}
+                  onChange={(e) => setCustomDate(e.target.value)}
+                  className="mt-1.5 w-full rounded-xl border border-border bg-card p-3 text-sm text-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Time Slot Selection */}
+          <div className="space-y-3">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Preferred Arrival Window *
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {TIME_SLOTS.map((slot) => {
+                const isSelected = preferredSlot === slot.label;
+                return (
+                  <button
+                    key={slot.id}
+                    type="button"
+                    onClick={() => setPreferredSlot(slot.label)}
+                    className={`flex items-center justify-between rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-brand bg-brand text-brand-foreground shadow-md ring-2 ring-brand/30"
+                        : "border-border bg-surface/50 text-foreground hover:border-brand/40 hover:bg-surface"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Clock
+                        className={`size-4 shrink-0 ${
+                          isSelected ? "text-brand-foreground" : "text-brand"
+                        }`}
+                      />
+                      <div>
+                        <div className="text-xs sm:text-sm font-bold">{slot.label}</div>
+                        <div
+                          className={`text-[10px] ${
+                            isSelected ? "text-brand-foreground/80" : "text-muted-foreground"
+                          }`}
+                        >
+                          {slot.note}
+                        </div>
+                      </div>
+                    </div>
+                    {isSelected && <Check className="size-4 shrink-0 text-brand-foreground" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Special Timing / Arrival Notes */}
+          <div>
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Special Instructions for Technician (Optional)
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Call 30 mins before arrival, ring doorbell twice, visit after 10 AM..."
+              value={specialTimingNotes}
+              onChange={(e) => setSpecialTimingNotes(e.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-border bg-card p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+            />
+          </div>
+
+          {/* Complete Booking Review Card */}
+          <div className="rounded-2xl border-2 border-brand/20 bg-brand/5 p-4 sm:p-5 space-y-3 text-sm">
+            <div className="flex items-center justify-between border-b border-brand/10 pb-2">
+              <span className="font-extrabold text-foreground">
+                {currentServiceObj.emoji} {currentServiceObj.title}
+              </span>
+              <span className="font-black text-brand text-base">
+                {estimatedTotal > 0
+                  ? `₹${estimatedTotal.toLocaleString("en-IN")}`
+                  : currentServiceObj.priceText}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-foreground">
+              <div>
+                <strong className="text-foreground">AC Type:</strong> {acType} ({unitSelection}{" "}
+                {unitSelection === "1" ? "Unit" : "Units"})
+              </div>
+              <div>
+                <strong className="text-foreground">Customer:</strong> {customerName} ({contactPhone})
+              </div>
+              <div>
+                <strong className="text-foreground">Location:</strong> {area}, {city} - {pincode}
+              </div>
+              <div>
+                <strong className="text-foreground">Schedule:</strong>{" "}
+                {dateOption === "today" ? "Today" : dateOption === "tomorrow" ? "Tomorrow" : customDate} • {preferredSlot}
+              </div>
+            </div>
+
+            <div className="pt-1 flex items-center justify-between text-[11px] font-semibold text-emerald-600">
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="size-3.5" /> 30-Day Post-Service Guarantee
+              </span>
+              <span className="text-foreground font-bold">Pay After Service (Cash / UPI)</span>
+            </div>
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex items-center justify-between pt-2">
+            <button
+              type="button"
+              onClick={() => setStep(4)}
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground hover:bg-border/40"
+            >
+              <ArrowLeft className="size-4" />
+              <span>Back</span>
+            </button>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90"
             >
               <span>Confirm &amp; Book Service</span>
               <CheckCircle2 className="size-4" />
@@ -1211,9 +1360,9 @@ export function BookingWizard({
       )}
 
       {/* ============================================================ */}
-      {/* STEP 5: BOOKING CONFIRMATION & WHATSAPP DISPATCH */}
+      {/* STEP 6: BOOKING CONFIRMATION & WHATSAPP DISPATCH */}
       {/* ============================================================ */}
-      {step === 5 && createdBooking && (
+      {step === 6 && createdBooking && (
         <div className="text-center py-4 space-y-6">
           <div className="inline-flex size-16 items-center justify-center rounded-3xl bg-emerald-500/10 text-emerald-500 ring-8 ring-emerald-500/5">
             <CheckCircle2 className="size-9" />
@@ -1224,11 +1373,11 @@ export function BookingWizard({
               Booking ID: {createdBooking.id}
             </span>
             <h2 className="mt-2 text-2xl md:text-3xl font-black text-foreground">
-              Booking Received Successfully!
+              Booking Confirmed Successfully!
             </h2>
             <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-              Thank you, <strong className="text-foreground">{createdBooking.customerName}</strong>. Our service manager in{" "}
-              <strong className="text-foreground">{createdBooking.city}</strong> has received your request.
+              Thank you, <strong className="text-foreground">{createdBooking.customerName}</strong>. Our service desk in{" "}
+              <strong className="text-foreground">{createdBooking.city}</strong> has received your request and assigned a technician.
             </p>
           </div>
 
@@ -1246,7 +1395,7 @@ export function BookingWizard({
               </span>
             </div>
             <div className="flex justify-between border-b border-border/80 pb-2">
-              <span className="text-muted-foreground">Date &amp; Slot:</span>
+              <span className="text-muted-foreground">Preferred Time:</span>
               <span className="font-medium text-foreground">
                 {createdBooking.preferredDate} ({createdBooking.preferredSlot})
               </span>
