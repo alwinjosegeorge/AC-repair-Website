@@ -499,6 +499,11 @@ export function BookingWizard({
       service: booking.serviceName,
       amount: booking.estimatedAmount,
       city: booking.city,
+      customerName: booking.customerName,
+      customerPhone: booking.phone,
+      customerEmail: booking.email,
+      pincode: booking.pincode,
+      address: booking.address,
     });
 
     setCreatedBooking(booking);

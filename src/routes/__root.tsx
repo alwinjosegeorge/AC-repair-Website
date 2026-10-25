@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -11,7 +12,12 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { FloatingActions } from "../components/FloatingActions";
-import { captureTrackingParams } from "../lib/tracking";
+import {
+  captureTrackingParams,
+  getTrackingConfig,
+  DEFAULT_TRACKING_CONFIG,
+  pushDataLayer,
+} from "../lib/tracking";
 
 function NotFoundComponent() {
   return (
@@ -75,18 +81,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EGS INDIA" },
+      { title: "EGS INDIA | Expert AC Service & HVAC Solutions" },
       {
         name: "description",
         content:
-          "EGS INDIA - Expert Air Conditioner Service & HVAC Solutions in India.",
+          "EGS INDIA - Expert Air Conditioner Service, Repair, Installation, AMC & Commercial HVAC Solutions in India.",
       },
       { name: "author", content: "EGS INDIA" },
-      { property: "og:title", content: "EGS INDIA" },
+      // Google Search Console Site Verification Meta Tag
+      {
+        name: "google-site-verification",
+        content: DEFAULT_TRACKING_CONFIG.gscVerification,
+      },
+      { property: "og:title", content: "EGS INDIA | Expert AC Service & HVAC Solutions" },
       {
         property: "og:description",
         content:
-          "EGS INDIA - Expert Air Conditioner Service & HVAC Solutions in India.",
+          "EGS INDIA - Expert Air Conditioner Service, Repair, Installation, AMC & Commercial HVAC Solutions in India.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -112,12 +123,76 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const gtmId = DEFAULT_TRACKING_CONFIG.gtmId;
+  const ga4Id = DEFAULT_TRACKING_CONFIG.ga4MeasurementId;
+  const gAdsId = DEFAULT_TRACKING_CONFIG.googleAdsId;
+  const metaPixelId = DEFAULT_TRACKING_CONFIG.metaPixelId;
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
+
+        {/* 1. Google Tag Manager - Pre-init dataLayer */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${ga4Id}', { send_page_view: false });
+gtag('config', '${gAdsId}');`,
+          }}
+        />
+
+        {/* 2. Google Tag Manager Main Script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${gtmId}');`,
+          }}
+        />
+
+        {/* 3. Meta Pixel Main Script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${metaPixelId}');
+fbq('track', 'PageView');`,
+          }}
+        />
       </head>
       <body>
+        {/* Google Tag Manager (noscript fallback) */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+
+        {/* Meta Pixel (noscript fallback) */}
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`}
+            alt=""
+          />
+        </noscript>
+
         {children}
         <Scripts />
       </body>
@@ -127,16 +202,26 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useRouterState({ select: (s) => s.location });
 
   useEffect(() => {
     captureTrackingParams();
   }, []);
 
+  useEffect(() => {
+    // Dispatch page view to dataLayer, GA4 & Meta Pixel on route change
+    pushDataLayer("page_view", {
+      page_path: location.pathname,
+      page_search: location.searchStr,
+      page_title: typeof document !== "undefined" ? document.title : "EGS INDIA",
+    });
+  }, [location.pathname, location.searchStr]);
+
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <FloatingActions />
     </QueryClientProvider>
   );
 }
+

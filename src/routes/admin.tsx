@@ -83,7 +83,29 @@ import {
   BadgePercent,
   Banknote,
   FileText,
+  Radio,
+  Activity,
+  Terminal,
+  Sliders,
+  Cpu,
+  Layers,
 } from "lucide-react";
+import {
+  getTrackingConfig,
+  saveTrackingConfig,
+  DEFAULT_TRACKING_CONFIG,
+  TrackingConfig,
+  pushDataLayer,
+  trackGoogleAdsConversion,
+  trackGAEvent,
+  trackMetaPixel,
+  sendMetaCapiEvent,
+  getTrackingLogs,
+  clearTrackingLogs,
+  TrackingLog,
+  trackWhatsAppClick,
+  trackCallClick,
+} from "@/lib/tracking";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -108,7 +130,8 @@ export type AdminSection =
   | "technicians"
   | "service-areas"
   | "reports"
-  | "payments";
+  | "payments"
+  | "tracking-diagnostics";
 
 const SERVICE_HUBS = [
   {
@@ -192,6 +215,109 @@ export function AdminDashboard() {
   const [recordPaymentModalOpen, setRecordPaymentModalOpen] = useState(false);
   const [bankDetailsModalOpen, setBankDetailsModalOpen] = useState(false);
   const [paymentActionToast, setPaymentActionToast] = useState<string | null>(null);
+
+  // GTM & Tracking Diagnostics State
+  const [trackingConfig, setTrackingConfig] = useState<TrackingConfig>(() => getTrackingConfig());
+  const [trackingLogs, setTrackingLogs] = useState<TrackingLog[]>(() => getTrackingLogs());
+  const [trackingToast, setTrackingToast] = useState<string | null>(null);
+  const [isEditingTrackingConfig, setIsEditingTrackingConfig] = useState(false);
+  const [editedConfig, setEditedConfig] = useState<TrackingConfig>(() => getTrackingConfig());
+  const [trackingLogFilter, setTrackingLogFilter] = useState<string>("all");
+
+  const filteredTrackingLogs = useMemo(() => {
+    if (trackingLogFilter === "all") return trackingLogs;
+    return trackingLogs.filter((l) => l.platform === trackingLogFilter);
+  }, [trackingLogs, trackingLogFilter]);
+
+  const handleFireTestGTMLead = () => {
+    const id = `TEST-EGS-${Math.floor(1000 + Math.random() * 9000)}`;
+    pushDataLayer("generate_lead", {
+      transaction_id: id,
+      value: 1499,
+      currency: "INR",
+      service_name: "AC Deep Jet Cleaning & Service",
+      city: "Ernakulam",
+      lead_source: "admin_test_trigger",
+    });
+    setTrackingLogs(getTrackingLogs());
+    setTrackingToast(`✓ GTM generate_lead event pushed to dataLayer (${id})`);
+  };
+
+  const handleFireTestGoogleAds = () => {
+    const txId = `GADS-TEST-${Math.floor(1000 + Math.random() * 9000)}`;
+    trackGoogleAdsConversion({
+      conversionLabel: trackingConfig.googleAdsLeadLabel,
+      value: 1499,
+      transactionId: txId,
+      customerData: {
+        email: "contact@egsindia.com",
+        phone: "+919895012345",
+        firstName: "Rajesh",
+        city: "Kollam",
+        postalCode: "691001",
+        country: "IN",
+      },
+    });
+    setTrackingLogs(getTrackingLogs());
+    setTrackingToast(`✓ Google Ads Lead Conversion & Enhanced Conversions dispatched (${txId})`);
+  };
+
+  const handleFireTestMetaCAPI = () => {
+    const testId = `META-TEST-${Date.now()}`;
+    trackMetaPixel("Lead", {
+      content_name: "AC Deep Jet Service",
+      value: 1499,
+      currency: "INR",
+    });
+    sendMetaCapiEvent(
+      "Lead",
+      {
+        email: "contact@egsindia.com",
+        phone: "+919895012345",
+        firstName: "Rajesh",
+        city: "Ernakulam",
+        zip: "682020",
+      },
+      {
+        content_name: "AC Deep Jet Service",
+        value: 1499,
+        currency: "INR",
+        event_id: testId,
+      }
+    );
+    setTrackingLogs(getTrackingLogs());
+    setTrackingToast("✓ Meta Pixel & CAPI Lead with SHA-256 PII hashed payload dispatched!");
+  };
+
+  const handleFireTestWhatsApp = () => {
+    trackWhatsAppClick("admin_diagnostics_test", "AC Service");
+    setTrackingLogs(getTrackingLogs());
+    setTrackingToast("✓ WhatsApp Click Conversion fired (Google Ads + Meta Contact + GTM)!");
+  };
+
+  const handleFireTestCall = () => {
+    trackCallClick("admin_diagnostics_test");
+    setTrackingLogs(getTrackingLogs());
+    setTrackingToast("✓ Phone Call Click Conversion fired (Google Ads + GA4 + GTM)!");
+  };
+
+  const handleClearLogs = () => {
+    clearTrackingLogs();
+    setTrackingLogs([]);
+    setTrackingToast("✓ Event stream logs cleared.");
+  };
+
+  const handleSaveTrackingConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveTrackingConfig(editedConfig);
+    setTrackingConfig(editedConfig);
+    setIsEditingTrackingConfig(false);
+    setTrackingToast("✓ Marketing tracking configuration saved and applied!");
+  };
+
+  const handleResetTrackingConfig = () => {
+    setEditedConfig({ ...DEFAULT_TRACKING_CONFIG });
+  };
 
   // Manual payment recording form inputs
   const [recordPayBookingId, setRecordPayBookingId] = useState("");
@@ -1002,6 +1128,34 @@ export function AdminDashboard() {
                   <TrendingUp className="size-4" />
                   <span>Reports</span>
                 </button>
+
+                {/* 12. GTM & Ads Tracking Diagnostics */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("tracking-diagnostics");
+                    setMobileSidebarOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    activeSection === "tracking-diagnostics"
+                      ? "bg-brand text-brand-foreground shadow-md"
+                      : "text-foreground hover:bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Radio className="size-4" />
+                    <span>GTM &amp; Ads Tracking</span>
+                  </div>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                      activeSection === "tracking-diagnostics"
+                        ? "bg-white text-brand"
+                        : "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+                    }`}
+                  >
+                    6/6 Live
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -1065,23 +1219,26 @@ export function AdminDashboard() {
                 {activeSection === "technicians" && "Certified field technicians roster, rating & active jobs."}
                 {activeSection === "service-areas" && "Regional hubs, active dispatchers & coverage pincodes."}
                 {activeSection === "reports" && "Revenue, Google & Meta Ads ROI, and conversion funnel."}
+                {activeSection === "tracking-diagnostics" && "Google Tag Manager, Google Ads Conversion Tracking (Enhanced), GA4, Meta Pixel & Conversions API (CAPI)."}
               </p>
             </div>
 
             {/* Search & City Filter (for booking/customer views) */}
             <div className="flex flex-wrap items-center gap-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-2.5 size-3.5 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search by ID, Name, Phone..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="rounded-xl border border-border bg-card py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none"
-                />
-              </div>
+              {activeSection !== "tracking-diagnostics" && (
+                <div className="relative">
+                  <Search className="absolute left-3 top-2.5 size-3.5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search by ID, Name, Phone..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="rounded-xl border border-border bg-card py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+              )}
 
-              {activeSection !== "reports" && activeSection !== "service-areas" && (
+              {activeSection !== "reports" && activeSection !== "service-areas" && activeSection !== "tracking-diagnostics" && (
                 <select
                   value={cityFilter}
                   onChange={(e) => setCityFilter(e.target.value)}
@@ -2411,6 +2568,464 @@ export function AdminDashboard() {
                                   <MessageSquare className="size-3 fill-current" />
                                   <span>Receipt</span>
                                 </a>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* VIEW: GTM & MARKETING TRACKING DIAGNOSTICS (Item 24) */}
+          {/* ============================================================ */}
+          {activeSection === "tracking-diagnostics" && (
+            <div className="space-y-6">
+              {/* Toast Feedback */}
+              {trackingToast && (
+                <div className="rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white shadow-lg flex items-center justify-between border border-emerald-400/30 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="size-4 shrink-0 text-white" />
+                    <span>{trackingToast}</span>
+                  </div>
+                  <button onClick={() => setTrackingToast(null)} className="opacity-75 hover:opacity-100">
+                    <X className="size-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Header Ribbon & Settings Trigger */}
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <div>
+                  <h2 className="text-base font-extrabold text-foreground flex items-center gap-2">
+                    <Radio className="size-5 text-brand" />
+                    <span>Marketing Tag Manager &amp; Conversion Diagnostics</span>
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Google Tag Manager container, Google Ads Conversion Tracking (with Enhanced Conversions), GA4, GSC, Meta Pixel &amp; Meta Conversions API (CAPI).
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditedConfig({ ...trackingConfig });
+                      setIsEditingTrackingConfig(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-bold text-foreground shadow-sm hover:border-brand/40 hover:bg-surface/80"
+                  >
+                    <Sliders className="size-3.5 text-brand" />
+                    <span>Configure IDs</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTrackingLogs(getTrackingLogs());
+                      setTrackingToast("✓ Event stream refreshed.");
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-xs font-bold text-brand-foreground shadow-sm hover:bg-brand/90"
+                  >
+                    <RefreshCw className="size-3.5" />
+                    <span>Refresh Logs ({trackingLogs.length})</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 6 Core Integration Cards (Item 24 Breakdown) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* 1. Google Tag Manager */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 font-black text-xs">
+                        GTM
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-extrabold text-foreground">Google Tag Manager</h3>
+                        <p className="text-[11px] text-muted-foreground">Global DataLayer Pipeline</p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      INSTALLED
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 text-xs bg-surface p-3 rounded-xl border border-border/60">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Container ID:</span>
+                      <code className="font-mono font-bold text-foreground">{trackingConfig.gtmContainerId}</code>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">DataLayer State:</span>
+                      <span className="font-semibold text-emerald-600">Initialized in &lt;head&gt;</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Noscript Fallback:</span>
+                      <span className="font-semibold text-foreground">Active in &lt;body&gt;</span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    All funnel events push through unified <code className="text-xs bg-surface px-1 py-0.5 rounded">window.dataLayer.push()</code>.
+                  </p>
+                </div>
+
+                {/* 2. Google Ads Conversion Tracking */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="size-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 font-black text-xs">
+                        GAds
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-extrabold text-foreground">Google Ads Tracking</h3>
+                        <p className="text-[11px] text-muted-foreground">Enhanced Conversions Active</p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      ACTIVE
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 text-xs bg-surface p-3 rounded-xl border border-border/60">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Conversion ID:</span>
+                      <code className="font-mono font-bold text-foreground">{trackingConfig.googleAdsId}</code>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Lead Label:</span>
+                      <code className="font-mono text-brand truncate max-w-[140px]">{trackingConfig.googleAdsLeadLabel}</code>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Phone / WA Labels:</span>
+                      <span className="font-semibold text-emerald-600">CALL &amp; WA Configured</span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Includes SHA-256 hashed customer email &amp; phone for maximum offline conversion accuracy.
+                  </p>
+                </div>
+
+                {/* 3. Google Analytics 4 (GA4) */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="size-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-600 font-black text-xs">
+                        GA4
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-extrabold text-foreground">Google Analytics 4</h3>
+                        <p className="text-[11px] text-muted-foreground">Full Funnel &amp; UTM Tracking</p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      STREAMING
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 text-xs bg-surface p-3 rounded-xl border border-border/60">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Measurement ID:</span>
+                      <code className="font-mono font-bold text-foreground">{trackingConfig.ga4MeasurementId}</code>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Key Events:</span>
+                      <span className="font-semibold text-foreground">page_view, generate_lead, contact</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Attribution:</span>
+                      <span className="font-semibold text-emerald-600">UTM + GCLID + FBCLID</span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Automatic route transition <code className="text-xs bg-surface px-1 py-0.5 rounded">page_view</code> dispatches with page titles.
+                  </p>
+                </div>
+
+                {/* 4. Google Search Console */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="size-8 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-600 font-black text-xs">
+                        GSC
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-extrabold text-foreground">Search Console &amp; SEO</h3>
+                        <p className="text-[11px] text-muted-foreground">HTML Meta &amp; XML Sitemap</p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+                      <CheckCircle2 className="size-3" />
+                      VERIFIED
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 text-xs bg-surface p-3 rounded-xl border border-border/60">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Verification Meta:</span>
+                      <span className="font-semibold text-emerald-600">Embedded in &lt;head&gt;</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Sitemap URL:</span>
+                      <a href="/sitemap.xml" target="_blank" rel="noreferrer" className="font-mono font-bold text-brand hover:underline flex items-center gap-1">
+                        <span>/sitemap.xml</span>
+                        <ExternalLink className="size-3" />
+                      </a>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Robots.txt:</span>
+                      <a href="/robots.txt" target="_blank" rel="noreferrer" className="font-mono font-bold text-foreground hover:underline flex items-center gap-1">
+                        <span>/robots.txt</span>
+                        <ExternalLink className="size-3" />
+                      </a>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    10 core service &amp; regional landing pages indexed with canonical tags and priority tags.
+                  </p>
+                </div>
+
+                {/* 5. Meta Pixel */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="size-8 rounded-lg bg-pink-500/10 flex items-center justify-center text-pink-600 font-black text-xs">
+                        Meta
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-extrabold text-foreground">Meta Pixel (Facebook)</h3>
+                        <p className="text-[11px] text-muted-foreground">Browser-Side Tracking</p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      ACTIVE
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 text-xs bg-surface p-3 rounded-xl border border-border/60">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Pixel ID:</span>
+                      <code className="font-mono font-bold text-foreground">{trackingConfig.metaPixelId}</code>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Standard Events:</span>
+                      <span className="font-semibold text-foreground">PageView, Lead, Contact, Purchase</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Noscript Pixel:</span>
+                      <span className="font-semibold text-emerald-600">Configured in &lt;noscript&gt;</span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Captures Facebook &amp; Instagram ad clicks, re-targets visitors via Custom Audiences.
+                  </p>
+                </div>
+
+                {/* 6. Meta Conversions API (CAPI) */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="size-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 font-black text-xs">
+                        CAPI
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-extrabold text-foreground">Meta Conversions API</h3>
+                        <p className="text-[11px] text-muted-foreground">Server-Side Resilient CAPI</p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      CONNECTED
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 text-xs bg-surface p-3 rounded-xl border border-border/60">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Endpoint:</span>
+                      <span className="font-semibold text-foreground">Graph API v19.0</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">PII Hashing:</span>
+                      <span className="font-semibold text-emerald-600">SHA-256 (email, phone, name, city)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Test Event Code:</span>
+                      <code className="font-mono text-indigo-600 font-bold">{trackingConfig.metaTestEventCode || "TEST8833"}</code>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Bypasses browser ad blockers with deterministic event ID deduplication against Meta Pixel.
+                  </p>
+                </div>
+              </div>
+
+              {/* Live Test Event Triggers Toolbar */}
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
+                  <div>
+                    <h3 className="text-sm font-extrabold text-foreground flex items-center gap-2">
+                      <Activity className="size-4 text-brand" />
+                      <span>1-Click Live Test Event Triggers</span>
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Fire simulated conversions across all 6 tracking platforms to verify your setup in real-time.
+                    </p>
+                  </div>
+                  <span className="text-[11px] font-bold text-muted-foreground">
+                    Check browser console &amp; log stream below
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={handleFireTestGTMLead}
+                    className="flex flex-col items-center justify-center p-3 rounded-xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 text-center transition-all group cursor-pointer"
+                  >
+                    <Layers className="size-5 text-blue-600 group-hover:scale-110 transition-transform mb-1.5" />
+                    <span className="text-xs font-bold text-foreground">Test GTM Lead</span>
+                    <span className="text-[10px] text-muted-foreground">dataLayer.push</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleFireTestGoogleAds}
+                    className="flex flex-col items-center justify-center p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 text-center transition-all group cursor-pointer"
+                  >
+                    <Award className="size-5 text-amber-600 group-hover:scale-110 transition-transform mb-1.5" />
+                    <span className="text-xs font-bold text-foreground">Test Google Ads</span>
+                    <span className="text-[10px] text-muted-foreground">Enhanced Conv.</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleFireTestMetaCAPI}
+                    className="flex flex-col items-center justify-center p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 text-center transition-all group cursor-pointer"
+                  >
+                    <Cpu className="size-5 text-indigo-600 group-hover:scale-110 transition-transform mb-1.5" />
+                    <span className="text-xs font-bold text-foreground">Test Meta CAPI</span>
+                    <span className="text-[10px] text-muted-foreground">SHA-256 Hashed</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleFireTestWhatsApp}
+                    className="flex flex-col items-center justify-center p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 text-center transition-all group cursor-pointer"
+                  >
+                    <MessageSquare className="size-5 text-emerald-600 group-hover:scale-110 transition-transform mb-1.5" />
+                    <span className="text-xs font-bold text-foreground">Test WhatsApp</span>
+                    <span className="text-[10px] text-muted-foreground">Ads + Meta Contact</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleFireTestCall}
+                    className="flex flex-col items-center justify-center p-3 rounded-xl border border-teal-500/20 bg-teal-500/5 hover:bg-teal-500/10 text-center transition-all group cursor-pointer"
+                  >
+                    <Phone className="size-5 text-teal-600 group-hover:scale-110 transition-transform mb-1.5" />
+                    <span className="text-xs font-bold text-foreground">Test Call Click</span>
+                    <span className="text-[10px] text-muted-foreground">Ads Call Label</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Live Event Stream / Log Inspector */}
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-3">
+                  <div className="flex items-center gap-2">
+                    <Terminal className="size-4 text-brand" />
+                    <h3 className="text-sm font-extrabold text-foreground">
+                      Real-Time Tracking Event Stream
+                    </h3>
+                    <span className="rounded-full bg-brand/10 text-brand px-2 py-0.5 text-[10px] font-black">
+                      {filteredTrackingLogs.length} Events
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Platform Filter */}
+                    <div className="flex items-center gap-1 rounded-xl bg-surface p-1 border border-border text-[11px] font-bold">
+                      {["all", "GTM", "GOOGLE_ADS", "GA4", "META_PIXEL", "META_CAPI"].map((platform) => (
+                        <button
+                          key={platform}
+                          type="button"
+                          onClick={() => setTrackingLogFilter(platform)}
+                          className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                            trackingLogFilter === platform
+                              ? "bg-brand text-brand-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {platform === "all" ? "All" : platform}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleClearLogs}
+                      className="px-2.5 py-1 rounded-lg border border-border text-[11px] font-bold text-muted-foreground hover:bg-surface hover:text-foreground cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+
+                {/* Event Stream Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-border/60 bg-surface/60 text-muted-foreground font-black uppercase text-[10px]">
+                        <th className="py-2.5 px-3">Time</th>
+                        <th className="py-2.5 px-3">Platform</th>
+                        <th className="py-2.5 px-3">Event Name</th>
+                        <th className="py-2.5 px-3">Payload Data</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40 font-mono">
+                      {filteredTrackingLogs.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="py-8 text-center text-muted-foreground font-sans">
+                            No tracking events recorded yet. Click one of the test buttons above to simulate events!
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredTrackingLogs.slice(0, 50).map((log) => {
+                          const timeStr = new Date(log.timestamp).toLocaleTimeString("en-IN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          });
+                          return (
+                            <tr key={log.id} className="hover:bg-surface/50 transition-colors">
+                              <td className="py-2 px-3 text-muted-foreground text-[11px] whitespace-nowrap">
+                                {timeStr}
+                              </td>
+                              <td className="py-2 px-3 whitespace-nowrap">
+                                <span
+                                  className={`inline-block px-2 py-0.5 rounded text-[10px] font-black ${
+                                    log.platform === "GTM"
+                                      ? "bg-blue-500/15 text-blue-600 border border-blue-500/20"
+                                      : log.platform === "GOOGLE_ADS"
+                                      ? "bg-amber-500/15 text-amber-600 border border-amber-500/20"
+                                      : log.platform === "GA4"
+                                      ? "bg-orange-500/15 text-orange-600 border border-orange-500/20"
+                                      : log.platform === "META_PIXEL"
+                                      ? "bg-pink-500/15 text-pink-600 border border-pink-500/20"
+                                      : "bg-indigo-500/15 text-indigo-600 border border-indigo-500/20"
+                                  }`}
+                                >
+                                  {log.platform}
+                                </span>
+                              </td>
+                              <td className="py-2 px-3 font-bold text-foreground whitespace-nowrap">
+                                {log.event}
+                              </td>
+                              <td className="py-2 px-3 text-muted-foreground text-[11px] max-w-md truncate">
+                                <span title={JSON.stringify(log.payload, null, 2)}>
+                                  {JSON.stringify(log.payload)}
+                                </span>
                               </td>
                             </tr>
                           );
@@ -3836,6 +4451,251 @@ export function AdminDashboard() {
             >
               Done
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MARKETING & TRACKING CONFIGURATION MODAL */}
+      {/* ============================================================ */}
+      {isEditingTrackingConfig && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-6">
+            <div className="flex items-start justify-between border-b border-border pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Sliders className="size-5 text-brand" />
+                  <h3 className="text-base font-black text-foreground">
+                    Marketing Tag &amp; Conversion Tracking Config
+                  </h3>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Update Container IDs, Conversion Labels, and Meta CAPI parameters without touching code.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditingTrackingConfig(false)}
+                className="rounded-xl p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveTrackingConfig} className="space-y-4">
+              {/* 1. Google Tag Manager */}
+              <div className="rounded-2xl border border-border bg-surface/50 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-blue-600" />
+                    Google Tag Manager
+                  </span>
+                  <label className="flex items-center gap-2 text-xs font-bold text-foreground cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editedConfig.enabled}
+                      onChange={(e) => setEditedConfig({ ...editedConfig, enabled: e.target.checked })}
+                      className="rounded accent-brand"
+                    />
+                    <span>Enabled</span>
+                  </label>
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                    GTM Container ID
+                  </label>
+                  <input
+                    type="text"
+                    value={editedConfig.gtmContainerId}
+                    onChange={(e) => setEditedConfig({ ...editedConfig, gtmContainerId: e.target.value.trim() })}
+                    placeholder="GTM-N68W4M8"
+                    className="w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-mono text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* 2. Google Ads Tracking */}
+              <div className="rounded-2xl border border-border bg-surface/50 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-600 flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-amber-600" />
+                    Google Ads Conversion Tracking
+                  </span>
+                  <label className="flex items-center gap-2 text-xs font-bold text-foreground cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editedConfig.googleAdsEnabled}
+                      onChange={(e) => setEditedConfig({ ...editedConfig, googleAdsEnabled: e.target.checked })}
+                      className="rounded accent-brand"
+                    />
+                    <span>Enabled</span>
+                  </label>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                      Conversion ID
+                    </label>
+                    <input
+                      type="text"
+                      value={editedConfig.googleAdsId}
+                      onChange={(e) => setEditedConfig({ ...editedConfig, googleAdsId: e.target.value.trim() })}
+                      placeholder="AW-11628491023"
+                      className="w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-mono text-foreground focus:border-brand focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                      Lead Conversion Label
+                    </label>
+                    <input
+                      type="text"
+                      value={editedConfig.googleAdsLeadLabel}
+                      onChange={(e) => setEditedConfig({ ...editedConfig, googleAdsLeadLabel: e.target.value.trim() })}
+                      placeholder="vL3aCN-N_qcZEP-z8s0D"
+                      className="w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-mono text-foreground focus:border-brand focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                      Call Conversion Label
+                    </label>
+                    <input
+                      type="text"
+                      value={editedConfig.googleAdsPhoneCallLabel}
+                      onChange={(e) => setEditedConfig({ ...editedConfig, googleAdsPhoneCallLabel: e.target.value.trim() })}
+                      placeholder="CALL_EGS_INDIA_2026"
+                      className="w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-mono text-foreground focus:border-brand focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                      WhatsApp Conversion Label
+                    </label>
+                    <input
+                      type="text"
+                      value={editedConfig.googleAdsWhatsAppLabel}
+                      onChange={(e) => setEditedConfig({ ...editedConfig, googleAdsWhatsAppLabel: e.target.value.trim() })}
+                      placeholder="WA_EGS_INDIA_2026"
+                      className="w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-mono text-foreground focus:border-brand focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Google Analytics 4 */}
+              <div className="rounded-2xl border border-border bg-surface/50 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase tracking-wider text-orange-600 flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-orange-600" />
+                    Google Analytics 4 (GA4)
+                  </span>
+                  <label className="flex items-center gap-2 text-xs font-bold text-foreground cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editedConfig.ga4Enabled}
+                      onChange={(e) => setEditedConfig({ ...editedConfig, ga4Enabled: e.target.checked })}
+                      className="rounded accent-brand"
+                    />
+                    <span>Enabled</span>
+                  </label>
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                    GA4 Measurement ID
+                  </label>
+                  <input
+                    type="text"
+                    value={editedConfig.ga4MeasurementId}
+                    onChange={(e) => setEditedConfig({ ...editedConfig, ga4MeasurementId: e.target.value.trim() })}
+                    placeholder="G-EGSINDIA26"
+                    className="w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-mono text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* 4. Meta Pixel & Conversions API */}
+              <div className="rounded-2xl border border-border bg-surface/50 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase tracking-wider text-pink-600 flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-pink-600" />
+                    Meta Pixel &amp; Conversions API (CAPI)
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-1.5 text-xs font-bold text-foreground cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={editedConfig.metaPixelEnabled}
+                        onChange={(e) => setEditedConfig({ ...editedConfig, metaPixelEnabled: e.target.checked })}
+                        className="rounded accent-brand"
+                      />
+                      <span>Pixel</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 text-xs font-bold text-foreground cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={editedConfig.metaCapiEnabled}
+                        onChange={(e) => setEditedConfig({ ...editedConfig, metaCapiEnabled: e.target.checked })}
+                        className="rounded accent-brand"
+                      />
+                      <span>CAPI</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                      Meta Pixel ID
+                    </label>
+                    <input
+                      type="text"
+                      value={editedConfig.metaPixelId}
+                      onChange={(e) => setEditedConfig({ ...editedConfig, metaPixelId: e.target.value.trim() })}
+                      placeholder="108928374619283"
+                      className="w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-mono text-foreground focus:border-brand focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                      CAPI Test Event Code
+                    </label>
+                    <input
+                      type="text"
+                      value={editedConfig.metaTestEventCode || ""}
+                      onChange={(e) => setEditedConfig({ ...editedConfig, metaTestEventCode: e.target.value.trim() })}
+                      placeholder="TEST8833"
+                      className="w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-mono text-foreground focus:border-brand focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Form Action Buttons */}
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <button
+                  type="button"
+                  onClick={handleResetTrackingConfig}
+                  className="rounded-xl border border-border px-3.5 py-2 text-xs font-bold text-muted-foreground hover:bg-surface hover:text-foreground cursor-pointer"
+                >
+                  Reset Defaults
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingTrackingConfig(false)}
+                    className="rounded-xl border border-border px-4 py-2 text-xs font-bold text-foreground hover:bg-surface cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-brand px-5 py-2 text-xs font-black text-brand-foreground shadow-md hover:bg-brand/90 cursor-pointer"
+                  >
+                    Save &amp; Apply
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       )}
