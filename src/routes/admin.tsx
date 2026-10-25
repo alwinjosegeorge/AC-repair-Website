@@ -9,6 +9,11 @@ import {
   CustomerBookingHistory,
   BookingStatus,
   BOOKING_STATUS_FLOW,
+  PaymentMethod,
+  PaymentStatus,
+  PaymentTransaction,
+  EGSInvoice,
+  EGS_COMPANY_DETAILS,
   getBookings,
   getTechnicians,
   getAMCContracts,
@@ -16,6 +21,17 @@ import {
   scheduleAMCNextService,
   saveAMCContract,
   getCustomers,
+  getTransactions,
+  saveTransaction,
+  recordBookingPayment,
+  getInvoices,
+  getInvoiceByNumber,
+  generateInvoiceForBooking,
+  generateInvoiceForAMC,
+  generatePaymentReceiptWhatsAppURL,
+  generateCustomerPaymentLinkWhatsAppURL,
+  generateUPIPaymentUrl,
+  getUPIQRCodeUrl,
   updateBookingStatus,
   generateAdminToCustomerWhatsAppURL,
   generateAMCRenewalWhatsAppURL,
@@ -58,6 +74,15 @@ import {
   CreditCard,
   XCircle,
   Menu,
+  Receipt,
+  QrCode,
+  Printer,
+  Download,
+  Share2,
+  Copy,
+  BadgePercent,
+  Banknote,
+  FileText,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -82,7 +107,8 @@ export type AdminSection =
   | "customers"
   | "technicians"
   | "service-areas"
-  | "reports";
+  | "reports"
+  | "payments";
 
 const SERVICE_HUBS = [
   {
@@ -155,6 +181,28 @@ export function AdminDashboard() {
   const [showNewAMCModal, setShowNewAMCModal] = useState(false);
   const [amcActionToast, setAmcActionToast] = useState<string | null>(null);
 
+  // Payments & Invoicing State
+  const [transactions, setTransactions] = useState<PaymentTransaction[]>([]);
+  const [invoices, setInvoices] = useState<EGSInvoice[]>([]);
+  const [paymentSearchQuery, setPaymentSearchQuery] = useState("");
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
+  const [paymentDateFilter, setPaymentDateFilter] = useState("all");
+  const [selectedInvoice, setSelectedInvoice] = useState<EGSInvoice | null>(null);
+  const [recordPaymentModalOpen, setRecordPaymentModalOpen] = useState(false);
+  const [bankDetailsModalOpen, setBankDetailsModalOpen] = useState(false);
+  const [paymentActionToast, setPaymentActionToast] = useState<string | null>(null);
+
+  // Manual payment recording form inputs
+  const [recordPayBookingId, setRecordPayBookingId] = useState("");
+  const [recordPayCustName, setRecordPayCustName] = useState("");
+  const [recordPayCustPhone, setRecordPayCustPhone] = useState("");
+  const [recordPayServiceName, setRecordPayServiceName] = useState("❄ AC Service");
+  const [recordPayAmount, setRecordPayAmount] = useState<number>(1499);
+  const [recordPayMethod, setRecordPayMethod] = useState<PaymentMethod>("UPI / QR Code");
+  const [recordPayRef, setRecordPayRef] = useState("");
+  const [recordPayNotes, setRecordPayNotes] = useState("");
+
   // Renewal form inputs
   const [renewalAmount, setRenewalAmount] = useState<number>(0);
   const [renewalPaymentMode, setRenewalPaymentMode] = useState<string>("UPI / GPay");
@@ -184,6 +232,8 @@ export function AdminDashboard() {
     setTechnicians(getTechnicians());
     setAmcContracts(getAMCContracts());
     setCustomers(getCustomers());
+    setTransactions(getTransactions());
+    setInvoices(getInvoices());
   };
 
   useEffect(() => {
@@ -193,10 +243,14 @@ export function AdminDashboard() {
     window.addEventListener("egs_bookings_updated", handleUpdate);
     window.addEventListener("egs_customers_updated", handleUpdate);
     window.addEventListener("egs_amc_updated", handleUpdate);
+    window.addEventListener("egs_transactions_updated", handleUpdate);
+    window.addEventListener("egs_invoices_updated", handleUpdate);
     return () => {
       window.removeEventListener("egs_bookings_updated", handleUpdate);
       window.removeEventListener("egs_customers_updated", handleUpdate);
       window.removeEventListener("egs_amc_updated", handleUpdate);
+      window.removeEventListener("egs_transactions_updated", handleUpdate);
+      window.removeEventListener("egs_invoices_updated", handleUpdate);
     };
   }, []);
 
@@ -241,6 +295,25 @@ export function AdminDashboard() {
         String(b.unitCount).includes("+")
     ).length;
 
+    const totalRevenue = transactions
+      .filter((t) => t.status === "PAID")
+      .reduce((acc, t) => acc + (t.amount || 0), 0);
+    const todayRevenue = transactions
+      .filter((t) => {
+        if (t.status !== "PAID") return false;
+        const d = new Date(t.paidAt || t.createdAt);
+        const today = new Date();
+        return (
+          d.getDate() === today.getDate() &&
+          d.getMonth() === today.getMonth() &&
+          d.getFullYear() === today.getFullYear()
+        );
+      })
+      .reduce((acc, t) => acc + (t.amount || 0), 0);
+    const pendingCollections = bookings
+      .filter((b) => b.status === "COMPLETED")
+      .reduce((acc, b) => acc + (b.estimatedAmount || 0), 0);
+
     return {
       newBookings,
       todays,
@@ -250,8 +323,53 @@ export function AdminDashboard() {
       amcLeads,
       amcExpiring,
       quotation,
+      totalRevenue,
+      todayRevenue,
+      pendingCollections,
+      transactionsCount: transactions.length,
     };
-  }, [bookings, amcContracts]);
+  }, [bookings, amcContracts, transactions]);
+
+  // Filtered Transactions for Payments Ledger
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((t) => {
+      if (paymentMethodFilter !== "all" && t.paymentMethod !== paymentMethodFilter) {
+        return false;
+      }
+      if (paymentStatusFilter !== "all" && t.status !== paymentStatusFilter) {
+        return false;
+      }
+      if (paymentDateFilter === "today") {
+        const d = new Date(t.paidAt || t.createdAt);
+        const today = new Date();
+        if (
+          d.getDate() !== today.getDate() ||
+          d.getMonth() !== today.getMonth() ||
+          d.getFullYear() !== today.getFullYear()
+        ) {
+          return false;
+        }
+      } else if (paymentDateFilter === "month") {
+        const d = new Date(t.paidAt || t.createdAt);
+        const today = new Date();
+        if (d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
+          return false;
+        }
+      }
+      if (paymentSearchQuery.trim()) {
+        const q = paymentSearchQuery.toLowerCase();
+        const match =
+          t.id.toLowerCase().includes(q) ||
+          t.invoiceNo.toLowerCase().includes(q) ||
+          t.customerName.toLowerCase().includes(q) ||
+          t.phone.includes(q) ||
+          t.serviceName.toLowerCase().includes(q) ||
+          (t.transactionRef && t.transactionRef.toLowerCase().includes(q));
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [transactions, paymentMethodFilter, paymentStatusFilter, paymentDateFilter, paymentSearchQuery]);
 
   // Filtered AMC Contracts for the AMC Renewal System
   const filteredAMCContracts = useMemo(() => {
@@ -826,7 +944,43 @@ export function AdminDashboard() {
               </div>
             </div>
 
-            {/* Section 4: Analytics */}
+            {/* Section 4: Billing & Finance */}
+            <div>
+              <div className="px-3 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                Billing &amp; Finance
+              </div>
+              <div className="mt-2 space-y-1">
+                {/* Payments & Invoices */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("payments");
+                    setMobileSidebarOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    activeSection === "payments"
+                      ? "bg-brand text-brand-foreground shadow-md"
+                      : "text-foreground hover:bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <CreditCard className="size-4" />
+                    <span>Payments &amp; Invoices</span>
+                  </div>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                      activeSection === "payments"
+                        ? "bg-white text-brand"
+                        : "bg-emerald-500/15 text-emerald-600"
+                    }`}
+                  >
+                    ₹{(counts.totalRevenue / 1000).toFixed(0)}k
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Section 5: Analytics */}
             <div>
               <div className="px-3 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                 Analytics
@@ -1897,6 +2051,377 @@ export function AdminDashboard() {
               </div>
             </div>
           )}
+
+          {/* ============================================================ */}
+          {/* VIEW: PAYMENTS & INVOICING (GST 18% Invoices & UPI QR Ledger) */}
+          {/* ============================================================ */}
+          {activeSection === "payments" && (
+            <div className="space-y-4">
+              {/* Payment Action Toast */}
+              {paymentActionToast && (
+                <div className="rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white shadow-lg flex items-center justify-between border border-emerald-400/30 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="size-4 shrink-0 text-white" />
+                    <span>{paymentActionToast}</span>
+                  </div>
+                  <button onClick={() => setPaymentActionToast(null)} className="opacity-75 hover:opacity-100">
+                    <X className="size-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Header Ribbon & Action Buttons */}
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <div>
+                  <h2 className="text-base font-extrabold text-foreground flex items-center gap-2">
+                    <CreditCard className="size-5 text-brand" />
+                    <span>Payments, Invoicing &amp; 30-Day Guarantee Ledger</span>
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Real-time GST-ready tax invoicing, UPI QR reconciliations, field cash collections &amp; warranty dispatch.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBankDetailsModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-bold text-foreground hover:bg-surface/80 transition-colors"
+                  >
+                    <Building2 className="size-3.5 text-brand" />
+                    <span>Banking &amp; UPI Details</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecordPayBookingId("");
+                      setRecordPayCustName("");
+                      setRecordPayCustPhone("");
+                      setRecordPayServiceName("❄ AC Service");
+                      setRecordPayAmount(1499);
+                      setRecordPayMethod("UPI / QR Code");
+                      setRecordPayRef("");
+                      setRecordPayNotes("");
+                      setRecordPaymentModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-xs font-black text-brand-foreground shadow-md shadow-brand/25 hover:bg-brand/90 transition-transform active:scale-95"
+                  >
+                    <span>+ Record Payment / Invoice</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 4 Revenue KPI Metric Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* 1. Total Revenue Collected */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-1">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Total Collections
+                  </div>
+                  <div className="text-2xl font-black text-foreground">
+                    ₹{counts.totalRevenue.toLocaleString("en-IN")}
+                  </div>
+                  <div className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
+                    <CheckCircle2 className="size-3" />
+                    <span>{transactions.filter((t) => t.status === "PAID").length} Paid Transactions</span>
+                  </div>
+                </div>
+
+                {/* 2. Today's Collections */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-1">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Today's Collections
+                  </div>
+                  <div className="text-2xl font-black text-brand">
+                    ₹{counts.todayRevenue.toLocaleString("en-IN")}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    Realized via UPI &amp; Field COD
+                  </div>
+                </div>
+
+                {/* 3. Channels Breakdown */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-1">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Top Collection Method
+                  </div>
+                  <div className="text-sm font-extrabold text-foreground pt-1">
+                    📱 UPI: ₹{transactions.filter(t => t.paymentMethod.includes("UPI") && t.status === "PAID").reduce((a,b)=>a+b.amount,0).toLocaleString("en-IN")}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground flex gap-2">
+                    <span>💵 COD: ₹{transactions.filter(t => t.paymentMethod.includes("Cash") && t.status === "PAID").reduce((a,b)=>a+b.amount,0).toLocaleString("en-IN")}</span>
+                    <span>🏦 NEFT: ₹{transactions.filter(t => t.paymentMethod.includes("NEFT") && t.status === "PAID").reduce((a,b)=>a+b.amount,0).toLocaleString("en-IN")}</span>
+                  </div>
+                </div>
+
+                {/* 4. Pending Receivables */}
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-1">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Pending Receivables
+                  </div>
+                  <div className="text-2xl font-black text-amber-600">
+                    ₹{counts.pendingCollections.toLocaleString("en-IN")}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    {bookings.filter((b) => b.status === "COMPLETED").length} Completed jobs awaiting payment
+                  </div>
+                </div>
+              </div>
+
+              {/* Filters & Search Toolbar */}
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-3 shadow-sm">
+                <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[260px]">
+                  {/* Search */}
+                  <div className="relative flex-1 min-w-[180px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                    <input
+                      type="text"
+                      value={paymentSearchQuery}
+                      onChange={(e) => setPaymentSearchQuery(e.target.value)}
+                      placeholder="Search customer, Txn ID, invoice or ref..."
+                      className="w-full rounded-xl border border-border bg-surface py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Method Filter */}
+                  <select
+                    value={paymentMethodFilter}
+                    onChange={(e) => setPaymentMethodFilter(e.target.value)}
+                    className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground focus:border-brand focus:outline-none"
+                  >
+                    <option value="all">All Payment Modes</option>
+                    <option value="UPI / QR Code">📱 UPI / QR Code</option>
+                    <option value="Cash on Delivery">💵 Cash on Delivery</option>
+                    <option value="Bank NEFT / RTGS">🏦 Bank NEFT / RTGS</option>
+                    <option value="Credit / Debit Card">💳 Credit / Debit Card</option>
+                  </select>
+
+                  {/* Status Filter */}
+                  <select
+                    value={paymentStatusFilter}
+                    onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                    className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground focus:border-brand focus:outline-none"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="PAID">PAID</option>
+                    <option value="PENDING">PENDING</option>
+                  </select>
+                </div>
+
+                {/* Date Filter Tabs */}
+                <div className="flex items-center gap-1 bg-surface p-1 rounded-xl border border-border text-xs">
+                  {[
+                    { id: "all", label: "All Time" },
+                    { id: "today", label: "Today" },
+                    { id: "month", label: "This Month" },
+                  ].map((df) => (
+                    <button
+                      key={df.id}
+                      type="button"
+                      onClick={() => setPaymentDateFilter(df.id)}
+                      className={`px-3 py-1 rounded-lg font-bold transition-all ${
+                        paymentDateFilter === df.id
+                          ? "bg-brand text-brand-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {df.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Transactions Ledger Table */}
+              <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-surface/80 text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b border-border">
+                      <tr>
+                        <th className="px-4 py-3">Txn &amp; Invoice No</th>
+                        <th className="px-4 py-3">Customer Details</th>
+                        <th className="px-4 py-3">Service &amp; Reference</th>
+                        <th className="px-4 py-3">Gross Amount</th>
+                        <th className="px-4 py-3">GST (18%)</th>
+                        <th className="px-4 py-3">Mode &amp; Reference</th>
+                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3">Date</th>
+                        <th className="px-4 py-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/60">
+                      {filteredTransactions.length === 0 ? (
+                        <tr>
+                          <td colSpan={9} className="px-4 py-12 text-center text-muted-foreground">
+                            No payment transactions found matching the filter.
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredTransactions.map((t) => {
+                          const isPaid = t.status === "PAID";
+                          return (
+                            <tr key={t.id} className="hover:bg-surface/50 transition-colors">
+                              {/* Txn ID & Invoice */}
+                              <td className="px-4 py-3.5">
+                                <div className="font-mono font-black text-brand text-xs">
+                                  {t.id}
+                                </div>
+                                <div className="font-mono text-[11px] text-muted-foreground">
+                                  {t.invoiceNo}
+                                </div>
+                              </td>
+
+                              {/* Customer */}
+                              <td className="px-4 py-3.5">
+                                <div className="font-bold text-foreground">{t.customerName}</div>
+                                <div className="text-[11px] text-muted-foreground">{t.phone}</div>
+                              </td>
+
+                              {/* Service & Ref */}
+                              <td className="px-4 py-3.5">
+                                <div className="font-semibold text-foreground line-clamp-1 max-w-[200px]">
+                                  {t.serviceName}
+                                </div>
+                                <div className="text-[10px] text-muted-foreground">
+                                  {t.bookingId || t.amcContractNo || "Direct HVAC"}
+                                  {t.technicianName && ` • Tech: ${t.technicianName}`}
+                                </div>
+                              </td>
+
+                              {/* Gross Amount */}
+                              <td className="px-4 py-3.5">
+                                <div className="font-black text-foreground text-sm">
+                                  ₹{t.amount.toLocaleString("en-IN")}
+                                </div>
+                                <div className="text-[10px] text-muted-foreground">
+                                  Base: ₹{t.subtotal.toFixed(0)}
+                                </div>
+                              </td>
+
+                              {/* Tax 18% */}
+                              <td className="px-4 py-3.5">
+                                <div className="font-semibold text-foreground">
+                                  ₹{t.taxAmount.toFixed(0)}
+                                </div>
+                                <div className="text-[9px] text-muted-foreground uppercase">
+                                  CGST 9% + SGST 9%
+                                </div>
+                              </td>
+
+                              {/* Mode & Ref */}
+                              <td className="px-4 py-3.5">
+                                <span className="inline-flex items-center gap-1 font-bold text-foreground">
+                                  {t.paymentMethod.includes("UPI") ? (
+                                    <QrCode className="size-3 text-brand" />
+                                  ) : t.paymentMethod.includes("Cash") ? (
+                                    <Banknote className="size-3 text-emerald-600" />
+                                  ) : (
+                                    <CreditCard className="size-3 text-blue-600" />
+                                  )}
+                                  <span>{t.paymentMethod}</span>
+                                </span>
+                                {t.transactionRef && (
+                                  <div className="font-mono text-[10px] text-muted-foreground truncate max-w-[130px]">
+                                    {t.transactionRef}
+                                  </div>
+                                )}
+                              </td>
+
+                              {/* Status Badge */}
+                              <td className="px-4 py-3.5">
+                                <span
+                                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+                                    isPaid
+                                      ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/30"
+                                      : "bg-amber-500/15 text-amber-600 border border-amber-500/30 animate-pulse"
+                                  }`}
+                                >
+                                  <span className={`size-1.5 rounded-full ${isPaid ? "bg-emerald-500" : "bg-amber-500"}`} />
+                                  <span>{t.status}</span>
+                                </span>
+                              </td>
+
+                              {/* Date */}
+                              <td className="px-4 py-3.5 text-muted-foreground text-[11px] whitespace-nowrap">
+                                {new Date(t.paidAt || t.createdAt).toLocaleDateString("en-IN", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </td>
+
+                              {/* 1-Tap Actions */}
+                              <td className="px-4 py-3.5 text-right space-x-1.5 whitespace-nowrap">
+                                {/* View Tax Invoice */}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const inv = getInvoiceByNumber(t.invoiceNo);
+                                    if (inv) {
+                                      setSelectedInvoice(inv);
+                                    } else {
+                                      const mockInv: EGSInvoice = {
+                                        invoiceNo: t.invoiceNo,
+                                        date: t.paidAt ? t.paidAt.split("T")[0] : new Date().toISOString().split("T")[0],
+                                        bookingId: t.bookingId,
+                                        amcContractNo: t.amcContractNo,
+                                        customerName: t.customerName,
+                                        customerPhone: t.phone,
+                                        customerAddress: "Kerala, India",
+                                        customerCity: "Ernakulam",
+                                        technicianName: t.technicianName || "EGS HVAC Specialist",
+                                        items: [
+                                          {
+                                            description: t.serviceName,
+                                            hsnCode: EGS_COMPANY_DETAILS.sacCode,
+                                            quantity: 1,
+                                            unitPrice: t.subtotal,
+                                            amount: t.subtotal,
+                                          },
+                                        ],
+                                        subtotal: t.subtotal,
+                                        cgst: Math.round(t.taxAmount / 2),
+                                        sgst: Math.round(t.taxAmount / 2),
+                                        taxAmount: t.taxAmount,
+                                        grandTotal: t.amount,
+                                        paymentMethod: t.paymentMethod,
+                                        paymentStatus: t.status,
+                                        transactionRef: t.transactionRef,
+                                        warrantyPeriodDays: 30,
+                                        warrantyValidUntil: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+                                      };
+                                      setSelectedInvoice(mockInv);
+                                    }
+                                  }}
+                                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-2.5 py-1 text-[11px] font-bold text-foreground hover:bg-surface/80"
+                                  title="View GST Tax Invoice & Warranty"
+                                >
+                                  <FileText className="size-3 text-brand" />
+                                  <span>Invoice</span>
+                                </button>
+
+                                {/* WhatsApp Receipt */}
+                                <a
+                                  href={generatePaymentReceiptWhatsAppURL(t)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 rounded-lg bg-[#25D366]/15 border border-[#25D366]/30 px-2.5 py-1 text-[11px] font-bold text-[#25D366] hover:bg-[#25D366]/25"
+                                  title="Send WhatsApp Payment Receipt"
+                                >
+                                  <MessageSquare className="size-3 fill-current" />
+                                  <span>Receipt</span>
+                                </a>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
@@ -2777,6 +3302,540 @@ export function AdminDashboard() {
                 Create Contract
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL 1: OFFICIAL GST TAX INVOICE & 30-DAY WARRANTY CARD */}
+      {/* ============================================================ */}
+      {selectedInvoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm print:p-0 print:bg-white">
+          <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl border border-border bg-card p-6 md:p-8 shadow-2xl space-y-6 print:border-none print:shadow-none print:p-0 print:max-h-none print:max-w-none">
+            {/* Top Toolbar (Hidden on print) */}
+            <div className="flex items-center justify-between border-b border-border pb-4 print:hidden">
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-black text-brand text-lg">
+                  {selectedInvoice.invoiceNo}
+                </span>
+                <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-black uppercase text-emerald-600">
+                  {selectedInvoice.paymentStatus}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-foreground hover:bg-surface/80 cursor-pointer"
+                >
+                  <Printer className="size-3.5 text-brand" />
+                  <span>Print / PDF</span>
+                </button>
+                <a
+                  href={generatePaymentReceiptWhatsAppURL({
+                    id: `TXN-${selectedInvoice.invoiceNo.replace(/\D/g, "")}`,
+                    invoiceNo: selectedInvoice.invoiceNo,
+                    bookingId: selectedInvoice.bookingId,
+                    customerName: selectedInvoice.customerName,
+                    phone: selectedInvoice.customerPhone,
+                    whatsapp: selectedInvoice.customerPhone,
+                    amount: selectedInvoice.grandTotal,
+                    subtotal: selectedInvoice.subtotal,
+                    taxAmount: selectedInvoice.taxAmount,
+                    paymentMethod: selectedInvoice.paymentMethod,
+                    status: selectedInvoice.paymentStatus,
+                    serviceName: selectedInvoice.items[0]?.description || "HVAC Service",
+                    createdAt: selectedInvoice.date,
+                    paidAt: selectedInvoice.date,
+                  }, selectedInvoice)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#25D366] px-3 py-1.5 text-xs font-black text-white hover:bg-[#20ba59]"
+                >
+                  <MessageSquare className="size-3.5 fill-current" />
+                  <span>Send WhatsApp</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setSelectedInvoice(null)}
+                  className="rounded-xl p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* PRINTABLE INVOICE BODY */}
+            <div className="space-y-6 text-foreground print:space-y-4">
+              {/* Company Header */}
+              <div className="flex flex-col sm:flex-row justify-between gap-4 border-b border-border pb-6">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-lg bg-brand flex items-center justify-center text-brand-foreground font-black text-sm">
+                      EGS
+                    </div>
+                    <div>
+                      <h1 className="text-lg font-black tracking-tight text-foreground">
+                        {EGS_COMPANY_DETAILS.name}
+                      </h1>
+                      <div className="text-[11px] font-bold text-muted-foreground">
+                        {EGS_COMPANY_DETAILS.legalName}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground space-y-0.5">
+                    <div>{EGS_COMPANY_DETAILS.registeredOffice}</div>
+                    <div>Branches: Kollam • Kochi • Thiruvananthapuram • Thrissur • Chennai</div>
+                    <div>GSTIN: <strong className="text-foreground font-mono">{EGS_COMPANY_DETAILS.gstin}</strong> | PAN: <strong className="text-foreground font-mono">{EGS_COMPANY_DETAILS.pan}</strong></div>
+                    <div>Helpline: {EGS_COMPANY_DETAILS.phone} | {EGS_COMPANY_DETAILS.email}</div>
+                  </div>
+                </div>
+
+                <div className="text-left sm:text-right space-y-1 text-xs">
+                  <div className="text-[11px] font-black uppercase tracking-wider text-brand">
+                    TAX INVOICE (RULE 46 OF CGST RULES)
+                  </div>
+                  <div className="text-base font-black font-mono text-foreground">
+                    {selectedInvoice.invoiceNo}
+                  </div>
+                  <div>Date: <strong className="text-foreground">{selectedInvoice.date}</strong></div>
+                  <div>Reference: <strong className="text-foreground">{selectedInvoice.bookingId || selectedInvoice.amcContractNo || "Direct"}</strong></div>
+                  <div>Payment Mode: <strong className="text-foreground">{selectedInvoice.paymentMethod}</strong></div>
+                  {selectedInvoice.transactionRef && (
+                    <div className="text-[11px] text-muted-foreground font-mono">
+                      Ref: {selectedInvoice.transactionRef}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Billed To */}
+              <div className="grid grid-cols-2 gap-4 text-xs bg-surface/50 p-4 rounded-2xl border border-border">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1">
+                    Billed To (Customer):
+                  </span>
+                  <div className="font-extrabold text-foreground text-sm">
+                    {selectedInvoice.customerName}
+                  </div>
+                  <div className="text-muted-foreground mt-0.5">{selectedInvoice.customerAddress}</div>
+                  <div className="text-muted-foreground">{selectedInvoice.customerCity}</div>
+                  <div className="text-foreground font-medium mt-1">Phone: {selectedInvoice.customerPhone}</div>
+                  {selectedInvoice.customerEmail && (
+                    <div className="text-muted-foreground">{selectedInvoice.customerEmail}</div>
+                  )}
+                </div>
+
+                <div className="text-right">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1">
+                    Service Details:
+                  </span>
+                  <div className="font-bold text-foreground">
+                    {selectedInvoice.acType || "HVAC Unit Servicing"}
+                  </div>
+                  <div className="text-muted-foreground">
+                    Assigned Specialist: {selectedInvoice.technicianName || "EGS Certified Specialist"}
+                  </div>
+                  <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-600 border border-emerald-500/20">
+                    <CheckCircle2 className="size-3" />
+                    <span>Payment Received</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Itemized Table */}
+              <div className="overflow-hidden rounded-2xl border border-border">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-surface text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b border-border">
+                    <tr>
+                      <th className="px-4 py-2.5">#</th>
+                      <th className="px-4 py-2.5">Description of Goods / Services</th>
+                      <th className="px-4 py-2.5">HSN/SAC</th>
+                      <th className="px-4 py-2.5 text-center">Qty</th>
+                      <th className="px-4 py-2.5 text-right">Rate (₹)</th>
+                      <th className="px-4 py-2.5 text-right">Taxable Amount (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {selectedInvoice.items.map((item, idx) => (
+                      <tr key={idx}>
+                        <td className="px-4 py-3 text-muted-foreground">{idx + 1}</td>
+                        <td className="px-4 py-3 font-semibold text-foreground">{item.description}</td>
+                        <td className="px-4 py-3 font-mono text-muted-foreground">{item.hsnCode || "998719"}</td>
+                        <td className="px-4 py-3 text-center text-foreground font-bold">{item.quantity}</td>
+                        <td className="px-4 py-3 text-right font-mono">₹{item.unitPrice.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-right font-mono font-bold">₹{item.amount.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Tax Calculation Breakdown */}
+              <div className="flex flex-col sm:flex-row justify-between gap-4 pt-2">
+                <div className="flex-1 space-y-2 text-xs">
+                  <div className="rounded-xl border border-border bg-surface/40 p-3 text-muted-foreground">
+                    <span className="font-bold text-foreground block mb-0.5">Payment Terms &amp; Conditions:</span>
+                    <ol className="list-decimal list-inside space-y-0.5 text-[11px]">
+                      <li>All charges are inclusive of 18% GST (CGST 9% + SGST 9%).</li>
+                      <li>This is a computer-generated tax invoice and requires no physical signature.</li>
+                      <li>EGS INDIA helpline: +91 98956 88833 (24/7 HVAC Breakdown Support).</li>
+                    </ol>
+                  </div>
+                </div>
+
+                <div className="w-full sm:w-72 space-y-2 text-xs bg-surface/50 p-4 rounded-2xl border border-border font-mono">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Taxable Subtotal:</span>
+                    <span>₹{selectedInvoice.subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>CGST (9.0%):</span>
+                    <span>₹{selectedInvoice.cgst.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>SGST (9.0%):</span>
+                    <span>₹{selectedInvoice.sgst.toFixed(2)}</span>
+                  </div>
+                  <div className="border-t border-border pt-2 flex justify-between text-sm font-black text-foreground">
+                    <span>Grand Total:</span>
+                    <span className="text-brand">₹{selectedInvoice.grandTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* OFFICIAL STAMPED 30-DAY WARRANTY CARD */}
+              <div className="rounded-2xl border-2 border-emerald-500/50 bg-emerald-500/10 p-5 space-y-3 relative overflow-hidden">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-black uppercase text-white tracking-wider shadow-sm">
+                      <ShieldCheck className="size-4" />
+                      <span>30-Day Post-Service Guarantee Warranty Certificate</span>
+                    </div>
+                    <div className="text-sm font-black text-foreground">
+                      Certified Cooling &amp; Workmanship Protection
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      This unit is protected under EGS INDIA 30-Day No-Questions-Asked Revisit Guarantee. If any cooling loss or gas drop occurs within 30 days, our senior technician will re-attend free of charge.
+                    </p>
+                  </div>
+
+                  <div className="text-right shrink-0 bg-card p-3 rounded-xl border border-emerald-500/30 font-mono">
+                    <div className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                      Warranty Expiry
+                    </div>
+                    <div className="text-sm font-black text-emerald-600">
+                      {selectedInvoice.warrantyValidUntil}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5">
+                      30 Days Validity
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stamped Authorized Seal */}
+                <div className="flex items-center justify-between pt-2 border-t border-emerald-500/20 text-[11px]">
+                  <div className="font-bold text-emerald-700 dark:text-emerald-400">
+                    Verified by EGS Quality Assurance Desk • Kollam &amp; Kochi Hub
+                  </div>
+                  <div className="font-mono text-muted-foreground text-[10px]">
+                    Authorized Digital Stamp • EGS INDIA
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL 2: RECORD PAYMENT / GENERATE INVOICE */}
+      {/* ============================================================ */}
+      {recordPaymentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div>
+                <h3 className="font-black text-foreground text-base">Record Payment &amp; Generate Invoice</h3>
+                <p className="text-xs text-muted-foreground">Log offline payment or field cash realization</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRecordPaymentModalOpen(false)}
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              {/* Optional: Link to Existing Booking */}
+              <div>
+                <label className="font-bold text-foreground block mb-1">
+                  Link to Completed Booking (Optional):
+                </label>
+                <select
+                  value={recordPayBookingId}
+                  onChange={(e) => {
+                    const bId = e.target.value;
+                    setRecordPayBookingId(bId);
+                    if (bId) {
+                      const match = bookings.find((b) => b.id === bId);
+                      if (match) {
+                        setRecordPayCustName(match.customerName);
+                        setRecordPayCustPhone(match.phone);
+                        setRecordPayServiceName(match.serviceName);
+                        setRecordPayAmount(match.estimatedAmount || 1499);
+                      }
+                    }
+                  }}
+                  className="w-full rounded-xl border border-border bg-surface p-2.5 font-medium text-foreground focus:border-brand focus:outline-none"
+                >
+                  <option value="">-- Direct Payment (Not linked to booking) --</option>
+                  {bookings
+                    .filter((b) => b.status === "COMPLETED" || b.status === "SERVICE STARTED" || b.status === "CONFIRMED")
+                    .map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.id} - {b.customerName} ({b.serviceName} • ₹{b.estimatedAmount})
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-foreground block mb-1">Customer Name:</label>
+                  <input
+                    type="text"
+                    value={recordPayCustName}
+                    onChange={(e) => setRecordPayCustName(e.target.value)}
+                    placeholder="e.g. Suresh Menon"
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-foreground block mb-1">Phone Number:</label>
+                  <input
+                    type="text"
+                    value={recordPayCustPhone}
+                    onChange={(e) => setRecordPayCustPhone(e.target.value)}
+                    placeholder="+91 98470 12345"
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-foreground block mb-1">Amount (₹):</label>
+                  <input
+                    type="number"
+                    min={100}
+                    value={recordPayAmount}
+                    onChange={(e) => setRecordPayAmount(Number(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-bold text-foreground focus:border-brand focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-foreground block mb-1">Payment Mode:</label>
+                  <select
+                    value={recordPayMethod}
+                    onChange={(e) => setRecordPayMethod(e.target.value as PaymentMethod)}
+                    className="w-full rounded-xl border border-border bg-surface p-2.5 font-medium text-foreground focus:border-brand focus:outline-none"
+                  >
+                    <option value="UPI / QR Code">📱 UPI / QR Code</option>
+                    <option value="Cash on Delivery">💵 Cash on Delivery</option>
+                    <option value="Bank NEFT / RTGS">🏦 Bank NEFT / RTGS</option>
+                    <option value="Credit / Debit Card">💳 Credit / Debit Card</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-foreground block mb-1">
+                  Transaction Reference / UTR Number:
+                </label>
+                <input
+                  type="text"
+                  value={recordPayRef}
+                  onChange={(e) => setRecordPayRef(e.target.value)}
+                  placeholder="e.g. UPI/429188491023 or Cash Slip #42"
+                  className="w-full rounded-xl border border-border bg-surface p-2.5 text-foreground focus:border-brand focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-foreground block mb-1">Service Notes:</label>
+                <input
+                  type="text"
+                  value={recordPayNotes}
+                  onChange={(e) => setRecordPayNotes(e.target.value)}
+                  placeholder="e.g. Full gas recharge completed with 30-day warranty"
+                  className="w-full rounded-xl border border-border bg-surface p-2.5 text-foreground focus:border-brand focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setRecordPaymentModalOpen(false)}
+                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-bold text-foreground hover:bg-surface cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (recordPayAmount <= 0) return;
+                  if (recordPayBookingId) {
+                    const result = recordBookingPayment(
+                      recordPayBookingId,
+                      recordPayMethod,
+                      recordPayAmount,
+                      recordPayRef,
+                      undefined,
+                      undefined,
+                      recordPayNotes
+                    );
+                    setPaymentActionToast(`Payment of ₹${recordPayAmount} recorded for ${recordPayBookingId}!`);
+                    setSelectedInvoice(result.invoice);
+                  } else {
+                    const finalAmount = recordPayAmount;
+                    const subtotal = Math.round((finalAmount / 1.18) * 100) / 100;
+                    const taxAmount = Math.round((finalAmount - subtotal) * 100) / 100;
+                    const invNo = `INV-2026-${Math.floor(8820 + Math.random() * 800)}`;
+                    const txn: PaymentTransaction = {
+                      id: `TXN-2026-${Math.floor(8820 + Math.random() * 800)}`,
+                      invoiceNo: invNo,
+                      customerName: recordPayCustName || "Walk-in Customer",
+                      phone: recordPayCustPhone || "+91 98956 88833",
+                      amount: finalAmount,
+                      subtotal,
+                      taxAmount,
+                      paymentMethod: recordPayMethod,
+                      status: "PAID",
+                      transactionRef: recordPayRef || `TXN-${Date.now().toString().slice(-6)}`,
+                      serviceName: recordPayServiceName,
+                      createdAt: new Date().toISOString(),
+                      paidAt: new Date().toISOString(),
+                      notes: recordPayNotes,
+                    };
+                    saveTransaction(txn);
+                    const inv: EGSInvoice = {
+                      invoiceNo: invNo,
+                      date: new Date().toISOString().split("T")[0],
+                      customerName: txn.customerName,
+                      customerPhone: txn.phone,
+                      customerAddress: "Kerala, India",
+                      customerCity: "Ernakulam",
+                      items: [
+                        {
+                          description: recordPayServiceName,
+                          hsnCode: EGS_COMPANY_DETAILS.sacCode,
+                          quantity: 1,
+                          unitPrice: subtotal,
+                          amount: subtotal,
+                        },
+                      ],
+                      subtotal,
+                      cgst: Math.round(taxAmount / 2),
+                      sgst: Math.round(taxAmount / 2),
+                      taxAmount,
+                      grandTotal: finalAmount,
+                      paymentMethod: recordPayMethod,
+                      paymentStatus: "PAID",
+                      transactionRef: txn.transactionRef,
+                      warrantyPeriodDays: 30,
+                      warrantyValidUntil: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+                    };
+                    setSelectedInvoice(inv);
+                    setPaymentActionToast(`Custom Invoice ${invNo} generated successfully!`);
+                  }
+                  setRecordPaymentModalOpen(false);
+                  loadData();
+                }}
+                className="flex-1 rounded-xl bg-brand py-2.5 text-xs font-black text-brand-foreground shadow-lg shadow-brand/30 hover:bg-brand/90 transition-transform active:scale-95 cursor-pointer"
+              >
+                Record &amp; Issue Invoice
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL 3: ICICI BANKING & DYNAMIC QR DETAILS */}
+      {/* ============================================================ */}
+      {bankDetailsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div>
+                <h3 className="font-black text-foreground text-base">EGS INDIA Banking &amp; UPI</h3>
+                <p className="text-xs text-muted-foreground">Official Corporate Collections Account</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setBankDetailsModalOpen(false)}
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Merchant QR Code */}
+            <div className="text-center space-y-2">
+              <div className="mx-auto flex size-44 items-center justify-center rounded-2xl bg-white p-2 border-2 border-border shadow-inner">
+                <img
+                  src={getUPIQRCodeUrl(generateUPIPaymentUrl(0, "EGS-MERCHANT"), 220)}
+                  alt="EGS Merchant UPI QR"
+                  className="size-full object-contain rounded-lg"
+                />
+              </div>
+              <div className="text-xs font-bold text-foreground">
+                UPI VPA ID: <span className="font-mono text-brand">{EGS_COMPANY_DETAILS.bankDetails.upiId}</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Accepts GPay, PhonePe, Paytm, BHIM, Amazon Pay &amp; all Indian UPI Apps.
+              </p>
+            </div>
+
+            {/* Corporate Bank Account Details */}
+            <div className="rounded-2xl border border-border bg-surface/50 p-4 text-xs space-y-2">
+              <div className="flex justify-between pb-1.5 border-b border-border/80">
+                <span className="text-muted-foreground">Bank Name:</span>
+                <span className="font-bold text-foreground">{EGS_COMPANY_DETAILS.bankDetails.bankName}</span>
+              </div>
+              <div className="flex justify-between pb-1.5 border-b border-border/80">
+                <span className="text-muted-foreground">Account Name:</span>
+                <span className="font-bold text-foreground">{EGS_COMPANY_DETAILS.bankDetails.accountName}</span>
+              </div>
+              <div className="flex justify-between pb-1.5 border-b border-border/80">
+                <span className="text-muted-foreground">Account Number:</span>
+                <span className="font-mono font-bold text-brand">{EGS_COMPANY_DETAILS.bankDetails.accountNumber}</span>
+              </div>
+              <div className="flex justify-between pb-1.5 border-b border-border/80">
+                <span className="text-muted-foreground">Account Type:</span>
+                <span className="font-bold text-foreground">{EGS_COMPANY_DETAILS.bankDetails.accountType}</span>
+              </div>
+              <div className="flex justify-between pb-1.5 border-b border-border/80">
+                <span className="text-muted-foreground">IFSC Code:</span>
+                <span className="font-mono font-bold text-foreground">{EGS_COMPANY_DETAILS.bankDetails.ifscCode}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Branch:</span>
+                <span className="font-bold text-foreground">{EGS_COMPANY_DETAILS.bankDetails.branch}</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setBankDetailsModalOpen(false)}
+              className="w-full rounded-xl bg-brand py-2.5 text-xs font-black text-brand-foreground hover:bg-brand/90 transition-colors cursor-pointer"
+            >
+              Done
+            </button>
           </div>
         </div>
       )}

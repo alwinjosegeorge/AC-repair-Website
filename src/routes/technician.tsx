@@ -5,13 +5,23 @@ import {
   Technician,
   BookingStatus,
   BOOKING_STATUS_FLOW,
+  PaymentMethod,
+  PaymentTransaction,
+  EGSInvoice,
   getBookings,
   getTechnicians,
+  getTransactions,
+  getInvoiceByNumber,
   updateBookingStatus,
+  recordBookingPayment,
+  generateUPIPaymentUrl,
+  getUPIQRCodeUrl,
+  generatePaymentReceiptWhatsAppURL,
   generateTechnicianEtaWhatsAppURL,
   generateTechnicianCompletedWhatsAppURL,
   EGS_CALL_NUMBER,
   EGS_WHATSAPP_NUMBER,
+  EGS_COMPANY_DETAILS,
 } from "@/lib/store";
 import {
   Phone,
@@ -43,6 +53,14 @@ import {
   FileText,
   DollarSign,
   AlertTriangle,
+  QrCode,
+  Share2,
+  Copy,
+  Receipt,
+  Download,
+  Printer,
+  Building2,
+  ExternalLink,
 } from "lucide-react";
 
 export const Route = createFileRoute("/technician")({
@@ -69,8 +87,20 @@ export function TechnicianMobilePortal() {
   const [activeJobDetails, setActiveJobDetails] = useState<Booking | null>(null);
   const [sparesNotesModal, setSparesNotesModal] = useState<Booking | null>(null);
   const [sparesText, setSparesText] = useState("");
-  const [techRemarks, setTechRemarks] = useState("");
   const [actionSuccessNotice, setActionSuccessNotice] = useState<string | null>(null);
+
+  // Field Technician Payment Collector State
+  const [paymentModalJob, setPaymentModalJob] = useState<Booking | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("UPI / QR Code");
+  const [paymentCollectAmount, setPaymentCollectAmount] = useState<number>(0);
+  const [paymentUtrRef, setPaymentUtrRef] = useState<string>("");
+  const [paymentNotes, setPaymentNotes] = useState<string>("");
+  const [paymentSuccessResult, setPaymentSuccessResult] = useState<{
+    transaction: PaymentTransaction;
+    invoice: EGSInvoice;
+  } | null>(null);
+  const [receiptModalJob, setReceiptModalJob] = useState<Booking | null>(null);
+  const [copiedUpiNotice, setCopiedUpiNotice] = useState(false);
 
   // Load state and listen for store updates
   const refreshData = () => {
@@ -683,24 +713,41 @@ export function TechnicianMobilePortal() {
                           </a>
                         </div>
                         <button
-                          onClick={() => handleAdvanceStatus(b, "PAYMENT RECEIVED")}
-                          className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand hover:bg-brand/90 py-2.5 text-xs font-black text-brand-foreground shadow-md shadow-brand/30 active:scale-98"
+                          onClick={() => {
+                            setPaymentModalJob(b);
+                            setPaymentCollectAmount(b.estimatedAmount);
+                            setPaymentMethod("UPI / QR Code");
+                            setPaymentUtrRef("");
+                            setPaymentNotes("");
+                            setPaymentSuccessResult(null);
+                          }}
+                          className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand hover:bg-brand/90 py-2.5 text-xs font-black text-brand-foreground shadow-md shadow-brand/30 active:scale-98 transition-transform cursor-pointer"
                         >
-                          <CreditCard className="size-4" />
-                          <span>💳 Collect Payment (₹{b.estimatedAmount})</span>
+                          <QrCode className="size-4" />
+                          <span>💳 Show UPI QR / Collect Payment (₹{b.estimatedAmount})</span>
                         </button>
                       </div>
                     )}
 
                     {isPaid && (
-                      <div className="flex items-center justify-between rounded-xl bg-emerald-950/40 p-2.5 border border-emerald-500/30 text-xs">
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold">
-                          <Check className="size-4" />
-                          <span>Payment Received (₹{b.estimatedAmount})</span>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between rounded-xl bg-emerald-950/40 p-2.5 border border-emerald-500/30 text-xs">
+                          <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                            <Check className="size-4" />
+                            <span>Payment Received (₹{b.estimatedAmount})</span>
+                          </div>
+                          <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-300">
+                            Warranty Active 🛡️
+                          </span>
                         </div>
-                        <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-300">
-                          Warranty Active 🛡️
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setReceiptModalJob(b)}
+                          className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 py-2 text-xs font-bold text-slate-200 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <Receipt className="size-3.5 text-brand" />
+                          <span>View Receipt, Invoice &amp; 30-Day Guarantee</span>
+                        </button>
                       </div>
                     )}
 
@@ -785,6 +832,459 @@ export function TechnicianMobilePortal() {
                 className="flex-1 rounded-xl bg-brand py-2.5 text-xs font-black text-brand-foreground shadow-md shadow-brand/30"
               >
                 Save Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL: FIELD TECHNICIAN PAYMENT COLLECTOR */}
+      {/* ============================================================ */}
+      {paymentModalJob && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/85 backdrop-blur-sm p-3 overflow-y-auto">
+          <div className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-5 shadow-2xl space-y-4 animate-in fade-in slide-in-from-bottom-6 max-h-[92vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-brand">
+                  Field Payment Collection
+                </span>
+                <h3 className="font-black text-white text-base mt-0.5">
+                  {paymentModalJob.serviceName}
+                </h3>
+                <p className="text-xs text-slate-400">
+                  {paymentModalJob.id} • {paymentModalJob.customerName}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setPaymentModalJob(null);
+                  setPaymentSuccessResult(null);
+                }}
+                className="rounded-lg p-1.5 text-slate-400 hover:text-white hover:bg-slate-800"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* IF PAYMENT COMPLETED SUCCESSFULLY: SHOW RECEIPT SCREEN */}
+            {paymentSuccessResult ? (
+              <div className="space-y-4 text-center py-2 animate-in fade-in zoom-in-95">
+                <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+                  <CheckCircle2 className="size-8" />
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-black text-white">Payment Received!</h4>
+                  <p className="text-xs text-emerald-400 font-bold mt-0.5">
+                    ₹{paymentSuccessResult.transaction.amount.toLocaleString("en-IN")} collected via {paymentSuccessResult.transaction.paymentMethod}
+                  </p>
+                </div>
+
+                {/* Receipt Card */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-950 p-3.5 text-left text-xs space-y-2">
+                  <div className="flex justify-between items-center text-slate-400 pb-2 border-b border-slate-800/80">
+                    <span>Receipt No:</span>
+                    <span className="font-mono font-bold text-slate-200">
+                      {paymentSuccessResult.transaction.id}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-400 pb-2 border-b border-slate-800/80">
+                    <span>Tax Invoice:</span>
+                    <span className="font-mono font-bold text-brand">
+                      {paymentSuccessResult.invoice.invoiceNo}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-400 pb-2 border-b border-slate-800/80">
+                    <span>GST (18% Included):</span>
+                    <span className="font-semibold text-slate-300">
+                      ₹{paymentSuccessResult.transaction.taxAmount.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-400">
+                    <span>30-Day Guarantee Valid:</span>
+                    <span className="font-bold text-emerald-400 flex items-center gap-1">
+                      <ShieldCheck className="size-3.5" />
+                      {paymentSuccessResult.invoice.warrantyValidUntil}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Dispatch WhatsApp Receipt */}
+                <div className="space-y-2 pt-1">
+                  <a
+                    href={generatePaymentReceiptWhatsAppURL(
+                      paymentSuccessResult.transaction,
+                      paymentSuccessResult.invoice
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] py-3 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#25D366]/25 transition-transform active:scale-98"
+                  >
+                    <MessageSquare className="size-4 fill-current" />
+                    <span>Send Receipt &amp; Warranty via WhatsApp</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPaymentModalJob(null);
+                      setPaymentSuccessResult(null);
+                      refreshData();
+                    }}
+                    className="w-full rounded-xl border border-slate-800 bg-slate-900 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white"
+                  >
+                    Close &amp; Return to Job Queue
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* COLLECT PAYMENT FORM */
+              <div className="space-y-4">
+                {/* Amount to Collect with optional quick adjustments */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-950 p-3.5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-300">
+                      Total Amount to Collect:
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-semibold">
+                      (Includes 18% GST)
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-base font-extrabold text-brand">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      min={100}
+                      value={paymentCollectAmount}
+                      onChange={(e) => setPaymentCollectAmount(Number(e.target.value))}
+                      className="w-full rounded-xl border border-slate-700 bg-slate-900 py-2.5 pl-8 pr-3 text-base font-black text-white focus:border-brand focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Quick adjustments */}
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    <span className="text-[10px] text-slate-400 py-1">Quick Add:</span>
+                    {[
+                      { label: "Base Fee", val: paymentModalJob.estimatedAmount },
+                      { label: "+₹299 Gas Topup", val: paymentModalJob.estimatedAmount + 299 },
+                      { label: "+₹450 Capacitor", val: paymentModalJob.estimatedAmount + 450 },
+                      { label: "+₹950 Deep Coil Wash", val: paymentModalJob.estimatedAmount + 950 },
+                    ].map((adj, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setPaymentCollectAmount(adj.val)}
+                        className={`rounded-lg px-2 py-0.5 text-[10px] font-bold border transition-all ${
+                          paymentCollectAmount === adj.val
+                            ? "border-brand bg-brand/20 text-brand"
+                            : "border-slate-800 bg-slate-900 text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        {adj.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Payment Method Selector Tabs */}
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1.5">
+                    Select Collection Method:
+                  </label>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[
+                      { id: "UPI / QR Code", label: "📱 UPI / QR", sub: "GPay/PhonePe" },
+                      { id: "Cash on Delivery", label: "💵 Cash", sub: "Handover" },
+                      { id: "Credit / Debit Card", label: "💳 Card/POS", sub: "Card Swipe" },
+                    ].map((m) => {
+                      const active = paymentMethod === m.id;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => setPaymentMethod(m.id as PaymentMethod)}
+                          className={`rounded-xl border p-2.5 text-center transition-all cursor-pointer ${
+                            active
+                              ? "border-brand bg-brand text-brand-foreground shadow-md font-black"
+                              : "border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700 font-bold"
+                          }`}
+                        >
+                          <div className="text-xs">{m.label}</div>
+                          <div
+                            className={`text-[9px] mt-0.5 ${
+                              active ? "text-brand-foreground/80 font-bold" : "text-slate-500"
+                            }`}
+                          >
+                            {m.sub}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* METHOD 1: DYNAMIC UPI QR CODE */}
+                {paymentMethod === "UPI / QR Code" && (
+                  <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-3">
+                    <div className="text-center space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                        Scan with GPay, PhonePe, Paytm, BHIM
+                      </span>
+                      <div className="text-xs font-bold text-white">
+                        EGS Merchant UPI: <span className="font-mono text-brand">{EGS_COMPANY_DETAILS.bankDetails.upiId}</span>
+                      </div>
+                    </div>
+
+                    {/* QR Code Container */}
+                    <div className="mx-auto flex size-48 items-center justify-center rounded-2xl bg-white p-2 shadow-inner border-2 border-slate-700">
+                      <img
+                        src={getUPIQRCodeUrl(
+                          generateUPIPaymentUrl(paymentCollectAmount, paymentModalJob.id),
+                          240
+                        )}
+                        alt="EGS INDIA UPI QR Code"
+                        className="size-full object-contain rounded-lg"
+                      />
+                    </div>
+
+                    {/* Quick 1-tap open in mobile UPI app or Copy UPI ID */}
+                    <div className="flex gap-2 justify-center text-xs">
+                      <a
+                        href={generateUPIPaymentUrl(paymentCollectAmount, paymentModalJob.id)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 font-bold text-brand hover:border-brand"
+                      >
+                        <ExternalLink className="size-3.5" />
+                        <span>Open UPI App</span>
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(EGS_COMPANY_DETAILS.bankDetails.upiId);
+                          setCopiedUpiNotice(true);
+                          setTimeout(() => setCopiedUpiNotice(false), 2500);
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 font-bold text-slate-300 hover:text-white"
+                      >
+                        <Copy className="size-3.5" />
+                        <span>{copiedUpiNotice ? "Copied!" : "Copy VPA"}</span>
+                      </button>
+                    </div>
+
+                    {/* UTR reference input */}
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                        Customer UPI Transaction UTR / Ref ID (Optional):
+                      </label>
+                      <input
+                        type="text"
+                        value={paymentUtrRef}
+                        onChange={(e) => setPaymentUtrRef(e.target.value)}
+                        placeholder="e.g. 429188491023 (12-digit UTR)"
+                        className="w-full rounded-xl border border-slate-800 bg-slate-900 p-2 text-xs text-white placeholder:text-slate-500 focus:border-brand focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* METHOD 2: CASH ON DELIVERY */}
+                {paymentMethod === "Cash on Delivery" && (
+                  <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 space-y-2.5 text-xs">
+                    <div className="flex items-center gap-2 font-bold text-amber-300">
+                      <CheckCircle2 className="size-4" />
+                      <span>Physical Cash Collection</span>
+                    </div>
+                    <p className="text-slate-300 text-[11px]">
+                      Collect ₹{paymentCollectAmount.toLocaleString("en-IN")} in cash directly from {paymentModalJob.customerName}. Once verified, confirm below to issue digital receipt &amp; 30-day guarantee.
+                    </p>
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                        Cash Slip / Denomination Notes:
+                      </label>
+                      <input
+                        type="text"
+                        value={paymentUtrRef}
+                        onChange={(e) => setPaymentUtrRef(e.target.value)}
+                        placeholder="e.g. Received ₹1500 cash from customer"
+                        className="w-full rounded-xl border border-slate-800 bg-slate-900 p-2 text-xs text-white placeholder:text-slate-500 focus:border-brand focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* METHOD 3: CARD / POS */}
+                {paymentMethod === "Credit / Debit Card" && (
+                  <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4 space-y-2.5 text-xs">
+                    <div className="flex items-center gap-2 font-bold text-blue-300">
+                      <CreditCard className="size-4" />
+                      <span>mPOS Card Swipe / Tap</span>
+                    </div>
+                    <p className="text-slate-300 text-[11px]">
+                      Process ₹{paymentCollectAmount.toLocaleString("en-IN")} on portable card machine or digital payment link.
+                    </p>
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                        Card Approval Code / Machine Ref:
+                      </label>
+                      <input
+                        type="text"
+                        value={paymentUtrRef}
+                        onChange={(e) => setPaymentUtrRef(e.target.value)}
+                        placeholder="e.g. AUTH-882910"
+                        className="w-full rounded-xl border border-slate-800 bg-slate-900 p-2 text-xs text-white placeholder:text-slate-500 focus:border-brand focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* ACTION CONFIRM BUTTON */}
+                <div className="pt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentModalJob(null)}
+                    className="flex-1 rounded-xl border border-slate-700 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (paymentCollectAmount <= 0) return;
+                      const result = recordBookingPayment(
+                        paymentModalJob.id,
+                        paymentMethod,
+                        paymentCollectAmount,
+                        paymentUtrRef,
+                        currentTechnician?.id || selectedTechId,
+                        currentTechnician?.name || "Arun Kumar",
+                        paymentNotes || `Field payment received via ${paymentMethod}`
+                      );
+                      setPaymentSuccessResult(result);
+                      setActionSuccessNotice(`Payment of ₹${paymentCollectAmount} recorded! Status: PAYMENT RECEIVED.`);
+                      refreshData();
+                    }}
+                    className="flex-2 rounded-xl bg-brand py-3 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/30 hover:bg-brand/90 transition-transform active:scale-98 cursor-pointer"
+                  >
+                    Confirm Payment (₹{paymentCollectAmount.toLocaleString("en-IN")})
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL: DIGITAL RECEIPT & 30-DAY GUARANTEE VIEWER */}
+      {/* ============================================================ */}
+      {receiptModalJob && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/85 backdrop-blur-sm p-3 overflow-y-auto">
+          <div className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-5 shadow-2xl space-y-4 animate-in fade-in slide-in-from-bottom-6 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-start justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
+                  Digital Service Receipt
+                </span>
+                <h3 className="font-black text-white text-base mt-0.5">
+                  {receiptModalJob.serviceName}
+                </h3>
+                <p className="text-xs text-slate-400">
+                  {receiptModalJob.id} • {receiptModalJob.customerName}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReceiptModalJob(null)}
+                className="rounded-lg p-1.5 text-slate-400 hover:text-white hover:bg-slate-800"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Receipt Summary Card */}
+            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 text-xs space-y-2.5">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                <span className="text-slate-400">Invoice Number:</span>
+                <span className="font-mono font-bold text-brand">
+                  INV-2026-{receiptModalJob.id.replace(/\D/g, "") || "1088"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                <span className="text-slate-400">Amount Paid:</span>
+                <span className="font-black text-white text-sm">
+                  ₹{receiptModalJob.estimatedAmount.toLocaleString("en-IN")}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                <span className="text-slate-400">Tax Breakdown (18% GST):</span>
+                <span className="text-slate-300">
+                  CGST (9%) + SGST (9%)
+                </span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                <span className="text-slate-400">Serviced By:</span>
+                <span className="font-semibold text-slate-200">
+                  {receiptModalJob.assignedTechnicianName || currentTechnician?.name || "EGS Specialist"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-400">Warranty Certificate:</span>
+                <span className="font-bold text-emerald-400 flex items-center gap-1">
+                  <ShieldCheck className="size-3.5" /> 30-Day Active
+                </span>
+              </div>
+            </div>
+
+            {/* Official Stamped Guarantee Box */}
+            <div className="rounded-2xl border-2 border-dashed border-emerald-500/40 bg-emerald-500/10 p-4 text-center space-y-1">
+              <div className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
+                🛡️ Stamped Post-Service Warranty
+              </div>
+              <div className="text-xs font-bold text-white">
+                Expert Goods &amp; Services (EGS INDIA)
+              </div>
+              <p className="text-[11px] text-slate-300">
+                Covers free re-visit, leak diagnostics, and cooling performance check for 30 calendar days from service completion.
+              </p>
+            </div>
+
+            {/* Buttons */}
+            <div className="space-y-2 pt-1">
+              <a
+                href={generatePaymentReceiptWhatsAppURL({
+                  id: `TXN-2026-${receiptModalJob.id.replace(/\D/g, "") || "8801"}`,
+                  invoiceNo: `INV-2026-${receiptModalJob.id.replace(/\D/g, "") || "1088"}`,
+                  bookingId: receiptModalJob.id,
+                  customerName: receiptModalJob.customerName,
+                  phone: receiptModalJob.phone,
+                  whatsapp: receiptModalJob.whatsappNumber || receiptModalJob.phone,
+                  amount: receiptModalJob.estimatedAmount,
+                  subtotal: Math.round(receiptModalJob.estimatedAmount / 1.18),
+                  taxAmount: Math.round(receiptModalJob.estimatedAmount - receiptModalJob.estimatedAmount / 1.18),
+                  paymentMethod: "UPI / QR Code",
+                  status: "PAID",
+                  serviceName: receiptModalJob.serviceName,
+                  createdAt: receiptModalJob.createdAt,
+                  paidAt: new Date().toISOString(),
+                })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] py-3 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#25D366]/25"
+              >
+                <MessageSquare className="size-4 fill-current" />
+                <span>Re-send Receipt via WhatsApp</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setReceiptModalJob(null)}
+                className="w-full rounded-xl border border-slate-800 bg-slate-900 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800"
+              >
+                Close
               </button>
             </div>
           </div>

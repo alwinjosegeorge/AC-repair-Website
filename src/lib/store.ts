@@ -211,6 +211,99 @@ export interface AMCContract {
   }>;
 }
 
+export type PaymentMethod =
+  | "UPI / QR Code"
+  | "Cash on Delivery"
+  | "Credit / Debit Card"
+  | "Net Banking"
+  | "Bank NEFT / RTGS";
+
+export type PaymentStatus = "PAID" | "PENDING" | "REFUNDED";
+
+export interface PaymentTransaction {
+  id: string; // e.g. "TXN-2026-8801"
+  invoiceNo: string; // e.g. "INV-2026-1088"
+  bookingId?: string; // e.g. "EGS-2026-1088b"
+  amcContractNo?: string; // e.g. "AMC-2026-104"
+  customerName: string;
+  phone: string;
+  whatsapp?: string;
+  amount: number;
+  subtotal: number;
+  taxAmount: number; // 18% GST (CGST 9% + SGST 9%)
+  paymentMethod: PaymentMethod;
+  status: PaymentStatus;
+  transactionRef?: string; // e.g. UPI UTR number or cash slip
+  technicianId?: string;
+  technicianName?: string;
+  serviceName: string;
+  createdAt: string;
+  paidAt?: string;
+  notes?: string;
+}
+
+export interface EGSInvoiceItem {
+  description: string;
+  hsnCode?: string; // e.g. "998719"
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+}
+
+export interface EGSInvoice {
+  invoiceNo: string;
+  date: string;
+  dueDate?: string;
+  bookingId?: string;
+  amcContractNo?: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  customerAddress: string;
+  customerCity: string;
+  customerGstin?: string;
+  acType?: ACType | string;
+  technicianName?: string;
+  items: EGSInvoiceItem[];
+  subtotal: number;
+  cgst: number; // 9%
+  sgst: number; // 9%
+  taxAmount: number;
+  grandTotal: number;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  transactionRef?: string;
+  warrantyPeriodDays: number;
+  warrantyValidUntil: string;
+  notes?: string;
+}
+
+export const EGS_COMPANY_DETAILS = {
+  name: "Expert Goods & Services India (EGS INDIA)",
+  legalName: "Expert Goods and Services India Pvt Ltd",
+  tagline: "Expert Air Conditioner Service & HVAC Solutions",
+  gstin: "32AAECE8921M1ZX",
+  pan: "AAECE8921M",
+  cin: "U29190KL2021PTC068192",
+  sacCode: "998719", // Maintenance, repair and cleaning of HVAC & machinery
+  phone: "+91 98956 88833",
+  whatsapp: "919895688833",
+  email: "service@egsindia.com",
+  website: "https://egsindia.com",
+  registeredOffice: "EGS Towers, Near Collectorate, Kollam - 691001, Kerala",
+  cochinOffice: "Infopark Phase 1, Kakkanad, Ernakulam - 682030",
+  trivandrumOffice: "Golf Links Road, Kowdiar, Thiruvananthapuram - 695003",
+  bankDetails: {
+    bankName: "ICICI Bank Ltd",
+    accountName: "Expert Goods and Services India Pvt Ltd",
+    accountNumber: "004205018899",
+    accountType: "Current Account",
+    ifscCode: "ICIC0000042",
+    branch: "Kochi MG Road Branch",
+    upiId: "egsindia@icici",
+  },
+};
+
 // Initial Technicians Data
 const SEED_TECHNICIANS: Technician[] = [
   {
@@ -894,11 +987,133 @@ const SEED_BOOKINGS: Booking[] = [
   },
 ];
 
+// Seed Payment Transactions
+const SEED_TRANSACTIONS: PaymentTransaction[] = [
+  {
+    id: "TXN-2026-8801",
+    invoiceNo: "INV-2026-1088",
+    bookingId: "EGS-2026-1088b",
+    customerName: "Harish Kumar",
+    phone: "+91 98460 77881",
+    whatsapp: "+91 98460 77881",
+    amount: 1499,
+    subtotal: 1270.34,
+    taxAmount: 228.66,
+    paymentMethod: "UPI / QR Code",
+    status: "PAID",
+    transactionRef: "UPI/429188491023",
+    technicianId: "tech-3",
+    technicianName: "Muhammed Shafi",
+    serviceName: "💨 Gas Charging (Daikin Split AC)",
+    createdAt: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
+    paidAt: new Date(Date.now() - 3.8 * 3600 * 1000).toISOString(),
+    notes: "R410A refrigerant charge + flare nut brazed. Scanned dynamic GPay QR code.",
+  },
+  {
+    id: "TXN-2026-8802",
+    invoiceNo: "INV-2026-1089",
+    bookingId: "EGS-2026-1089b",
+    customerName: "Dr. Thomas Mathew",
+    phone: "+91 94471 22334",
+    whatsapp: "+91 94471 22334",
+    amount: 499,
+    subtotal: 422.88,
+    taxAmount: 76.12,
+    paymentMethod: "Cash on Delivery",
+    status: "PAID",
+    transactionRef: "CASH-REC-1089",
+    technicianId: "tech-2",
+    technicianName: "Vipin Das",
+    serviceName: "❄ AC Service (Foam Wash)",
+    createdAt: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
+    paidAt: new Date(Date.now() - 7.5 * 3600 * 1000).toISOString(),
+    notes: "Collected ₹500 cash in field, digital receipt dispatched via WhatsApp.",
+  },
+  {
+    id: "TXN-2026-8803",
+    invoiceNo: "INV-2026-0104",
+    amcContractNo: "AMC-2026-104",
+    customerName: "Apex Software Solutions",
+    phone: "+91 98956 77889",
+    whatsapp: "+91 98956 77889",
+    amount: 34999,
+    subtotal: 29660.17,
+    taxAmount: 5338.83,
+    paymentMethod: "Bank NEFT / RTGS",
+    status: "PAID",
+    transactionRef: "NEFT-ICICI-88294101",
+    technicianId: "tech-3",
+    technicianName: "Muhammed Shafi",
+    serviceName: "📋 AMC - Commercial Pro (12 Units)",
+    createdAt: "2025-11-01T10:00:00.000Z",
+    paidAt: "2025-11-01T14:30:00.000Z",
+    notes: "Corporate NEFT transfer to ICICI Current Account. GSTIN: 32AAACA1234D1Z8.",
+  },
+  {
+    id: "TXN-2026-8804",
+    invoiceNo: "INV-2026-0081",
+    amcContractNo: "AMC-2026-081",
+    customerName: "Dr. Thomas Mathew",
+    phone: "+91 94471 22334",
+    whatsapp: "+91 94471 22334",
+    amount: 5999,
+    subtotal: 5083.9,
+    taxAmount: 915.1,
+    paymentMethod: "UPI / QR Code",
+    status: "PAID",
+    transactionRef: "UPI/PhonePe-410294819012",
+    technicianId: "tech-1",
+    technicianName: "Arun Kumar",
+    serviceName: "📋 AMC - Comprehensive Care (3 Units)",
+    createdAt: "2026-01-15T11:20:00.000Z",
+    paidAt: "2026-01-15T11:25:00.000Z",
+    notes: "Annual maintenance contract covering 3 bedroom split units.",
+  },
+  {
+    id: "TXN-2026-8805",
+    invoiceNo: "INV-2026-1090",
+    bookingId: "EGS-2026-1090",
+    customerName: "Biju Thomas",
+    phone: "+91 94470 66554",
+    whatsapp: "+91 94470 66554",
+    amount: 799,
+    subtotal: 677.12,
+    taxAmount: 121.88,
+    paymentMethod: "Cash on Delivery",
+    status: "PENDING",
+    technicianId: "tech-1",
+    technicianName: "Arun Kumar",
+    serviceName: "🔧 AC Repair (PCB Board Repair)",
+    createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+    notes: "Service started on-site. Payment to be collected upon completion.",
+  },
+  {
+    id: "TXN-2026-8806",
+    invoiceNo: "INV-2026-1091",
+    bookingId: "EGS-2026-1091",
+    customerName: "Priya Soman",
+    phone: "+91 98952 44332",
+    whatsapp: "+91 98952 44332",
+    amount: 1798,
+    subtotal: 1523.73,
+    taxAmount: 274.27,
+    paymentMethod: "UPI / QR Code",
+    status: "PENDING",
+    technicianId: "tech-4",
+    technicianName: "Sujith Nair",
+    serviceName: "❄ AC Service (2 Cassette Units)",
+    createdAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    notes: "Technician en route. Customer requested UPI QR code payment upon finish.",
+  },
+];
+
 const STORAGE_KEYS = {
   BOOKINGS: "egs_crm_bookings_v2",
   TECHNICIANS: "egs_crm_technicians_v2",
   AMC: "egs_crm_amc_v2",
   CUSTOMERS: "egs_crm_customers_v3",
+  TRANSACTIONS: "egs_crm_transactions_v2",
+  INVOICES: "egs_crm_invoices_v2",
 };
 
 /**
@@ -1755,6 +1970,321 @@ Your HVAC AMC Contract (*${contract.contractNo}*) has been *RENEWED* successfull
 • Amount Paid: ₹${contract.amount.toLocaleString("en-IN")}
 
 Your digital AMC Warranty Certificate & Invoicing have been archived.
+Support Helpline: +91 98956 88833.`;
+
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+
+/**
+ * ============================================================
+ * PAYMENT & INVOICING HELPERS
+ * ============================================================
+ */
+
+export function generateUPIPaymentUrl(
+  amount: number,
+  refId: string,
+  note = "EGS HVAC Service"
+): string {
+  const upiId = EGS_COMPANY_DETAILS.bankDetails.upiId;
+  const payeeName = "Expert Goods and Services";
+  const formattedAmount = Number(amount || 0).toFixed(2);
+  const cleanRef = (refId || `EGS-${Date.now()}`).replace(/[^a-zA-Z0-9-]/g, "");
+  return `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(`${cleanRef} ${note}`)}&tr=${encodeURIComponent(cleanRef)}`;
+}
+
+export function getUPIQRCodeUrl(upiUrl: string, size = 260): string {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(upiUrl)}&margin=8`;
+}
+
+export function getTransactions(): PaymentTransaction[] {
+  if (typeof window === "undefined") return SEED_TRANSACTIONS;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(SEED_TRANSACTIONS));
+      return SEED_TRANSACTIONS;
+    }
+    return JSON.parse(raw);
+  } catch {
+    return SEED_TRANSACTIONS;
+  }
+}
+
+export function saveTransaction(txn: PaymentTransaction): void {
+  const current = getTransactions();
+  const existingIdx = current.findIndex((t) => t.id === txn.id);
+  let updated: PaymentTransaction[];
+  if (existingIdx >= 0) {
+    updated = current.map((t, i) => (i === existingIdx ? txn : t));
+  } else {
+    updated = [txn, ...current];
+  }
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(updated));
+    window.dispatchEvent(new Event("egs_transactions_updated"));
+  }
+}
+
+export function getInvoices(): EGSInvoice[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.INVOICES);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function saveInvoice(inv: EGSInvoice): void {
+  const current = getInvoices();
+  const existingIdx = current.findIndex((i) => i.invoiceNo === inv.invoiceNo);
+  let updated: EGSInvoice[];
+  if (existingIdx >= 0) {
+    updated = current.map((item, idx) => (idx === existingIdx ? inv : item));
+  } else {
+    updated = [inv, ...current];
+  }
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(updated));
+    window.dispatchEvent(new Event("egs_invoices_updated"));
+  }
+}
+
+export function getInvoiceByNumber(invoiceNo: string): EGSInvoice | undefined {
+  const invoices = getInvoices();
+  const found = invoices.find((inv) => inv.invoiceNo === invoiceNo);
+  if (found) return found;
+
+  // On-the-fly generation if matching a transaction or booking
+  const txns = getTransactions();
+  const txn = txns.find((t) => t.invoiceNo === invoiceNo);
+  if (txn && txn.bookingId) {
+    const booking = getBookings().find((b) => b.id === txn.bookingId);
+    if (booking) {
+      return generateInvoiceForBooking(booking, txn.paymentMethod, txn.transactionRef, txn.id);
+    }
+  }
+  if (txn && txn.amcContractNo) {
+    const contract = getAMCContracts().find((c) => c.contractNo === txn.amcContractNo);
+    if (contract) {
+      return generateInvoiceForAMC(contract, txn.paymentMethod, txn.transactionRef, txn.id);
+    }
+  }
+  return undefined;
+}
+
+export function generateInvoiceForBooking(
+  booking: Booking,
+  paymentMethod: PaymentMethod = "UPI / QR Code",
+  transactionRef?: string,
+  transactionId?: string
+): EGSInvoice {
+  const grandTotal = booking.estimatedAmount || 499;
+  const subtotal = Math.round((grandTotal / 1.18) * 100) / 100;
+  const taxAmount = Math.round((grandTotal - subtotal) * 100) / 100;
+  const halfTax = Math.round((taxAmount / 2) * 100) / 100;
+
+  const validUntilDate = new Date();
+  validUntilDate.setDate(validUntilDate.getDate() + 30); // 30-day warranty
+
+  const invNum = `INV-2026-${booking.id.replace(/\D/g, "") || Date.now().toString().slice(-4)}`;
+
+  const invoice: EGSInvoice = {
+    invoiceNo: invNum,
+    date: new Date().toISOString().split("T")[0],
+    dueDate: new Date().toISOString().split("T")[0],
+    bookingId: booking.id,
+    customerName: booking.customerName,
+    customerPhone: booking.phone,
+    customerEmail: booking.email || `${booking.customerName.toLowerCase().replace(/[^a-z0-9]/g, "")}@gmail.com`,
+    customerAddress: `${booking.houseBuilding ? `${booking.houseBuilding}, ` : ""}${booking.address}`,
+    customerCity: booking.city,
+    acType: booking.acType,
+    technicianName: booking.assignedTechnicianName || "Arun Kumar (EGS Specialist)",
+    items: [
+      {
+        description: `${booking.serviceName} - ${booking.subService || booking.acType} (${booking.unitCount} Unit${Number(booking.unitCount) === 1 ? "" : "s"})`,
+        hsnCode: EGS_COMPANY_DETAILS.sacCode,
+        quantity: typeof booking.unitCount === "number" ? booking.unitCount : 1,
+        unitPrice: subtotal,
+        amount: subtotal,
+      },
+    ],
+    subtotal,
+    cgst: halfTax,
+    sgst: halfTax,
+    taxAmount,
+    grandTotal,
+    paymentMethod,
+    paymentStatus: "PAID",
+    transactionRef: transactionRef || (transactionId ? `REF-${transactionId}` : `UPI-${Date.now().toString().slice(-6)}`),
+    warrantyPeriodDays: 30,
+    warrantyValidUntil: validUntilDate.toISOString().split("T")[0],
+    notes: "Includes 30-Day Post-Service Guarantee covering cooling performance, gas pressure, and workmanship.",
+  };
+
+  saveInvoice(invoice);
+  return invoice;
+}
+
+export function generateInvoiceForAMC(
+  contract: AMCContract,
+  paymentMethod: PaymentMethod = "Bank NEFT / RTGS",
+  transactionRef?: string,
+  transactionId?: string
+): EGSInvoice {
+  const grandTotal = contract.amount || 4999;
+  const subtotal = Math.round((grandTotal / 1.18) * 100) / 100;
+  const taxAmount = Math.round((grandTotal - subtotal) * 100) / 100;
+  const halfTax = Math.round((taxAmount / 2) * 100) / 100;
+
+  const invoice: EGSInvoice = {
+    invoiceNo: `INV-2026-${contract.contractNo.replace(/\D/g, "")}`,
+    date: contract.amcStartDate || new Date().toISOString().split("T")[0],
+    dueDate: contract.amcStartDate || new Date().toISOString().split("T")[0],
+    amcContractNo: contract.contractNo,
+    customerName: contract.customerName,
+    customerPhone: contract.phone,
+    customerEmail: contract.email || "accounts@customer.com",
+    customerAddress: contract.address || contract.city,
+    customerCity: contract.city,
+    technicianName: contract.lastServiceTechnician || "EGS HVAC Engineering Team",
+    items: [
+      {
+        description: `HVAC Annual Maintenance Contract: ${contract.planName} (${contract.numberOfUnits} Units, ${contract.serviceFrequency})`,
+        hsnCode: EGS_COMPANY_DETAILS.sacCode,
+        quantity: contract.numberOfUnits,
+        unitPrice: Math.round((subtotal / contract.numberOfUnits) * 100) / 100,
+        amount: subtotal,
+      },
+    ],
+    subtotal,
+    cgst: halfTax,
+    sgst: halfTax,
+    taxAmount,
+    grandTotal,
+    paymentMethod,
+    paymentStatus: "PAID",
+    transactionRef: transactionRef || (transactionId ? `REF-${transactionId}` : `NEFT-${Date.now().toString().slice(-6)}`),
+    warrantyPeriodDays: 365,
+    warrantyValidUntil: contract.amcEndDate,
+    notes: "Annual Maintenance Contract valid through contract term. 0 Breakdown guarantee with free labor.",
+  };
+
+  saveInvoice(invoice);
+  return invoice;
+}
+
+export function recordBookingPayment(
+  bookingId: string,
+  paymentMethod: PaymentMethod,
+  amount: number,
+  transactionRef?: string,
+  technicianId?: string,
+  technicianName?: string,
+  notes?: string
+): { transaction: PaymentTransaction; invoice: EGSInvoice } {
+  const currentBookings = getBookings();
+  const booking = currentBookings.find((b) => b.id === bookingId);
+  if (!booking) {
+    throw new Error(`Booking ${bookingId} not found`);
+  }
+
+  // 1. Advance booking status to PAYMENT RECEIVED
+  updateBookingStatus(bookingId, "PAYMENT RECEIVED", technicianId);
+
+  // 2. Compute GST
+  const finalAmount = amount > 0 ? amount : booking.estimatedAmount;
+  const subtotal = Math.round((finalAmount / 1.18) * 100) / 100;
+  const taxAmount = Math.round((finalAmount - subtotal) * 100) / 100;
+
+  const txnId = `TXN-2026-${Math.floor(8810 + Math.random() * 900)}`;
+  const invNo = `INV-2026-${booking.id.replace(/\D/g, "") || Date.now().toString().slice(-4)}`;
+
+  const txn: PaymentTransaction = {
+    id: txnId,
+    invoiceNo: invNo,
+    bookingId: booking.id,
+    customerName: booking.customerName,
+    phone: booking.phone,
+    whatsapp: booking.whatsappNumber || booking.phone,
+    amount: finalAmount,
+    subtotal,
+    taxAmount,
+    paymentMethod,
+    status: "PAID",
+    transactionRef:
+      transactionRef ||
+      (paymentMethod === "Cash on Delivery"
+        ? `CASH-${Date.now().toString().slice(-6)}`
+        : `UPI/${Date.now().toString().slice(-8)}`),
+    technicianId: technicianId || booking.assignedTechnicianId,
+    technicianName: technicianName || booking.assignedTechnicianName,
+    serviceName: booking.serviceName,
+    createdAt: new Date().toISOString(),
+    paidAt: new Date().toISOString(),
+    notes: notes || `Payment collected for ${booking.serviceName} (${booking.acType})`,
+  };
+
+  saveTransaction(txn);
+
+  // 3. Generate Official Invoice
+  const invoice = generateInvoiceForBooking(booking, paymentMethod, txn.transactionRef, txn.id);
+
+  return { transaction: txn, invoice };
+}
+
+export function generatePaymentReceiptWhatsAppURL(
+  txn: PaymentTransaction,
+  invoice?: EGSInvoice
+): string {
+  const cleanPhone = (txn.whatsapp || txn.phone).replace(/[^0-9]/g, "");
+  const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+  const text = `*Payment Receipt & 30-Day Guarantee - EGS INDIA* 🧾
+━━━━━━━━━━━━━━━━━━
+Dear *${txn.customerName}*,
+Thank you for your payment to *Expert Goods & Services (EGS INDIA)*!
+
+💳 *Transaction Details:*
+• Receipt / Txn ID: *${txn.id}*
+• Invoice No: *${txn.invoiceNo}*
+• Service: ${txn.serviceName}
+• Amount Received: *₹${txn.amount.toLocaleString("en-IN")}*
+• Payment Mode: ${txn.paymentMethod}${txn.transactionRef ? ` (${txn.transactionRef})` : ""}
+• Date: ${new Date(txn.paidAt || txn.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+
+🛡️ *30-Day Post-Service Guarantee:*
+Your serviced AC is covered under our 30-Day Free Revisit & Performance Guarantee.
+
+To view or print your GST tax invoice, visit our portal or contact our 24/7 support.
+Helpline: +91 98956 88833 | https://egsindia.com`;
+
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+
+export function generateCustomerPaymentLinkWhatsAppURL(booking: Booking): string {
+  const cleanPhone = (booking.whatsappNumber || booking.phone).replace(/[^0-9]/g, "");
+  const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+  const upiUrl = generateUPIPaymentUrl(booking.estimatedAmount, booking.id);
+  const text = `*Service Payment Request - EGS INDIA* ❄️
+━━━━━━━━━━━━━━━━━━
+Dear *${booking.customerName}*,
+Here are your payment details for EGS INDIA booking *${booking.id}* (*${booking.serviceName}*):
+
+💰 *Amount Due:* ₹${booking.estimatedAmount.toLocaleString("en-IN")} (incl. 18% GST)
+
+📲 *Pay via UPI (GPay / PhonePe / Paytm / BHIM):*
+${upiUrl}
+
+🏢 *Official Bank Transfer:*
+• Bank: ICICI Bank Ltd
+• A/C Name: Expert Goods and Services India Pvt Ltd
+• A/C No: 004205018899
+• IFSC: ICIC0000042
+
+Cash can also be paid directly to our field technician upon service completion.
 Support Helpline: +91 98956 88833.`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
