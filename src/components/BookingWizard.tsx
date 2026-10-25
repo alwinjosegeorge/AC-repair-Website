@@ -268,7 +268,7 @@ export function BookingWizard({
   // Location fields
   const [houseBuilding, setHouseBuilding] = useState("");
   const [area, setArea] = useState("");
-  const [city, setCity] = useState("Kollam");
+  const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
   const [landmark, setLandmark] = useState("");
   const [locationCoordinates, setLocationCoordinates] = useState<{
@@ -430,22 +430,31 @@ export function BookingWizard({
     }
 
     const cleanContact = contactPhone.replace(/\D/g, "");
-    if (cleanContact.length < 10) {
-      setErrorMsg("Please enter a valid 10-digit contact mobile number.");
+    if (cleanContact.length !== 10) {
+      setErrorMsg("Please enter a valid 10-digit mobile number to proceed.");
       return;
     }
 
-    const cleanWhatsApp = (whatsappSameAsContact ? contactPhone : whatsappNumber).replace(
-      /\D/g,
-      ""
-    );
-    if (cleanWhatsApp.length < 10) {
-      setErrorMsg("Please enter a valid 10-digit WhatsApp number.");
-      return;
+    if (!whatsappSameAsContact) {
+      const cleanWhatsApp = whatsappNumber.replace(/\D/g, "");
+      if (cleanWhatsApp.length !== 10) {
+        setErrorMsg("Please enter a valid 10-digit WhatsApp number to proceed.");
+        return;
+      }
     }
 
     if (!area.trim()) {
       setErrorMsg("Please enter your Area / Locality name.");
+      return;
+    }
+
+    if (!city.trim()) {
+      setErrorMsg("Please enter your City / District name.");
+      return;
+    }
+
+    if (pincode.trim() && pincode.replace(/\D/g, "").length !== 6) {
+      setErrorMsg("Please enter a valid 6-digit PIN code.");
       return;
     }
 
@@ -459,12 +468,25 @@ export function BookingWizard({
     e.preventDefault();
     setErrorMsg("");
 
+    const cleanContact = contactPhone.replace(/\D/g, "");
+    if (cleanContact.length !== 10) {
+      setErrorMsg("Please enter a valid 10-digit mobile number.");
+      setStep(4);
+      return;
+    }
+
+    if (!customerName.trim()) {
+      setErrorMsg("Please enter your name.");
+      setStep(4);
+      return;
+    }
+
     if (dateOption === "custom" && !customDate) {
       setErrorMsg("Please pick your preferred service date.");
       return;
     }
 
-    const fullAddress = [houseBuilding.trim(), area.trim()].filter(Boolean).join(", ");
+    const fullAddress = [houseBuilding.trim(), area.trim(), city.trim()].filter(Boolean).join(", ");
 
     const preferredDateString =
       dateOption === "today"
@@ -491,8 +513,8 @@ export function BookingWizard({
       area: area.trim(),
       address: fullAddress,
       landmark: landmark.trim() || undefined,
-      city,
-      pincode: pincode.trim() || "691001",
+      city: city.trim(),
+      pincode: pincode.trim(),
       locationCoordinates: locationCoordinates || undefined,
       estimatedAmount: estimatedTotal,
     });
@@ -1144,204 +1166,307 @@ export function BookingWizard({
           )}
 
           {/* Contact Details */}
-          <div className="grid gap-2 sm:grid-cols-2">
-            {/* Name */}
-            <div>
-              <label className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
-                Name *
-              </label>
-              <div className="relative">
-                <User className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Rahul Nair"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
-                    isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
-                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
-                  }`}
-                />
-              </div>
-            </div>
+          {(() => {
+            const cleanContactDigits = contactPhone.replace(/\D/g, "");
+            const isPhoneComplete = cleanContactDigits.length === 10;
+            const isPhonePartial = cleanContactDigits.length > 0 && cleanContactDigits.length < 10;
 
-            {/* Contact */}
-            <div>
-              <label className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
-                Mobile Number *
-              </label>
-              <div className="relative">
-                <Phone className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
-                <input
-                  type="tel"
-                  required
-                  maxLength={10}
-                  placeholder="e.g. 9895688833"
-                  value={contactPhone}
-                  onChange={(e) => setContactPhone(e.target.value)}
-                  className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
-                    isGlass
-                      ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
-                      : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
-                  }`}
-                />
-              </div>
-            </div>
-          </div>
+            const cleanWhatsAppDigits = (whatsappSameAsContact ? contactPhone : whatsappNumber).replace(/\D/g, "");
+            const isWhatsAppComplete = cleanWhatsAppDigits.length === 10;
+            const isWhatsAppPartial = !whatsappSameAsContact && cleanWhatsAppDigits.length > 0 && cleanWhatsAppDigits.length < 10;
 
-          {/* WhatsApp Sync Checkbox (Compact) */}
-          <div className="flex items-center justify-between text-xs">
-            <label className={`flex items-center gap-1.5 cursor-pointer text-[11px] font-medium ${isGlass ? "text-white/90" : "text-foreground"}`}>
-              <input
-                type="checkbox"
-                checked={whatsappSameAsContact}
-                onChange={(e) => setWhatsappSameAsContact(e.target.checked)}
-                className="rounded border-border text-brand focus:ring-brand size-3.5 cursor-pointer"
-              />
-              <span>WhatsApp same as mobile number</span>
-            </label>
-            {!whatsappSameAsContact && (
-              <span className="text-[10px] text-amber-300 font-semibold">Enter WhatsApp below</span>
-            )}
-          </div>
+            return (
+              <>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {/* Name */}
+                  <div>
+                    <label className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
+                      Name *
+                    </label>
+                    <div className="relative">
+                      <User className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
+                      <input
+                        type="text"
+                        required
+                        placeholder="Enter your name"
+                        value={customerName}
+                        onChange={(e) => {
+                          setCustomerName(e.target.value);
+                          if (errorMsg) setErrorMsg("");
+                        }}
+                        className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                          isGlass
+                            ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                            : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
+                        }`}
+                      />
+                    </div>
+                  </div>
 
-          {!whatsappSameAsContact && (
-            <div className="relative">
-              <MessageSquare className="absolute left-3 top-2.5 size-3.5 text-[#25D366]" />
-              <input
-                type="tel"
-                required
-                maxLength={10}
-                placeholder="WhatsApp Number (10 digits)"
-                value={whatsappNumber}
-                onChange={(e) => setWhatsappNumber(e.target.value)}
-                className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
-                  isGlass
-                    ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
-                    : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
-                }`}
-              />
-            </div>
-          )}
+                  {/* Contact */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className={`text-[10px] font-bold uppercase tracking-wider ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
+                        Mobile Number *
+                      </label>
+                      {cleanContactDigits.length > 0 && (
+                        <span
+                          className={`text-[10px] font-bold transition-all ${
+                            isPhoneComplete
+                              ? isGlass ? "text-emerald-300" : "text-emerald-600"
+                              : isGlass ? "text-amber-300" : "text-amber-600"
+                          }`}
+                        >
+                          {isPhoneComplete ? "✓ 10 Digits" : `${cleanContactDigits.length}/10 digits`}
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <Phone className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
+                      <input
+                        type="tel"
+                        required
+                        maxLength={10}
+                        placeholder="Enter 10-digit mobile number"
+                        value={contactPhone}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                          setContactPhone(digits);
+                          if (errorMsg) setErrorMsg("");
+                        }}
+                        className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                          isPhoneComplete
+                            ? isGlass
+                              ? "bg-[#006ccf]/60 sm:bg-white/10 border-2 border-emerald-400 text-white placeholder:text-white/60 focus:border-emerald-300"
+                              : "border-2 border-emerald-500 bg-card text-foreground placeholder:text-muted-foreground"
+                            : isPhonePartial
+                            ? isGlass
+                              ? "bg-[#006ccf]/60 sm:bg-white/10 border-2 border-amber-400 text-white placeholder:text-white/60 focus:border-amber-300"
+                              : "border-2 border-amber-500 bg-card text-foreground placeholder:text-muted-foreground"
+                            : isGlass
+                            ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                            : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
 
-          {/* Location Heading + GPS Button */}
-          <div className="flex items-center justify-between pt-0.5">
-            <span className={`text-[10px] font-bold uppercase tracking-wider ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
-              Service Address
-            </span>
-            <button
-              type="button"
-              onClick={handleUseMyLocation}
-              disabled={isLocating}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
-                isGlass
-                  ? "border border-white/40 bg-white/20 text-white hover:bg-white/30"
-                  : "border border-brand/30 bg-brand/10 text-brand hover:bg-brand/20"
-              }`}
-            >
-              <LocateFixed className={`size-3 ${isLocating ? "animate-spin" : ""}`} />
-              <span>{isLocating ? "Locating..." : "📍 Auto GPS"}</span>
-            </button>
-          </div>
+                {/* WhatsApp Sync Checkbox (Compact) */}
+                <div className="flex items-center justify-between text-xs">
+                  <label className={`flex items-center gap-1.5 cursor-pointer text-[11px] font-medium ${isGlass ? "text-white/90" : "text-foreground"}`}>
+                    <input
+                      type="checkbox"
+                      checked={whatsappSameAsContact}
+                      onChange={(e) => setWhatsappSameAsContact(e.target.checked)}
+                      className="rounded border-border text-brand focus:ring-brand size-3.5 cursor-pointer"
+                    />
+                    <span>WhatsApp same as mobile number</span>
+                  </label>
+                  {!whatsappSameAsContact && (
+                    <span className="text-[10px] text-amber-300 font-semibold">Enter WhatsApp below</span>
+                  )}
+                </div>
 
-          {locationStatus && (
-            <div className={`rounded-lg px-2.5 py-1 text-[10px] font-medium flex items-center gap-1.5 ${
-              isGlass ? "border border-white/30 bg-white/20 text-white" : "border border-emerald-500/20 bg-emerald-500/10 text-emerald-700"
-            }`}>
-              <CheckCircle2 className="size-3 shrink-0" />
-              <span className="truncate">{locationStatus}</span>
-            </div>
-          )}
+                {!whatsappSameAsContact && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className={`text-[10px] font-bold uppercase tracking-wider ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
+                        WhatsApp Number *
+                      </label>
+                      {cleanWhatsAppDigits.length > 0 && (
+                        <span
+                          className={`text-[10px] font-bold transition-all ${
+                            isWhatsAppComplete
+                              ? isGlass ? "text-emerald-300" : "text-emerald-600"
+                              : isGlass ? "text-amber-300" : "text-amber-600"
+                          }`}
+                        >
+                          {isWhatsAppComplete ? "✓ 10 Digits" : `${cleanWhatsAppDigits.length}/10 digits`}
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <MessageSquare className="absolute left-3 top-2.5 size-3.5 text-[#25D366]" />
+                      <input
+                        type="tel"
+                        required
+                        maxLength={10}
+                        placeholder="Enter 10-digit WhatsApp number"
+                        value={whatsappNumber}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                          setWhatsappNumber(digits);
+                          if (errorMsg) setErrorMsg("");
+                        }}
+                        className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                          isWhatsAppComplete
+                            ? isGlass
+                              ? "bg-[#006ccf]/60 sm:bg-white/10 border-2 border-emerald-400 text-white placeholder:text-white/60 focus:border-emerald-300"
+                              : "border-2 border-emerald-500 bg-card text-foreground placeholder:text-muted-foreground"
+                            : isWhatsAppPartial
+                            ? isGlass
+                              ? "bg-[#006ccf]/60 sm:bg-white/10 border-2 border-amber-400 text-white placeholder:text-white/60 focus:border-amber-300"
+                              : "border-2 border-amber-500 bg-card text-foreground placeholder:text-muted-foreground"
+                            : isGlass
+                            ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                            : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                )}
 
-          {/* House / Flat + Area */}
-          <div className="grid gap-2 sm:grid-cols-2">
-            <div className="relative">
-              <Home className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
-              <input
-                type="text"
-                placeholder="House / Flat / Building"
-                value={houseBuilding}
-                onChange={(e) => setHouseBuilding(e.target.value)}
-                className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
-                  isGlass
-                    ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
-                    : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
-                }`}
-              />
-            </div>
+                {/* Location Heading + GPS Button */}
+                <div className="flex items-center justify-between pt-0.5">
+                  <span className={`text-[10px] font-bold uppercase tracking-wider ${isGlass ? "text-white/85" : "text-muted-foreground"}`}>
+                    Service Address
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleUseMyLocation}
+                    disabled={isLocating}
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+                      isGlass
+                        ? "border border-white/40 bg-white/20 text-white hover:bg-white/30"
+                        : "border border-brand/30 bg-brand/10 text-brand hover:bg-brand/20"
+                    }`}
+                  >
+                    <LocateFixed className={`size-3 ${isLocating ? "animate-spin" : ""}`} />
+                    <span>{isLocating ? "Locating..." : "📍 Auto GPS"}</span>
+                  </button>
+                </div>
 
-            <div className="relative">
-              <MapPin className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
-              <input
-                type="text"
-                required
-                placeholder="Area / Locality *"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
-                  isGlass
-                    ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
-                    : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
-                }`}
-              />
-            </div>
-          </div>
+                {locationStatus && (
+                  <div className={`rounded-lg px-2.5 py-1 text-[10px] font-medium flex items-center gap-1.5 ${
+                    isGlass ? "border border-white/30 bg-white/20 text-white" : "border border-emerald-500/20 bg-emerald-500/10 text-emerald-700"
+                  }`}>
+                    <CheckCircle2 className="size-3 shrink-0" />
+                    <span className="truncate">{locationStatus}</span>
+                  </div>
+                )}
 
-          {/* City & PIN */}
-          <div className="grid gap-2 sm:grid-cols-2">
-            <input
-              list="city-suggestions"
-              type="text"
-              required
-              placeholder="City (e.g. Kollam) *"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className={`w-full rounded-xl py-2 px-3 text-xs sm:text-sm focus:outline-none transition-all ${
-                isGlass
-                  ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
-                  : "border border-border bg-card text-foreground"
-              }`}
-            />
-            <input
-              type="text"
-              required
-              maxLength={6}
-              placeholder="PIN Code (e.g. 691001) *"
-              value={pincode}
-              onChange={(e) => setPincode(e.target.value)}
-              className={`w-full rounded-xl py-2 px-3 text-xs sm:text-sm focus:outline-none transition-all ${
-                isGlass
-                  ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
-                  : "border border-border bg-card text-foreground"
-              }`}
-            />
-          </div>
+                {/* House / Flat + Area */}
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="relative">
+                    <Home className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
+                    <input
+                      type="text"
+                      placeholder="House / Flat / Building (Optional)"
+                      value={houseBuilding}
+                      onChange={(e) => setHouseBuilding(e.target.value)}
+                      className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                        isGlass
+                          ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                          : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
+                      }`}
+                    />
+                  </div>
 
-          {/* Navigation */}
-          <div className="flex items-center justify-between gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => setStep(3)}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold shrink-0 cursor-pointer ${
-                isGlass ? "border-white/25 bg-white/15 text-white hover:bg-white/25" : "border-border bg-surface text-foreground"
-              }`}
-            >
-              <ArrowLeft className="size-3.5" />
-              <span>Back</span>
-            </button>
-            <button
-              type="button"
-              onClick={goToStep5}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-black uppercase tracking-wider shadow-xl transition-all hover:scale-105 cursor-pointer ${
-                isGlass ? "bg-white text-slate-900 hover:bg-slate-100 shadow-2xl" : "bg-brand text-brand-foreground"
-              }`}
-            >
-              <span>Continue to Time</span>
-              <ArrowRight className="size-3.5 sm:size-4" />
-            </button>
-          </div>
+                  <div className="relative">
+                    <MapPin className={`absolute left-3 top-2.5 size-3.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`} />
+                    <input
+                      type="text"
+                      required
+                      placeholder="Area / Locality / Street *"
+                      value={area}
+                      onChange={(e) => {
+                        setArea(e.target.value);
+                        if (errorMsg) setErrorMsg("");
+                      }}
+                      className={`w-full rounded-xl py-2 pl-9 pr-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                        isGlass
+                          ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                          : "border border-border bg-card text-foreground placeholder:text-muted-foreground"
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* City & PIN */}
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div>
+                    <input
+                      list="city-suggestions"
+                      type="text"
+                      required
+                      placeholder="City / District *"
+                      value={city}
+                      onChange={(e) => {
+                        setCity(e.target.value);
+                        if (errorMsg) setErrorMsg("");
+                      }}
+                      className={`w-full rounded-xl py-2 px-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                        isGlass
+                          ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                          : "border border-border bg-card text-foreground"
+                      }`}
+                    />
+                    <datalist id="city-suggestions">
+                      {MAJOR_CITIES.map((c) => (
+                        <option key={c} value={c} />
+                      ))}
+                    </datalist>
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="PIN Code (6 digits)"
+                      value={pincode}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, "").slice(0, 6);
+                        setPincode(digits);
+                        if (errorMsg) setErrorMsg("");
+                      }}
+                      className={`w-full rounded-xl py-2 px-3 text-xs sm:text-sm focus:outline-none transition-all ${
+                        isGlass
+                          ? "bg-[#006ccf]/60 sm:bg-white/10 border border-white/25 text-white placeholder:text-white/60 focus:bg-[#006ccf]/90 focus:border-white focus:ring-1 focus:ring-white/40"
+                          : "border border-border bg-card text-foreground"
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* Navigation */}
+                <div className="flex flex-col gap-1.5 pt-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setStep(3)}
+                      className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold shrink-0 cursor-pointer ${
+                        isGlass ? "border-white/25 bg-white/15 text-white hover:bg-white/25" : "border-border bg-surface text-foreground"
+                      }`}
+                    >
+                      <ArrowLeft className="size-3.5" />
+                      <span>Back</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={goToStep5}
+                      className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-black uppercase tracking-wider shadow-xl transition-all hover:scale-105 cursor-pointer ${
+                        isPhoneComplete
+                          ? isGlass
+                            ? "bg-white text-slate-900 hover:bg-slate-100 shadow-2xl"
+                            : "bg-brand text-brand-foreground shadow-brand/30 hover:bg-brand/90"
+                          : isGlass
+                          ? "bg-white/80 text-slate-900 hover:bg-white"
+                          : "bg-brand/80 text-brand-foreground hover:bg-brand"
+                      }`}
+                    >
+                      <span>Continue to Time</span>
+                      <ArrowRight className="size-3.5 sm:size-4" />
+                    </button>
+                  </div>
+                  {!isPhoneComplete && (
+                    <p className={`text-[10px] text-right ${isGlass ? "text-white/70" : "text-muted-foreground"}`}>
+                      * 10-digit mobile number required to proceed
+                    </p>
+                  )}
+                </div>
+              </>
+            );
+          })()}
         </div>
       )}
 
@@ -1507,7 +1632,7 @@ export function BookingWizard({
               </span>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-1 pt-1.5 text-[10px] text-white/80">
-              <span>📍 {area || "Local"}, {city}</span>
+              <span>📍 {[area, city].filter(Boolean).join(", ") || "Service Address"}</span>
               <span className="text-emerald-300 font-bold">✓ Pay After Service (Cash/UPI)</span>
             </div>
           </div>
