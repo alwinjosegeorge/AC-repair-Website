@@ -16,6 +16,7 @@ import { Route as BookRouteImport } from './routes/book'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ServiceAreasRouteImport } from './routes/service-areas'
+import { Route as TechnicianRouteImport } from './routes/technician'
 import { Route as ServicesAcAmcRouteImport } from './routes/services/ac-amc'
 import { Route as ServicesAcInstallationRouteImport } from './routes/services/ac-installation'
 import { Route as ServicesAcRepairRouteImport } from './routes/services/ac-repair'
@@ -57,6 +58,11 @@ const ServiceAreasRoute = ServiceAreasRouteImport.update({
   path: '/service-areas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TechnicianRoute = TechnicianRouteImport.update({
+  id: '/technician',
+  path: '/technician',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesAcAmcRoute = ServicesAcAmcRouteImport.update({
   id: '/services/ac-amc',
   path: '/services/ac-amc',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/projects': typeof ProjectsRoute
   '/service-areas': typeof ServiceAreasRoute
+  '/technician': typeof TechnicianRoute
   '/services/ac-amc': typeof ServicesAcAmcRoute
   '/services/ac-installation': typeof ServicesAcInstallationRoute
   '/services/ac-repair': typeof ServicesAcRepairRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/projects': typeof ProjectsRoute
   '/service-areas': typeof ServiceAreasRoute
+  '/technician': typeof TechnicianRoute
   '/services/ac-amc': typeof ServicesAcAmcRoute
   '/services/ac-installation': typeof ServicesAcInstallationRoute
   '/services/ac-repair': typeof ServicesAcRepairRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/projects': typeof ProjectsRoute
   '/service-areas': typeof ServiceAreasRoute
+  '/technician': typeof TechnicianRoute
   '/services/ac-amc': typeof ServicesAcAmcRoute
   '/services/ac-installation': typeof ServicesAcInstallationRoute
   '/services/ac-repair': typeof ServicesAcRepairRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/projects'
     | '/service-areas'
+    | '/technician'
     | '/services/ac-amc'
     | '/services/ac-installation'
     | '/services/ac-repair'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/projects'
     | '/service-areas'
+    | '/technician'
     | '/services/ac-amc'
     | '/services/ac-installation'
     | '/services/ac-repair'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/projects'
     | '/service-areas'
+    | '/technician'
     | '/services/ac-amc'
     | '/services/ac-installation'
     | '/services/ac-repair'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   ProjectsRoute: typeof ProjectsRoute
   ServiceAreasRoute: typeof ServiceAreasRoute
+  TechnicianRoute: typeof TechnicianRoute
   ServicesAcAmcRoute: typeof ServicesAcAmcRoute
   ServicesAcInstallationRoute: typeof ServicesAcInstallationRoute
   ServicesAcRepairRoute: typeof ServicesAcRepairRoute
@@ -237,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServiceAreasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/technician': {
+      id: '/technician'
+      path: '/technician'
+      fullPath: '/technician'
+      preLoaderRoute: typeof TechnicianRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services/ac-amc': {
       id: '/services/ac-amc'
       path: '/services/ac-amc'
@@ -283,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   ProjectsRoute: ProjectsRoute,
   ServiceAreasRoute: ServiceAreasRoute,
+  TechnicianRoute: TechnicianRoute,
   ServicesAcAmcRoute: ServicesAcAmcRoute,
   ServicesAcInstallationRoute: ServicesAcInstallationRoute,
   ServicesAcRepairRoute: ServicesAcRepairRoute,

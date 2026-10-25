@@ -4,11 +4,14 @@ import {
   Booking,
   Technician,
   AMCContract,
+  Customer,
+  CustomerBookingHistory,
   BookingStatus,
   BOOKING_STATUS_FLOW,
   getBookings,
   getTechnicians,
   getAMCContracts,
+  getCustomers,
   updateBookingStatus,
   generateAdminToCustomerWhatsAppURL,
   EGS_CALL_NUMBER,
@@ -128,11 +131,15 @@ export function AdminDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [amcContracts, setAmcContracts] = useState<AMCContract[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
 
   // Filters & Selected State
   const [searchQuery, setSearchQuery] = useState("");
   const [cityFilter, setCityFilter] = useState("all");
+  const [amcStatusFilter, setAmcStatusFilter] = useState("all");
+  const [acTypeFilter, setAcTypeFilter] = useState("all");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Load Data
@@ -141,10 +148,19 @@ export function AdminDashboard() {
     setBookings(b);
     setTechnicians(getTechnicians());
     setAmcContracts(getAMCContracts());
+    setCustomers(getCustomers());
   };
 
   useEffect(() => {
     loadData();
+
+    const handleUpdate = () => loadData();
+    window.addEventListener("egs_bookings_updated", handleUpdate);
+    window.addEventListener("egs_customers_updated", handleUpdate);
+    return () => {
+      window.removeEventListener("egs_bookings_updated", handleUpdate);
+      window.removeEventListener("egs_customers_updated", handleUpdate);
+    };
   }, []);
 
   // Update Status in Store
@@ -257,56 +273,34 @@ export function AdminDashboard() {
     });
   }, [bookings, activeSection, searchQuery, cityFilter]);
 
-  // Derived Customers CRM list
+  // Filtered Customers CRM list
   const customersList = useMemo(() => {
-    const map = new Map<
-      string,
-      {
-        name: string;
-        phone: string;
-        whatsapp: string;
-        city: string;
-        address: string;
-        count: number;
-        totalSpend: number;
-        lastDate: string;
-        lastService: string;
-      }
-    >();
-
-    bookings.forEach((b) => {
-      const key = b.phone;
-      if (!map.has(key)) {
-        map.set(key, {
-          name: b.customerName,
-          phone: b.phone,
-          whatsapp: b.whatsappNumber || b.phone,
-          city: b.city,
-          address: b.address,
-          count: 1,
-          totalSpend: b.estimatedAmount,
-          lastDate: b.createdAt,
-          lastService: b.serviceName,
-        });
-      } else {
-        const item = map.get(key)!;
-        item.count += 1;
-        item.totalSpend += b.estimatedAmount;
-        if (new Date(b.createdAt) > new Date(item.lastDate)) {
-          item.lastDate = b.createdAt;
-          item.lastService = b.serviceName;
-        }
-      }
-    });
-
-    return Array.from(map.values()).filter(
-      (c) =>
+    return customers.filter((c) => {
+      const matchSearch =
         searchQuery === "" ||
+        c.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.phone.includes(searchQuery) ||
-        c.city.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [bookings, searchQuery]);
+        c.mobile.includes(searchQuery) ||
+        c.whatsapp.includes(searchQuery) ||
+        c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.pin.includes(searchQuery) ||
+        c.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.acType.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchCity =
+        cityFilter === "all" ||
+        c.location.toLowerCase().includes(cityFilter.toLowerCase()) ||
+        c.address.toLowerCase().includes(cityFilter.toLowerCase());
+
+      const matchAmc =
+        amcStatusFilter === "all" || c.amcStatus.toLowerCase() === amcStatusFilter.toLowerCase();
+
+      const matchAcType = acTypeFilter === "all" || c.acType === acTypeFilter;
+
+      return matchSearch && matchCity && matchAmc && matchAcType;
+    });
+  }, [customers, searchQuery, cityFilter, amcStatusFilter, acTypeFilter]);
 
   // Reports / KPI Metrics
   const totalRevenue = bookings.reduce((sum, b) => sum + (b.estimatedAmount || 0), 0);
@@ -775,6 +769,25 @@ export function AdminDashboard() {
             </div>
           </div>
 
+          {/* Dedicated Field Technician Mobile Interface Link */}
+          <div className="mt-4 pt-3 border-t border-border">
+            <Link
+              to="/technician"
+              className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold text-white shadow-md hover:bg-slate-850 hover:border-slate-700 transition-all group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-brand text-brand-foreground font-black">
+                  <HardHat className="size-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-extrabold text-white">Technician Portal</div>
+                  <div className="text-[10px] text-slate-400">Mobile Field Interface</div>
+                </div>
+              </div>
+              <ChevronRight className="size-4 text-brand group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
           {/* Quick Hotline Card */}
           <div className="mt-4 rounded-2xl border border-border bg-surface p-3 text-xs">
             <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
@@ -845,6 +858,15 @@ export function AdminDashboard() {
                   <option value="Chennai">Chennai</option>
                 </select>
               )}
+
+              <Link
+                to="/technician"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 border border-slate-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition-colors shadow-sm"
+                title="Open Technician Field Mobile Portal"
+              >
+                <HardHat className="size-3.5 text-brand" />
+                <span>Field Tech Portal 📱</span>
+              </Link>
             </div>
           </div>
 
@@ -948,64 +970,261 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {/* VIEW: CUSTOMERS CRM DIRECTORY */}
+          {/* VIEW: CUSTOMERS CRM DIRECTORY (13 Core Customer Database Fields) */}
           {activeSection === "customers" && (
-            <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-foreground">
-                  <thead className="border-b border-border bg-surface text-[11px] font-black uppercase tracking-wider text-muted-foreground">
-                    <tr>
-                      <th className="px-4 py-3">Customer Name</th>
-                      <th className="px-4 py-3">Contact</th>
-                      <th className="px-4 py-3">City</th>
-                      <th className="px-4 py-3">Total Orders</th>
-                      <th className="px-4 py-3">Lifetime Value</th>
-                      <th className="px-4 py-3">Last Service</th>
-                      <th className="px-4 py-3 text-right">Connect</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/60">
-                    {customersList.map((c) => (
-                      <tr key={c.phone} className="hover:bg-surface/50 transition-colors">
-                        <td className="px-4 py-3.5 font-bold text-foreground">{c.name}</td>
-                        <td className="px-4 py-3.5">
-                          <div>{c.phone}</div>
-                          <div className="text-[11px] text-muted-foreground">WA: {c.whatsapp}</div>
-                        </td>
-                        <td className="px-4 py-3.5 font-medium">{c.city}</td>
-                        <td className="px-4 py-3.5">
-                          <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs font-bold text-brand">
-                            {c.count} {c.count === 1 ? "Booking" : "Bookings"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5 font-black text-brand">
-                          ₹{c.totalSpend.toLocaleString("en-IN")}
-                        </td>
-                        <td className="px-4 py-3.5 text-muted-foreground truncate max-w-xs">
-                          {c.lastService}
-                        </td>
-                        <td className="px-4 py-3.5 text-right space-x-2">
-                          <a
-                            href={`https://wa.me/${c.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Hello from EGS INDIA! Checking in regarding your AC comfort.")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 rounded-lg bg-[#25D366]/15 px-2.5 py-1 text-xs font-bold text-[#25D366]"
-                          >
-                            <MessageSquare className="size-3 fill-current" />
-                            <span>WhatsApp</span>
-                          </a>
-                          <a
-                            href={`tel:${c.phone}`}
-                            className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-2.5 py-1 text-xs font-bold text-foreground"
-                          >
-                            <Phone className="size-3 text-brand" />
-                            <span>Call</span>
-                          </a>
-                        </td>
+            <div className="space-y-4">
+              {/* Secondary Filter & Stats Ribbon for Customers */}
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-3.5 shadow-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* AMC Status Filter */}
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="font-bold text-muted-foreground text-[11px] uppercase tracking-wider">
+                      AMC Status:
+                    </span>
+                    <select
+                      value={amcStatusFilter}
+                      onChange={(e) => setAmcStatusFilter(e.target.value)}
+                      className="rounded-lg border border-border bg-surface px-2.5 py-1 text-xs font-semibold text-foreground focus:border-brand focus:outline-none"
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="Active">Active AMC</option>
+                      <option value="Expiring Soon">Expiring Soon</option>
+                      <option value="Expired">Expired</option>
+                      <option value="None">No AMC</option>
+                    </select>
+                  </div>
+
+                  {/* AC Type Filter */}
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="font-bold text-muted-foreground text-[11px] uppercase tracking-wider">
+                      AC Type:
+                    </span>
+                    <select
+                      value={acTypeFilter}
+                      onChange={(e) => setAcTypeFilter(e.target.value)}
+                      className="rounded-lg border border-border bg-surface px-2.5 py-1 text-xs font-semibold text-foreground focus:border-brand focus:outline-none"
+                    >
+                      <option value="all">All AC Types</option>
+                      <option value="Split AC">Split AC</option>
+                      <option value="Window AC">Window AC</option>
+                      <option value="Cassette AC">Cassette AC</option>
+                      <option value="Ductable AC">Ductable AC</option>
+                      <option value="VRF / VRV">VRF / VRV</option>
+                      <option value="Central AC">Central AC</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Quick CRM Metrics */}
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="rounded-lg bg-surface px-2.5 py-1 font-bold text-muted-foreground border border-border">
+                    Total: <strong className="text-foreground">{customersList.length}</strong>
+                  </span>
+                  <span className="rounded-lg bg-emerald-500/10 px-2.5 py-1 font-bold text-emerald-600 border border-emerald-500/20">
+                    AMC Holders: <strong className="text-foreground">{customers.filter((c) => c.amcStatus === "Active").length}</strong>
+                  </span>
+                  <span className="rounded-lg bg-brand-soft px-2.5 py-1 font-black text-brand">
+                    LTV: ₹{customersList.reduce((acc, c) => acc + (c.totalSpend || 0), 0).toLocaleString("en-IN")}
+                  </span>
+                </div>
+              </div>
+
+              {/* CRM Database Table (13 Fields) */}
+              <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-foreground">
+                    <thead className="border-b border-border bg-surface text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                      <tr>
+                        <th className="px-4 py-3">1. Customer ID</th>
+                        <th className="px-4 py-3">2. Name &amp; Email</th>
+                        <th className="px-4 py-3">3. Mobile &amp; WhatsApp</th>
+                        <th className="px-4 py-3">4. Address &amp; PIN</th>
+                        <th className="px-4 py-3">5. Location (GPS)</th>
+                        <th className="px-4 py-3">6. AC Type &amp; Units</th>
+                        <th className="px-4 py-3">7. Previous Services</th>
+                        <th className="px-4 py-3">8. AMC Status</th>
+                        <th className="px-4 py-3">9. Booking History</th>
+                        <th className="px-4 py-3 text-right">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-border/60">
+                      {customersList.length === 0 ? (
+                        <tr>
+                          <td colSpan={10} className="px-4 py-8 text-center text-muted-foreground">
+                            No customers found matching this filter criteria.
+                          </td>
+                        </tr>
+                      ) : (
+                        customersList.map((c) => {
+                          const isAmcActive = c.amcStatus === "Active";
+                          const isAmcExpiring = c.amcStatus === "Expiring Soon";
+                          const isAmcExpired = c.amcStatus === "Expired";
+
+                          return (
+                            <tr
+                              key={c.id}
+                              className="hover:bg-surface/50 transition-colors cursor-pointer group"
+                              onClick={() => setSelectedCustomer(c)}
+                            >
+                              {/* 1. Customer ID */}
+                              <td className="px-4 py-3.5 font-mono text-xs font-black text-brand whitespace-nowrap">
+                                <span className="rounded-md bg-brand-soft px-2 py-0.5 border border-brand/20">
+                                  {c.id}
+                                </span>
+                              </td>
+
+                              {/* 2. Name & Email */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <div className="font-bold text-foreground text-xs group-hover:text-brand transition-colors">
+                                  {c.name}
+                                </div>
+                                <div className="text-[11px] text-muted-foreground">{c.email}</div>
+                              </td>
+
+                              {/* 3. Mobile & WhatsApp */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <div className="font-semibold text-foreground">{c.mobile}</div>
+                                <div className="text-[11px] text-emerald-600 flex items-center gap-1 font-bold">
+                                  <MessageSquare className="size-3 fill-current" />
+                                  <span>{c.whatsapp}</span>
+                                </div>
+                              </td>
+
+                              {/* 4. Address & PIN */}
+                              <td className="px-4 py-3.5 max-w-xs">
+                                <div className="truncate text-foreground font-medium" title={c.address}>
+                                  {c.address}
+                                </div>
+                                <div className="text-[11px] font-mono text-muted-foreground">
+                                  PIN: {c.pin}
+                                </div>
+                              </td>
+
+                              {/* 5. Location */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <div className="font-semibold text-foreground flex items-center gap-1">
+                                  <MapPin className="size-3 text-red-500" />
+                                  <span>{c.location}</span>
+                                </div>
+                                {c.locationCoordinates ? (
+                                  <a
+                                    href={`https://maps.google.com/?q=${c.locationCoordinates.latitude},${c.locationCoordinates.longitude}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="text-[10px] text-brand hover:underline font-bold"
+                                  >
+                                    View GPS Pin 📍
+                                  </a>
+                                ) : (
+                                  <span className="text-[10px] text-muted-foreground">Local Area</span>
+                                )}
+                              </td>
+
+                              {/* 6. AC Type & Number of Units */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <span className="rounded-md bg-surface px-2 py-0.5 text-xs font-bold text-foreground border border-border">
+                                  ❄️ {c.acType}
+                                </span>
+                                <div className="text-[11px] text-muted-foreground font-semibold mt-0.5">
+                                  {c.numberOfUnits} {Number(c.numberOfUnits) === 1 ? "Unit" : "Units"}
+                                </div>
+                              </td>
+
+                              {/* 7. Previous Services */}
+                              <td className="px-4 py-3.5">
+                                <div className="flex flex-wrap gap-1 max-w-[200px]">
+                                  {c.previousServices.slice(0, 2).map((srv) => (
+                                    <span
+                                      key={srv}
+                                      className="rounded bg-surface px-1.5 py-0.5 text-[10px] font-bold text-foreground/80 border border-border truncate"
+                                    >
+                                      {srv}
+                                    </span>
+                                  ))}
+                                  {c.previousServices.length > 2 && (
+                                    <span className="text-[10px] font-bold text-muted-foreground">
+                                      +{c.previousServices.length - 2} more
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* 8. AMC Status */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <span
+                                  className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide border ${
+                                    isAmcActive
+                                      ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                                      : isAmcExpiring
+                                      ? "bg-amber-500/10 text-amber-600 border-amber-500/30"
+                                      : isAmcExpired
+                                      ? "bg-red-500/10 text-red-600 border-red-500/30"
+                                      : "bg-surface text-muted-foreground border-border"
+                                  }`}
+                                >
+                                  {c.amcStatus}
+                                </span>
+                                {c.amcPlan && (
+                                  <div className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate max-w-[130px]">
+                                    {c.amcPlan}
+                                  </div>
+                                )}
+                              </td>
+
+                              {/* 9. Booking History (Count & Drilldown) */}
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedCustomer(c);
+                                  }}
+                                  className="inline-flex items-center gap-1 rounded-lg bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand hover:bg-brand/20 transition-colors"
+                                >
+                                  <CalendarCheck className="size-3" />
+                                  <span>{c.bookingHistory.length} Bookings</span>
+                                </button>
+                                <div className="text-[10px] text-muted-foreground font-medium mt-0.5">
+                                  LTV: ₹{c.totalSpend.toLocaleString("en-IN")}
+                                </div>
+                              </td>
+
+                              {/* 10. Actions */}
+                              <td className="px-4 py-3.5 text-right space-x-1.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                                <a
+                                  href={`https://wa.me/${c.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Hello " + c.name + "! EGS INDIA HVAC support checking in regarding your AC service.")}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex size-7 items-center justify-center rounded-lg bg-[#25D366]/15 text-[#25D366] hover:bg-[#25D366]/25 transition-colors"
+                                  title="WhatsApp Customer"
+                                >
+                                  <MessageSquare className="size-3.5 fill-current" />
+                                </a>
+                                <a
+                                  href={`tel:${c.mobile}`}
+                                  className="inline-flex size-7 items-center justify-center rounded-lg border border-border bg-surface text-foreground hover:bg-surface/80 transition-colors"
+                                  title="Call Customer"
+                                >
+                                  <Phone className="size-3.5 text-brand" />
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedCustomer(c)}
+                                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-2.5 py-1 text-xs font-bold text-foreground hover:bg-surface/80"
+                                >
+                                  <span>View 360</span>
+                                  <ArrowRight className="size-3 text-brand" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -1440,6 +1659,202 @@ export function AdminDashboard() {
                 )}
                 {selectedBooking.attribution?.fbclid && (
                   <div className="text-pink-600 font-bold">Meta Ads (FBCLID captured)</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CUSTOMER 360 CRM PROFILE & BOOKING HISTORY MODAL */}
+      {selectedCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-border pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-black text-brand rounded-md bg-brand-soft px-2 py-0.5 border border-brand/20">
+                    {selectedCustomer.id}
+                  </span>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide border ${
+                      selectedCustomer.amcStatus === "Active"
+                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                        : selectedCustomer.amcStatus === "Expiring Soon"
+                        ? "bg-amber-500/10 text-amber-600 border-amber-500/30"
+                        : selectedCustomer.amcStatus === "Expired"
+                        ? "bg-red-500/10 text-red-600 border-red-500/30"
+                        : "bg-surface text-muted-foreground border-border"
+                    }`}
+                  >
+                    AMC: {selectedCustomer.amcStatus}
+                  </span>
+                </div>
+                <h2 className="text-xl font-black text-foreground mt-1.5">{selectedCustomer.name}</h2>
+                <p className="text-xs text-muted-foreground">{selectedCustomer.email}</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedCustomer(null)}
+                className="rounded-full p-2 text-muted-foreground hover:bg-surface hover:text-foreground transition-colors"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Quick Action Ribbon */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <a
+                href={`tel:${selectedCustomer.mobile}`}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-bold text-foreground hover:bg-surface/80 shadow-sm"
+              >
+                <Phone className="size-3.5 text-brand" />
+                <span>Call {selectedCustomer.mobile}</span>
+              </a>
+              <a
+                href={`https://wa.me/${selectedCustomer.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Hello " + selectedCustomer.name + "! Expert Goods & Services (EGS INDIA) checking in regarding your AC comfort.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 px-3 py-2 text-xs font-bold text-[#25D366] hover:bg-[#25D366]/25 shadow-sm"
+              >
+                <MessageSquare className="size-3.5 fill-current" />
+                <span>WhatsApp Message</span>
+              </a>
+              {selectedCustomer.locationCoordinates && (
+                <a
+                  href={`https://maps.google.com/?q=${selectedCustomer.locationCoordinates.latitude},${selectedCustomer.locationCoordinates.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-xs font-bold text-blue-600 hover:bg-blue-500/20 shadow-sm"
+                >
+                  <MapPin className="size-3.5" />
+                  <span>Google Maps GPS</span>
+                </a>
+              )}
+            </div>
+
+            {/* Customer Details Grid (Location & Equipment Profile) */}
+            <div className="grid gap-3 sm:grid-cols-2 text-xs">
+              {/* Card 1: Location & Address */}
+              <div className="rounded-2xl border border-border bg-surface/40 p-4 space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block flex items-center gap-1.5">
+                  <MapPin className="size-3.5 text-brand" /> Location &amp; Address
+                </span>
+                <div className="font-bold text-foreground text-sm">{selectedCustomer.location}</div>
+                <div className="text-muted-foreground">{selectedCustomer.address}</div>
+                <div className="font-mono text-xs text-muted-foreground">
+                  PIN Code: <strong className="text-foreground">{selectedCustomer.pin}</strong>
+                </div>
+              </div>
+
+              {/* Card 2: HVAC Equipment & AMC */}
+              <div className="rounded-2xl border border-border bg-surface/40 p-4 space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block flex items-center gap-1.5">
+                  <ShieldCheck className="size-3.5 text-brand" /> AC Equipment &amp; AMC Status
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-foreground">AC Type:</span>
+                  <span className="rounded-md bg-surface px-2 py-0.5 font-bold border border-border">
+                    ❄️ {selectedCustomer.acType}
+                  </span>
+                </div>
+                <div className="text-muted-foreground">
+                  Units Under Care: <strong className="text-foreground">{selectedCustomer.numberOfUnits} Units</strong>
+                </div>
+                {selectedCustomer.amcPlan && (
+                  <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-700 font-bold border border-emerald-500/20 text-[11px]">
+                    Plan: {selectedCustomer.amcPlan}
+                  </div>
+                )}
+                <div className="text-muted-foreground">
+                  Lifetime Value: <strong className="text-brand font-black">₹{selectedCustomer.totalSpend.toLocaleString("en-IN")}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Previous Services Tags */}
+            <div className="rounded-2xl border border-border bg-surface/20 p-4 space-y-2 text-xs">
+              <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
+                Previous Services Taken:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {selectedCustomer.previousServices.map((srv) => (
+                  <span
+                    key={srv}
+                    className="rounded-lg bg-surface px-2.5 py-1 text-xs font-bold text-foreground border border-border"
+                  >
+                    ✓ {srv}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Full Booking History Timeline */}
+            <div className="space-y-2.5 pt-1">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-2">
+                  <CalendarCheck className="size-4 text-brand" />
+                  <span>Chronological Booking History ({selectedCustomer.bookingHistory.length})</span>
+                </h3>
+                <span className="text-xs text-muted-foreground">Latest first</span>
+              </div>
+
+              <div className="space-y-2">
+                {selectedCustomer.bookingHistory.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-muted-foreground rounded-xl bg-surface">
+                    No booking records found.
+                  </div>
+                ) : (
+                  selectedCustomer.bookingHistory.map((hist, idx) => (
+                    <div
+                      key={hist.bookingId || idx}
+                      className="rounded-xl border border-border bg-surface/50 p-3.5 space-y-2 hover:border-brand/40 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-xs font-black text-brand">
+                              {hist.bookingId}
+                            </span>
+                            <span className="text-[11px] text-muted-foreground">• {hist.date}</span>
+                            {hist.slot && (
+                              <span className="text-[11px] text-muted-foreground">({hist.slot})</span>
+                            )}
+                          </div>
+                          <h4 className="text-xs font-black text-foreground mt-0.5">{hist.serviceName}</h4>
+                          {hist.subService && (
+                            <p className="text-[11px] text-muted-foreground mt-0.5">{hist.subService}</p>
+                          )}
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide border ${
+                              hist.status === "COMPLETED" || hist.status === "PAYMENT RECEIVED"
+                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                                : hist.status === "CANCELLED"
+                                ? "bg-red-500/10 text-red-600 border-red-500/30"
+                                : "bg-brand/10 text-brand border-brand/30"
+                            }`}
+                          >
+                            {hist.status}
+                          </span>
+                          <div className="text-xs font-black text-foreground mt-1">
+                            ₹{hist.amount.toLocaleString("en-IN")}
+                          </div>
+                        </div>
+                      </div>
+
+                      {hist.technicianName && (
+                        <div className="text-[11px] text-muted-foreground flex items-center gap-1 pt-1 border-t border-border/50">
+                          <HardHat className="size-3 text-brand" />
+                          <span>Technician: <strong>{hist.technicianName}</strong></span>
+                        </div>
+                      )}
+                    </div>
+                  ))
                 )}
               </div>
             </div>

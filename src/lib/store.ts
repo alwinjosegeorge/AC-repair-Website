@@ -115,16 +115,36 @@ export interface Technician {
   activeJobsCount: number;
 }
 
+export interface CustomerBookingHistory {
+  bookingId: string;
+  serviceCategory: ServiceCategory;
+  serviceName: string;
+  subService?: string;
+  date: string;
+  slot?: string;
+  amount: number;
+  status: BookingStatus;
+  technicianName?: string;
+}
+
 export interface Customer {
-  id: string;
+  id: string; // Customer ID e.g. "CUST-2026-101"
   name: string;
-  phone: string;
+  mobile: string;
+  whatsapp: string;
   email: string;
-  city: string;
   address: string;
-  totalBookings: number;
-  lastBookingDate: string;
-  amcActive: boolean;
+  pin: string;
+  location: string;
+  locationCoordinates?: { latitude: number; longitude: number };
+  previousServices: string[];
+  acType: ACType;
+  numberOfUnits: number | string;
+  amcStatus: "Active" | "Expiring Soon" | "Expired" | "None";
+  amcPlan?: string;
+  bookingHistory: CustomerBookingHistory[];
+  totalSpend: number;
+  lastBookingDate?: string;
 }
 
 export interface AMCContract {
@@ -701,6 +721,7 @@ const STORAGE_KEYS = {
   BOOKINGS: "egs_crm_bookings_v2",
   TECHNICIANS: "egs_crm_technicians_v2",
   AMC: "egs_crm_amc_v2",
+  CUSTOMERS: "egs_crm_customers_v3",
 };
 
 /**
@@ -799,6 +820,399 @@ export function getAMCContracts(): AMCContract[] {
     return JSON.parse(raw);
   } catch {
     return SEED_AMC;
+  }
+}
+
+export const SEED_CUSTOMERS: Customer[] = [
+  {
+    id: "CUST-2026-101",
+    name: "Sanjay Menon",
+    mobile: "+91 98950 11223",
+    whatsapp: "+91 98950 11223",
+    email: "sanjay.menon@gmail.com",
+    address: "Villa 4B, Palm Meadows, Kadavanthra",
+    pin: "682020",
+    location: "Kadavanthra, Ernakulam / Cochin",
+    locationCoordinates: { latitude: 9.9674, longitude: 76.2995 },
+    previousServices: ["❄ AC Service", "🔧 AC Repair"],
+    acType: "Split AC",
+    numberOfUnits: 2,
+    amcStatus: "Active",
+    amcPlan: "Residential Saver (2 Units)",
+    totalSpend: 1848,
+    lastBookingDate: "2026-10-25T11:00:00.000Z",
+    bookingHistory: [
+      {
+        bookingId: "EGS-2026-1095",
+        serviceCategory: "ac-service",
+        serviceName: "❄ AC Service",
+        subService: "Deep Hydro Jet Cleaning & Sanitization",
+        date: "Today (Express 90-Min Slot)",
+        slot: "Morning (9:00 AM - 12:00 PM)",
+        amount: 998,
+        status: "NEW",
+      },
+      {
+        bookingId: "EGS-2025-0812",
+        serviceCategory: "ac-repair",
+        serviceName: "🔧 AC Repair",
+        subService: "Capacitor Replacement & General Check",
+        date: "14 Oct 2025",
+        slot: "Afternoon (12:00 PM - 3:00 PM)",
+        amount: 850,
+        status: "COMPLETED",
+        technicianName: "Muhammed Shafi",
+      },
+    ],
+  },
+  {
+    id: "CUST-2026-102",
+    name: "Anita George",
+    mobile: "+91 94472 88990",
+    whatsapp: "+91 94472 88990",
+    email: "anita.george@outlook.com",
+    address: "Apt 502, Skyline Oasis, Pattom",
+    pin: "695004",
+    location: "Pattom, Thiruvananthapuram",
+    locationCoordinates: { latitude: 8.5241, longitude: 76.9366 },
+    previousServices: ["🔧 AC Repair"],
+    acType: "Split AC",
+    numberOfUnits: 1,
+    amcStatus: "None",
+    totalSpend: 699,
+    lastBookingDate: "2026-10-25T10:30:00.000Z",
+    bookingHistory: [
+      {
+        bookingId: "EGS-2026-1094",
+        serviceCategory: "ac-repair",
+        serviceName: "🔧 AC Repair",
+        subService: "Water Leakage & Drainage Block",
+        date: "Today (Express 90-Min Slot)",
+        slot: "Afternoon (12:00 PM - 3:00 PM)",
+        amount: 699,
+        status: "CONTACTED",
+      },
+    ],
+  },
+  {
+    id: "CUST-2026-103",
+    name: "Apex Software Solutions",
+    mobile: "+91 98956 77889",
+    whatsapp: "+91 98956 77889",
+    email: "facilities@apexsoftware.in",
+    address: "Level 4, IT Tower 2, Infopark Phase 1, Kakkanad",
+    pin: "682030",
+    location: "Infopark, Kakkanad, Ernakulam",
+    locationCoordinates: { latitude: 10.0104, longitude: 76.3654 },
+    previousServices: ["⚙ AC Installation", "🏢 Commercial HVAC", "📋 AMC"],
+    acType: "VRF / VRV",
+    numberOfUnits: 12,
+    amcStatus: "Expiring Soon",
+    amcPlan: "Commercial Pro (12 Units)",
+    totalSpend: 36498,
+    lastBookingDate: "2026-10-25T09:15:00.000Z",
+    bookingHistory: [
+      {
+        bookingId: "EGS-2026-1092",
+        serviceCategory: "ac-installation",
+        serviceName: "⚙ AC Installation",
+        subService: "Inverter Split AC Full Installation",
+        date: "Tomorrow",
+        slot: "Morning (9:00 AM - 12:00 PM)",
+        amount: 1499,
+        status: "ASSIGNED",
+        technicianName: "Muhammed Shafi",
+      },
+      {
+        bookingId: "EGS-2025-1101",
+        serviceCategory: "commercial-hvac",
+        serviceName: "🏢 Commercial HVAC",
+        subService: "Annual VRV Performance & Gas Charge",
+        date: "01 Nov 2025",
+        slot: "Full Day Service",
+        amount: 34999,
+        status: "COMPLETED",
+        technicianName: "Muhammed Shafi",
+      },
+    ],
+  },
+  {
+    id: "CUST-2026-104",
+    name: "Priya Soman",
+    mobile: "+91 98952 44332",
+    whatsapp: "+91 98952 44332",
+    email: "priya.soman@gmail.com",
+    address: "Soman Arcade, Round South",
+    pin: "680001",
+    location: "Round South, Thrissur",
+    locationCoordinates: { latitude: 10.5276, longitude: 76.2144 },
+    previousServices: ["❄ AC Service", "🧹 AC Cleaning"],
+    acType: "Cassette AC",
+    numberOfUnits: 2,
+    amcStatus: "Active",
+    amcPlan: "Comprehensive Care (2 Units)",
+    totalSpend: 1798,
+    lastBookingDate: "2026-10-25T08:00:00.000Z",
+    bookingHistory: [
+      {
+        bookingId: "EGS-2026-1091",
+        serviceCategory: "ac-service",
+        serviceName: "❄ AC Service",
+        subService: "Deep Jet Power Cleaning (Indoor + Outdoor)",
+        date: "Today (Express 90-Min Slot)",
+        slot: "Afternoon (12:00 PM - 3:00 PM)",
+        amount: 1798,
+        status: "TECHNICIAN ON THE WAY",
+        technicianName: "Sujith Nair",
+      },
+    ],
+  },
+  {
+    id: "CUST-2026-105",
+    name: "Biju Thomas",
+    mobile: "+91 94470 66554",
+    whatsapp: "+91 94470 66554",
+    email: "bijuthomas.kollam@gmail.com",
+    address: "House 55, Beach Road, Chinnakkada",
+    pin: "691001",
+    location: "Chinnakkada, Kollam",
+    locationCoordinates: { latitude: 8.8879, longitude: 76.5956 },
+    previousServices: ["🔧 AC Repair"],
+    acType: "Split AC",
+    numberOfUnits: 1,
+    amcStatus: "None",
+    totalSpend: 799,
+    lastBookingDate: "2026-10-25T07:30:00.000Z",
+    bookingHistory: [
+      {
+        bookingId: "EGS-2026-1090",
+        serviceCategory: "ac-repair",
+        serviceName: "🔧 AC Repair",
+        subService: "PCB Board Repair & Power Trip",
+        date: "Today (Express 90-Min Slot)",
+        slot: "Morning (9:00 AM - 12:00 PM)",
+        amount: 799,
+        status: "SERVICE STARTED",
+        technicianName: "Arun Kumar",
+      },
+    ],
+  },
+  {
+    id: "CUST-2026-106",
+    name: "Dr. Thomas Mathew",
+    mobile: "+91 94471 22334",
+    whatsapp: "+91 94471 22334",
+    email: "drthomasmathew@yahoo.com",
+    address: "Grace Villa, Kadappakada",
+    pin: "691008",
+    location: "Kadappakada, Kollam",
+    locationCoordinates: { latitude: 8.8942, longitude: 76.6025 },
+    previousServices: ["❄ AC Service", "📋 AMC", "🧹 AC Cleaning"],
+    acType: "Split AC",
+    numberOfUnits: 3,
+    amcStatus: "Active",
+    amcPlan: "Comprehensive Care (3 Units)",
+    totalSpend: 6498,
+    lastBookingDate: "2026-10-25T06:00:00.000Z",
+    bookingHistory: [
+      {
+        bookingId: "EGS-2026-1089b",
+        serviceCategory: "ac-service",
+        serviceName: "❄ AC Service",
+        subService: "Foam Wash & Jet Spray Sanitization",
+        date: "Today",
+        slot: "Morning (9:00 AM - 12:00 PM)",
+        amount: 499,
+        status: "COMPLETED",
+        technicianName: "Vipin Das",
+      },
+      {
+        bookingId: "EGS-2026-0115",
+        serviceCategory: "ac-amc",
+        serviceName: "📋 AMC",
+        subService: "Comprehensive AMC Package 3 Units",
+        date: "15 Jan 2026",
+        slot: "Full Day Setup",
+        amount: 5999,
+        status: "COMPLETED",
+        technicianName: "Arun Kumar",
+      },
+    ],
+  },
+  {
+    id: "CUST-2026-107",
+    name: "Harish Kumar",
+    mobile: "+91 98460 77881",
+    whatsapp: "+91 98460 77881",
+    email: "harish.kumar77@gmail.com",
+    address: "House 12, Lake View, Thevara",
+    pin: "682013",
+    location: "Thevara, Ernakulam / Cochin",
+    locationCoordinates: { latitude: 9.9328, longitude: 76.2991 },
+    previousServices: ["💨 Gas Charging", "🔧 AC Repair"],
+    acType: "Split AC",
+    numberOfUnits: 1,
+    amcStatus: "None",
+    totalSpend: 1499,
+    lastBookingDate: "2026-10-24T18:00:00.000Z",
+    bookingHistory: [
+      {
+        bookingId: "EGS-2026-1088b",
+        serviceCategory: "gas-charging",
+        serviceName: "💨 Gas Charging",
+        subService: "Nitrogen Pressure Leak Detection & R410A Refill",
+        date: "Today (Express 90-Min Slot)",
+        slot: "Morning (9:00 AM - 12:00 PM)",
+        amount: 1499,
+        status: "PAYMENT RECEIVED",
+        technicianName: "Muhammed Shafi",
+      },
+    ],
+  },
+  {
+    id: "CUST-2026-108",
+    name: "Rajesh Kannan",
+    mobile: "+91 98401 22334",
+    whatsapp: "+91 98401 22334",
+    email: "rajesh.kannan@chennaihvac.com",
+    address: "Flat 8A, Prime Heights, Anna Nagar",
+    pin: "600040",
+    location: "Anna Nagar, Chennai",
+    locationCoordinates: { latitude: 13.0850, longitude: 80.2101 },
+    previousServices: ["🛒 Buy new ac", "⚙ AC Installation"],
+    acType: "Split AC",
+    numberOfUnits: 2,
+    amcStatus: "None",
+    totalSpend: 76000,
+    lastBookingDate: "2026-10-24T12:00:00.000Z",
+    bookingHistory: [
+      {
+        bookingId: "EGS-2026-1085",
+        serviceCategory: "buy-new-ac",
+        serviceName: "🛒 Buy new ac",
+        subService: "Daikin 1.5 Ton 5-Star Inverter AC Purchase (x2)",
+        date: "Tomorrow",
+        slot: "Afternoon (12:00 PM - 3:00 PM)",
+        amount: 76000,
+        status: "NEW",
+      },
+    ],
+  },
+];
+
+export function getCustomers(): Customer[] {
+  let baseCustomers = SEED_CUSTOMERS;
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
+      if (raw) {
+        baseCustomers = JSON.parse(raw);
+      } else {
+        localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(SEED_CUSTOMERS));
+      }
+    } catch {
+      baseCustomers = SEED_CUSTOMERS;
+    }
+  }
+
+  // Dynamically enrich or merge with all bookings in localStorage:
+  const bookings = getBookings();
+  const amcContracts = getAMCContracts();
+
+  const customerMap = new Map<string, Customer>();
+  baseCustomers.forEach((c) => {
+    const cleanPhone = c.mobile.replace(/\D/g, "");
+    customerMap.set(cleanPhone, { ...c, bookingHistory: [...c.bookingHistory], previousServices: [...c.previousServices] });
+  });
+
+  bookings.forEach((b) => {
+    const cleanPhone = b.phone.replace(/\D/g, "");
+    if (!cleanPhone) return;
+
+    const existing = customerMap.get(cleanPhone);
+    const historyItem: CustomerBookingHistory = {
+      bookingId: b.id,
+      serviceCategory: b.serviceCategory,
+      serviceName: b.serviceName,
+      subService: b.subService,
+      date: b.preferredDate || new Date(b.createdAt).toLocaleDateString("en-IN"),
+      slot: b.preferredSlot,
+      amount: b.estimatedAmount,
+      status: b.status,
+      technicianName: b.assignedTechnicianName,
+    };
+
+    if (existing) {
+      const histIndex = existing.bookingHistory.findIndex((h) => h.bookingId === b.id);
+      if (histIndex === -1) {
+        existing.bookingHistory.unshift(historyItem);
+        existing.totalSpend += b.estimatedAmount;
+        if (!existing.previousServices.includes(b.serviceName)) {
+          existing.previousServices.push(b.serviceName);
+        }
+      } else {
+        existing.bookingHistory[histIndex] = {
+          ...existing.bookingHistory[histIndex],
+          status: b.status,
+          technicianName: b.assignedTechnicianName,
+          amount: b.estimatedAmount,
+        };
+      }
+    } else {
+      const amcMatch = amcContracts.find(
+        (a) => a.phone.replace(/\D/g, "") === cleanPhone
+      );
+      const newCust: Customer = {
+        id: `CUST-2026-${100 + customerMap.size + 1}`,
+        name: b.customerName,
+        mobile: b.phone,
+        whatsapp: b.whatsappNumber || b.phone,
+        email: b.email || `${b.customerName.toLowerCase().replace(/[^a-z0-9]/g, "")}@gmail.com`,
+        address: b.address,
+        pin: b.pincode,
+        location: b.area ? `${b.area}, ${b.city}` : b.city,
+        locationCoordinates: b.locationCoordinates,
+        previousServices: [b.serviceName],
+        acType: b.acType,
+        numberOfUnits: b.unitCount,
+        amcStatus: amcMatch
+          ? amcMatch.status === "active"
+            ? "Active"
+            : amcMatch.status === "expiring_soon"
+            ? "Expiring Soon"
+            : "Expired"
+          : "None",
+        amcPlan: amcMatch ? `${amcMatch.planName} (${amcMatch.unitsCovered} Units)` : undefined,
+        bookingHistory: [historyItem],
+        totalSpend: b.estimatedAmount,
+        lastBookingDate: b.createdAt,
+      };
+      customerMap.set(cleanPhone, newCust);
+    }
+  });
+
+  return Array.from(customerMap.values());
+}
+
+export function getCustomerById(id: string): Customer | undefined {
+  const all = getCustomers();
+  return all.find((c) => c.id === id || c.mobile.replace(/\D/g, "") === id.replace(/\D/g, ""));
+}
+
+export function saveCustomer(updatedCustomer: Customer): void {
+  const all = getCustomers();
+  const index = all.findIndex(
+    (c) => c.id === updatedCustomer.id || c.mobile.replace(/\D/g, "") === updatedCustomer.mobile.replace(/\D/g, "")
+  );
+  let newList: Customer[];
+  if (index >= 0) {
+    newList = all.map((c, i) => (i === index ? updatedCustomer : c));
+  } else {
+    newList = [updatedCustomer, ...all];
+  }
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(newList));
+    window.dispatchEvent(new Event("egs_customers_updated"));
   }
 }
 
@@ -910,3 +1324,41 @@ If you need to reschedule in the future, please call us at +91 98956 88833 or vi
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
+
+export function generateTechnicianEtaWhatsAppURL(
+  booking: Booking,
+  technicianName: string,
+  etaMinutes = 25
+): string {
+  const cleanPhone = (booking.whatsappNumber || booking.phone).replace(/[^0-9]/g, "");
+  const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+  const text = `Hello ${booking.customerName}! 👋
+This is *${technicianName}*, your certified HVAC technician from *Expert Goods & Services (EGS INDIA)*.
+I am on the way to your location for booking *${booking.id}* (*${booking.serviceName}*).
+
+📍 *Destination:* ${booking.address}, ${booking.city}
+⏱️ *ETA:* Approximately ${etaMinutes} minutes.
+
+Please let me know if you need any directions or special instructions. See you shortly!`;
+
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+
+export function generateTechnicianCompletedWhatsAppURL(
+  booking: Booking,
+  technicianName: string
+): string {
+  const cleanPhone = (booking.whatsappNumber || booking.phone).replace(/[^0-9]/g, "");
+  const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+  const text = `Hello ${booking.customerName}! ⭐
+Your AC service for booking *${booking.id}* (*${booking.serviceName}*) has been completed by technician *${technicianName}* - *EGS INDIA*.
+
+✅ Cooling diagnostic and performance test passed.
+🛡️ 30-Day Post-Service Warranty active.
+Total Amount: ₹${booking.estimatedAmount}.
+
+Thank you for choosing EGS INDIA!`;
+
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+

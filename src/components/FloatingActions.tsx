@@ -7,8 +7,11 @@ import { BookingWizard } from "./BookingWizard";
 export function FloatingActions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Don't render floating consumer actions inside the admin portal
-  if (typeof window !== "undefined" && window.location.pathname.startsWith("/admin")) {
+  // Don't render floating consumer actions inside admin or technician field portals
+  if (
+    typeof window !== "undefined" &&
+    (window.location.pathname.startsWith("/admin") || window.location.pathname.startsWith("/technician"))
+  ) {
     return null;
   }
 
