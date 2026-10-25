@@ -30,7 +30,7 @@ export function FloatingActions() {
             className="flex flex-1 flex-col items-center justify-center rounded-xl bg-surface/90 py-2 text-foreground transition-transform active:scale-95 border border-border"
           >
             <Phone className="size-5 text-brand" />
-            <span className="mt-0.5 text-[11px] font-bold">Call Now</span>
+            <span className="mt-0.5 text-[11px] font-bold">Call now</span>
           </a>
 
           {/* WhatsApp button */}
@@ -42,7 +42,7 @@ export function FloatingActions() {
             className="flex flex-1 flex-col items-center justify-center rounded-xl bg-[#25D366]/10 py-2 text-[#25D366] transition-transform active:scale-95 border border-[#25D366]/20"
           >
             <MessageSquare className="size-5 fill-current" />
-            <span className="mt-0.5 text-[11px] font-bold">WhatsApp</span>
+            <span className="mt-0.5 text-[11px] font-bold">WhatsApp us</span>
           </a>
 
           {/* Book Service button */}
@@ -52,7 +52,7 @@ export function FloatingActions() {
             className="flex flex-[1.6] items-center justify-center gap-1.5 rounded-xl bg-brand py-3 px-3 text-brand-foreground font-black text-xs uppercase tracking-wider shadow-lg shadow-brand/40 transition-transform active:scale-95 animate-pulse"
           >
             <Calendar className="size-4 shrink-0" />
-            <span>BOOK SERVICE</span>
+            <span>Book a service</span>
           </button>
         </div>
       </div>
@@ -66,7 +66,7 @@ export function FloatingActions() {
           className="group flex items-center gap-2.5 rounded-full bg-brand px-5 py-3 text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:shadow-brand/60 ring-2 ring-brand/30 animate-pulse"
         >
           <Calendar className="size-5" />
-          <span className="text-xs font-black uppercase tracking-wider">BOOK SERVICE</span>
+          <span className="text-xs font-black uppercase tracking-wider">Book a service</span>
         </button>
 
         {/* WhatsApp Floating Pill */}
@@ -78,7 +78,7 @@ export function FloatingActions() {
           className="group flex items-center gap-2.5 rounded-full bg-[#25D366] px-4 py-2.5 text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:shadow-2xl"
         >
           <MessageSquare className="size-4 fill-current" />
-          <span className="text-xs font-bold tracking-wide">WhatsApp</span>
+          <span className="text-xs font-bold tracking-wide">WhatsApp us</span>
         </a>
 
         {/* Call Floating Pill */}
@@ -89,7 +89,7 @@ export function FloatingActions() {
         >
           <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
           <Phone className="size-4 text-brand" />
-          <span className="text-xs font-bold">+91 98956 88833</span>
+          <span className="text-xs font-bold">Call now</span>
         </a>
       </div>
 

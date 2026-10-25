@@ -146,15 +146,15 @@ export function Navbar() {
         </nav>
 
         {/* Header Right Action Buttons */}
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2.5 md:flex">
           {/* Direct Phone Call */}
           <a
             href={`tel:${EGS_CALL_NUMBER}`}
             onClick={() => trackCallClick("header_navbar")}
-            className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3.5 py-2 text-xs font-bold text-foreground transition-colors hover:border-brand/40"
+            className="flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-bold text-foreground transition-colors hover:border-brand/40"
           >
             <Phone className="size-3.5 text-brand" />
-            <span>+91 98956 88833</span>
+            <span>Call now</span>
           </a>
 
           {/* Direct WhatsApp */}
@@ -163,19 +163,19 @@ export function Navbar() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick("header_navbar")}
-            className="flex items-center gap-1.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 px-3.5 py-2 text-xs font-bold text-[#25D366] transition-colors hover:bg-[#25D366]/20"
+            className="flex items-center gap-1.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 px-3 py-2 text-xs font-bold text-[#25D366] transition-colors hover:bg-[#25D366]/20"
           >
             <MessageSquare className="size-3.5 fill-current" />
-            <span>WhatsApp</span>
+            <span>WhatsApp us</span>
           </a>
 
           {/* Book a Service CTA */}
           <Link
             to="/book"
-            className="flex items-center gap-2 rounded-xl bg-brand px-4 py-2 text-xs font-black text-brand-foreground shadow-md shadow-brand/25 transition-all hover:opacity-95 hover:shadow-brand/40"
+            className="flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-xs font-black text-brand-foreground shadow-md shadow-brand/25 transition-all hover:opacity-95 hover:shadow-brand/40"
           >
             <Calendar className="size-3.5" />
-            <span>Book a Service</span>
+            <span>Book a service</span>
           </Link>
         </div>
 
@@ -251,22 +251,35 @@ export function Navbar() {
               </Link>
             </div>
 
-            <div className="border-t border-border pt-4 grid grid-cols-2 gap-2">
-              <a
-                href={`tel:${EGS_CALL_NUMBER}`}
-                className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface py-2.5 text-xs font-bold text-foreground"
-              >
-                <Phone className="size-3.5 text-brand" />
-                Call Now
-              </a>
+            <div className="border-t border-border pt-4 flex flex-col gap-2">
               <Link
                 to="/book"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-brand py-2.5 text-xs font-black text-brand-foreground"
+                className="flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-md shadow-brand/30"
               >
-                <Calendar className="size-3.5" />
-                Book Online
+                <Calendar className="size-4" />
+                <span>Book a service</span>
               </Link>
+              <div className="grid grid-cols-2 gap-2">
+                <a
+                  href={`tel:${EGS_CALL_NUMBER}`}
+                  onClick={() => trackCallClick("mobile_drawer")}
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface py-2.5 text-xs font-bold text-foreground"
+                >
+                  <Phone className="size-3.5 text-brand" />
+                  <span>Call now</span>
+                </a>
+                <a
+                  href={waURL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackWhatsAppClick("mobile_drawer")}
+                  className="flex items-center justify-center gap-1.5 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 py-2.5 text-xs font-bold text-[#25D366]"
+                >
+                  <MessageSquare className="size-3.5 fill-current" />
+                  <span>WhatsApp us</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>

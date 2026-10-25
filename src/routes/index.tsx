@@ -172,35 +172,60 @@ function Hero() {
           </span>
         </h1>
         <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-ink/65 md:text-lg animate-fade-in-up-delay-1">
-          Expert AC repair and maintenance services that keep your home comfortable year-round
-          technicians, guaranteed results.
+          Expert AC repair and maintenance services that keep your home comfortable year-round.
+          Certified technicians, 90-minute rapid arrival, guaranteed results.
         </p>
-        <div className="mt-8 flex flex-wrap justify-center items-center gap-3 animate-fade-in-up-delay-2">
-          <Link
-            to="/book"
-            className="flex items-center gap-2 rounded-2xl bg-brand px-8 py-4 text-sm font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90 hover:shadow-brand/60 ring-4 ring-brand/20 animate-pulse"
-          >
-            <Calendar className="size-4" />
-            <span>BOOK SERVICE (90-MIN ARRIVAL)</span>
-          </Link>
-          <a
-            href={`tel:${EGS_CALL_NUMBER}`}
-            onClick={() => trackCallClick("homepage_hero")}
-            className="flex items-center gap-2 rounded-2xl border border-border bg-background px-5 py-3.5 text-sm font-bold text-ink shadow-sm transition-all hover:bg-surface"
-          >
-            <Phone className="size-4 text-brand" />
-            <span>Call +91 9895688833</span>
-          </a>
-          <a
-            href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I need assistance with AC Service/Repair.")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackWhatsAppClick("homepage_hero")}
-            className="flex items-center gap-2 rounded-2xl bg-[#25D366]/10 border border-[#25D366]/20 px-5 py-3.5 text-sm font-bold text-[#25D366] transition-all hover:bg-[#25D366]/20"
-          >
-            <MessageSquare className="size-4 fill-current" />
-            <span>WhatsApp</span>
-          </a>
+
+        {/* 3 Main Action Buttons */}
+        <div className="mt-10 mx-auto max-w-3xl animate-fade-in-up-delay-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+            {/* 1. Book a service */}
+            <Link
+              to="/book"
+              className="group relative flex flex-col items-center justify-center rounded-2xl bg-brand px-6 py-4 text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90 hover:shadow-brand/60 ring-4 ring-brand/20 active:scale-95 animate-pulse"
+            >
+              <div className="flex items-center gap-2">
+                <Calendar className="size-5 shrink-0" />
+                <span className="text-base font-black tracking-wide uppercase">Book a service</span>
+              </div>
+              <span className="mt-1 text-[11px] font-semibold text-brand-foreground/85">
+                Online Slot • 90-Min Arrival
+              </span>
+            </Link>
+
+            {/* 2. WhatsApp us */}
+            <a
+              href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I need assistance with AC Service/Repair.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick("homepage_hero")}
+              className="group relative flex flex-col items-center justify-center rounded-2xl bg-[#25D366] px-6 py-4 text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59] hover:shadow-2xl active:scale-95"
+            >
+              <div className="flex items-center gap-2">
+                <MessageSquare className="size-5 shrink-0 fill-current" />
+                <span className="text-base font-black tracking-wide uppercase">WhatsApp us</span>
+              </div>
+              <span className="mt-1 text-[11px] font-semibold text-white/90">
+                Direct Chat with Engineer
+              </span>
+            </a>
+
+            {/* 3. Call now */}
+            <a
+              href={`tel:${EGS_CALL_NUMBER}`}
+              onClick={() => trackCallClick("homepage_hero")}
+              className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-border bg-card px-6 py-4 text-card-foreground shadow-lg transition-all hover:scale-105 hover:border-brand/50 hover:bg-surface active:scale-95"
+            >
+              <div className="flex items-center gap-2">
+                <div className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <Phone className="size-5 shrink-0 text-brand" />
+                <span className="text-base font-black tracking-wide uppercase">Call now</span>
+              </div>
+              <span className="mt-1 text-[11px] font-semibold text-muted-foreground">
+                +91 98956 88833 (24/7 Desk)
+              </span>
+            </a>
+          </div>
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-ink/70">
@@ -253,6 +278,66 @@ function Hero() {
           height={912}
           className="absolute left-1/2 top-[-8%] w-full max-w-3xl drop-shadow-2xl animate-ac-float z-10"
         />
+      </div>
+    </section>
+  );
+}
+
+function QuickActionBar() {
+  const waURL = `https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    "Hello EGS INDIA! I need fast AC service assistance."
+  )}`;
+
+  return (
+    <section className="relative z-20 -mt-6 px-4 md:px-8">
+      <div className="mx-auto max-w-6xl rounded-3xl border-2 border-brand/20 bg-background/95 p-6 shadow-2xl backdrop-blur-md md:p-8">
+        <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
+          <div className="max-w-xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1 text-xs font-bold text-brand">
+              <span className="size-2 rounded-full bg-brand animate-ping" />
+              PRIORITY SERVICE DISPATCH
+            </div>
+            <h3 className="mt-2 text-2xl font-black text-ink md:text-3xl">
+              Need AC Service Right Now?
+            </h3>
+            <p className="mt-1 text-sm text-ink/70">
+              Get certified HVAC technicians at your doorstep within 90 minutes. Choose your instant option:
+            </p>
+          </div>
+
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+            {/* 1. Book a service */}
+            <Link
+              to="/book"
+              className="flex items-center justify-center gap-2 rounded-xl bg-brand px-6 py-3.5 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/30 transition-all hover:scale-105 hover:bg-brand/90"
+            >
+              <Calendar className="size-4" />
+              <span>Book a service</span>
+            </Link>
+
+            {/* 2. WhatsApp us */}
+            <a
+              href={waURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick("homepage_quick_bar")}
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
+            >
+              <MessageSquare className="size-4 fill-current" />
+              <span>WhatsApp us</span>
+            </a>
+
+            {/* 3. Call now */}
+            <a
+              href={`tel:${EGS_CALL_NUMBER}`}
+              onClick={() => trackCallClick("homepage_quick_bar")}
+              className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-6 py-3.5 text-xs font-black uppercase tracking-wider text-ink shadow-sm transition-all hover:border-brand/40 hover:bg-background"
+            >
+              <Phone className="size-4 text-brand" />
+              <span>Call now</span>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -638,12 +723,35 @@ function CallToAction() {
         <h2 className="mx-auto mt-8 max-w-3xl text-4xl leading-tight font-extrabold md:text-6xl">
           Ready to Upgrade Your Cooling System?
         </h2>
-        <a
-          href="/contact"
-          className="mt-10 inline-block rounded-xl bg-background px-8 py-4 text-base font-semibold shadow-[0_18px_40px_-24px_oklch(0.2_0.06_260/0.6)] transition-transform hover:-translate-y-0.5"
-        >
-          Book A Schedule
-        </a>
+        
+        {/* 3 Prominent Home Page Action Buttons */}
+        <div className="mt-10 flex flex-wrap justify-center items-center gap-4">
+          <Link
+            to="/book"
+            className="flex items-center gap-2 rounded-2xl bg-brand px-8 py-4 text-base font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90"
+          >
+            <Calendar className="size-5" />
+            <span>Book a service</span>
+          </Link>
+          <a
+            href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I would like to schedule an AC inspection or upgrade.")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackWhatsAppClick("home_bottom_cta")}
+            className="flex items-center gap-2 rounded-2xl bg-[#25D366] px-8 py-4 text-base font-black uppercase tracking-wider text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
+          >
+            <MessageSquare className="size-5 fill-current" />
+            <span>WhatsApp us</span>
+          </a>
+          <a
+            href={`tel:${EGS_CALL_NUMBER}`}
+            onClick={() => trackCallClick("home_bottom_cta")}
+            className="flex items-center gap-2 rounded-2xl border-2 border-border bg-background px-8 py-4 text-base font-black uppercase tracking-wider text-ink shadow-md transition-all hover:scale-105 hover:bg-surface"
+          >
+            <Phone className="size-5 text-brand" />
+            <span>Call now</span>
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -858,6 +966,7 @@ function Index() {
     <main className="bg-background">
       <Navbar />
       <Hero />
+      <QuickActionBar />
       <Marquee />
       <About />
       <Services />
