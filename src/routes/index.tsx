@@ -159,7 +159,13 @@ function FloatingCard({
 
 function Hero() {
   return (
-    <section className="relative -mt-24 overflow-hidden cool-stripes pt-32 pb-16 sm:pt-40 sm:pb-24">
+    <section className="relative -mt-24 overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-24">
+      {/* Animated Flowing Cool Stripes Background */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-y-0 -left-6 w-[calc(100%+120px)] h-full cool-stripes-pattern animate-cool-stripes" />
+        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_15%,white_0%,transparent_65%)]" />
+      </div>
+
       <div className="mx-auto max-w-6xl px-4 sm:px-6 text-center">
         <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-extrabold leading-tight sm:leading-[1.05] tracking-tight animate-fade-in-up">
           Service Reinvented.
@@ -392,7 +398,9 @@ function Marquee() {
   return (
     <div className="relative my-8 sm:my-12 py-3 sm:py-5 overflow-hidden select-none">
       {/* Background stripes that fade out at the bottom */}
-      <div className="absolute inset-0 cool-stripes mask-bottom-fade -z-10" />
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden mask-bottom-fade">
+        <div className="absolute inset-y-0 -left-6 w-[calc(100%+120px)] h-full cool-stripes-pattern animate-cool-stripes" />
+      </div>
 
       {/* Left and Right Edge Vignette Fades for seamless entrance & exit */}
       <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10" />
@@ -803,7 +811,12 @@ function CallToAction() {
   return (
     <section className="bg-background px-6 py-16">
       <ScrollReveal>
-        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl cool-stripes px-6 py-28 text-center">
+        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl px-6 py-28 text-center">
+          {/* Animated Flowing Cool Stripes Background */}
+          <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+            <div className="absolute inset-y-0 -left-6 w-[calc(100%+120px)] h-full cool-stripes-pattern animate-cool-stripes" />
+            <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_10%,white_0%,transparent_60%)]" />
+          </div>
           <img
             src={cta2}
             alt="Technician cleaning an AC filter"
