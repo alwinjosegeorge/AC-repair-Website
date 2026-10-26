@@ -30,6 +30,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BookingWizard } from "@/components/BookingWizard";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { ScrollReveal } from "@/components/ScrollReveal";
 import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "@/lib/store";
 import {
   captureTrackingParams,
@@ -273,55 +274,57 @@ function QuickActionBar() {
 
   return (
     <section className="relative z-20 mt-6 sm:mt-8 md:mt-10 px-4 md:px-8">
-      <div className="mx-auto max-w-6xl rounded-3xl border-2 border-brand/20 bg-background/95 p-6 shadow-2xl backdrop-blur-md md:p-8">
-        <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
-          <div className="max-w-xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1 text-xs font-bold text-brand">
-              <span className="size-2 rounded-full bg-brand animate-ping" />
-              PRIORITY SERVICE DISPATCH
+      <ScrollReveal className="mx-auto max-w-6xl">
+        <div className="rounded-3xl border-2 border-brand/20 bg-background/95 p-6 shadow-2xl backdrop-blur-md md:p-8">
+          <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
+            <div className="max-w-xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1 text-xs font-bold text-brand">
+                <span className="size-2 rounded-full bg-brand animate-ping" />
+                PRIORITY SERVICE DISPATCH
+              </div>
+              <h3 className="mt-2 text-2xl font-black text-ink md:text-3xl">
+                Need AC Service Right Now?
+              </h3>
+              <p className="mt-1 text-sm text-ink/70">
+                Get certified HVAC technicians at your doorstep within 90 minutes. Choose your instant option:
+              </p>
             </div>
-            <h3 className="mt-2 text-2xl font-black text-ink md:text-3xl">
-              Need AC Service Right Now?
-            </h3>
-            <p className="mt-1 text-sm text-ink/70">
-              Get certified HVAC technicians at your doorstep within 90 minutes. Choose your instant option:
-            </p>
-          </div>
 
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-            {/* 1. Book a service */}
-            <Link
-              to="/book"
-              className="flex items-center justify-center gap-2 rounded-xl bg-brand px-6 py-3.5 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/30 transition-all hover:scale-105 hover:bg-brand/90"
-            >
-              <Calendar className="size-4" />
-              <span>Book a service</span>
-            </Link>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+              {/* 1. Book a service */}
+              <Link
+                to="/book"
+                className="flex items-center justify-center gap-2 rounded-xl bg-brand px-6 py-3.5 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/30 transition-all hover:scale-105 hover:bg-brand/90"
+              >
+                <Calendar className="size-4" />
+                <span>Book a service</span>
+              </Link>
 
-            {/* 2. WhatsApp us */}
-            <a
-              href={waURL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackWhatsAppClick("homepage_quick_bar")}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
-            >
-              <WhatsAppIcon className="size-4 fill-current" />
-              <span>WhatsApp us</span>
-            </a>
+              {/* 2. WhatsApp us */}
+              <a
+                href={waURL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick("homepage_quick_bar")}
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
+              >
+                <WhatsAppIcon className="size-4 fill-current" />
+                <span>WhatsApp us</span>
+              </a>
 
-            {/* 3. Call now */}
-            <a
-              href={`tel:${EGS_CALL_NUMBER}`}
-              onClick={() => trackCallClick("homepage_quick_bar")}
-              className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-6 py-3.5 text-xs font-black uppercase tracking-wider text-ink shadow-sm transition-all hover:border-brand/40 hover:bg-background"
-            >
-              <Phone className="size-4 text-brand" />
-              <span>Call now</span>
-            </a>
+              {/* 3. Call now */}
+              <a
+                href={`tel:${EGS_CALL_NUMBER}`}
+                onClick={() => trackCallClick("homepage_quick_bar")}
+                className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-6 py-3.5 text-xs font-black uppercase tracking-wider text-ink shadow-sm transition-all hover:border-brand/40 hover:bg-background"
+              >
+                <Phone className="size-4 text-brand" />
+                <span>Call now</span>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }
@@ -408,51 +411,61 @@ function About() {
   return (
     <section id="about" className="bg-background py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="text-center">
-          <Badge>KNOW ABOUT US</Badge>
-          <h2 className="mt-4 sm:mt-6 text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-ink">
-            South India's Most Trusted AC Service Partner
-          </h2>
-        </div>
+        <ScrollReveal>
+          <div className="text-center">
+            <Badge>KNOW ABOUT US</Badge>
+            <h2 className="mt-4 sm:mt-6 text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-ink">
+              South India's Most Trusted AC Service Partner
+            </h2>
+          </div>
+        </ScrollReveal>
 
         <div className="mt-16 grid gap-6 lg:grid-cols-3">
-          <div className="rounded-2xl bg-brand p-9 text-brand-foreground">
-            <span className="inline-block rounded-md bg-brand-foreground/20 px-3 py-1.5 text-xs font-bold tracking-[0.08em] uppercase">
-              GET TO KNOW US
-            </span>
-            <h3 className="mt-7 text-3xl leading-tight font-extrabold md:text-4xl">
-              Reliable Cooling Services For Homes{" "}
-              <span className="text-brand-foreground/50">And Businesses</span>
-            </h3>
-            <p className="mt-6 text-brand-foreground/85">
-              Expert AC repair and maintenance services that keep your home comfortable.
-            </p>
-          </div>
-
-          <img
-            src={aboutTech}
-            alt="Technician in a yellow hard hat servicing AC wiring"
-            width={800}
-            height={1000}
-            loading="lazy"
-            className="h-full max-h-[26rem] w-full rounded-2xl object-cover"
-          />
-
-          <div className="grid gap-6">
-            {[
-              { icon: HardHat, value: "15+", label: "YEARS OF EXPERIENCE" },
-              { icon: ThumbsUp, value: "2638+", label: "HAPPY CUSTOMERS" },
-            ].map(({ icon: Icon, value, label }) => (
-              <div key={label} className="rounded-2xl bg-surface p-9">
-                <Icon className="size-9 text-brand" strokeWidth={2} />
-                <p className="mt-10 text-5xl font-extrabold">{value}</p>
-                <p className="mt-3 text-sm font-bold tracking-wide text-ink/70 uppercase">
-                  <span className="mr-2 text-brand">|</span>
-                  {label}
-                </p>
+          <ScrollReveal delayMs={0} className="h-full">
+            <div className="h-full rounded-2xl bg-brand p-9 text-brand-foreground flex flex-col justify-between">
+              <div>
+                <span className="inline-block rounded-md bg-brand-foreground/20 px-3 py-1.5 text-xs font-bold tracking-[0.08em] uppercase">
+                  GET TO KNOW US
+                </span>
+                <h3 className="mt-7 text-3xl leading-tight font-extrabold md:text-4xl">
+                  Reliable Cooling Services For Homes{" "}
+                  <span className="text-brand-foreground/50">And Businesses</span>
+                </h3>
               </div>
-            ))}
-          </div>
+              <p className="mt-6 text-brand-foreground/85">
+                Expert AC repair and maintenance services that keep your home comfortable.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delayMs={80} className="h-full">
+            <img
+              src={aboutTech}
+              alt="Technician in a yellow hard hat servicing AC wiring"
+              width={800}
+              height={1000}
+              loading="lazy"
+              className="h-full max-h-[26rem] w-full rounded-2xl object-cover"
+            />
+          </ScrollReveal>
+
+          <ScrollReveal delayMs={160} className="h-full">
+            <div className="grid gap-6 h-full">
+              {[
+                { icon: HardHat, value: "15+", label: "YEARS OF EXPERIENCE" },
+                { icon: ThumbsUp, value: "2638+", label: "HAPPY CUSTOMERS" },
+              ].map(({ icon: Icon, value, label }) => (
+                <div key={label} className="rounded-2xl bg-surface p-9 flex flex-col justify-center">
+                  <Icon className="size-9 text-brand" strokeWidth={2} />
+                  <p className="mt-8 text-5xl font-extrabold">{value}</p>
+                  <p className="mt-3 text-sm font-bold tracking-wide text-ink/70 uppercase">
+                    <span className="mr-2 text-brand">|</span>
+                    {label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>
@@ -504,52 +517,56 @@ const services = [
 
 function Services() {
   return (
-    <section id="services" className="bg-[oklch(0.976_0.012_250)] py-24">
+    <section id="services" className="bg-[oklch(0.976_0.012_250)] py-20 sm:py-24 border-y border-border">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid gap-8 lg:grid-cols-2 lg:items-end">
-          <div>
-            <Badge tone="white">EXPERTISE YOU CAN TRUST</Badge>
-            <h2 className="mt-6 text-4xl font-extrabold md:text-6xl">Our HVAC Solutions</h2>
+        <ScrollReveal>
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-end">
+            <div>
+              <Badge tone="white">EXPERTISE YOU CAN TRUST</Badge>
+              <h2 className="mt-6 text-4xl font-extrabold md:text-6xl">Our HVAC Solutions</h2>
+            </div>
+            <p className="text-lg leading-relaxed text-ink/60">
+              Certified air conditioning and refrigeration solutions for homes, villas, corporate offices, and industrial complexes across Kerala and Tamil Nadu.
+            </p>
           </div>
-          <p className="text-lg leading-relaxed text-ink/60">
-            Certified air conditioning and refrigeration solutions for homes, villas, corporate offices, and industrial complexes across Kerala and Tamil Nadu.
-          </p>
-        </div>
+        </ScrollReveal>
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map(({ icon: Icon, title, href, price, badge, text }) => (
-            <article key={title} className="flex flex-col justify-between rounded-2xl sm:rounded-3xl bg-background p-5 sm:p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 border border-border/80">
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-soft text-brand">
-                    <Icon className="size-7" />
+          {services.map(({ icon: Icon, title, href, price, badge, text }, idx) => (
+            <ScrollReveal key={title} delayMs={idx * 60} className="h-full">
+              <article className="h-full flex flex-col justify-between rounded-2xl sm:rounded-3xl bg-background p-5 sm:p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 border border-border/80">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-soft text-brand">
+                      <Icon className="size-7" />
+                    </div>
+                    <span className="rounded-full bg-brand/10 px-3 py-1 text-[11px] font-black uppercase text-brand">
+                      {badge}
+                    </span>
                   </div>
-                  <span className="rounded-full bg-brand/10 px-3 py-1 text-[11px] font-black uppercase text-brand">
-                    {badge}
-                  </span>
+
+                  <h3 className="mt-6 text-2xl font-black text-ink">{title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-ink/65">{text}</p>
+                  <div className="mt-4 font-black text-brand text-lg">{price}</div>
                 </div>
 
-                <h3 className="mt-6 text-2xl font-black text-ink">{title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-ink/65">{text}</p>
-                <div className="mt-4 font-black text-brand text-lg">{price}</div>
-              </div>
-
-              <div className="mt-8 border-t border-border pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                <Link
-                  to={href}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-brand"
-                >
-                  Details <ArrowRight className="size-3.5" />
-                </Link>
-                <Link
-                  to="/book"
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-md shadow-brand/20 transition-all hover:scale-105 hover:bg-brand/90 hover:shadow-lg"
-                >
-                  <Calendar className="size-3.5" />
-                  <span>BOOK SERVICE</span>
-                </Link>
-              </div>
-            </article>
+                <div className="mt-8 border-t border-border pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                  <Link
+                    to={href}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-brand"
+                  >
+                    Details <ArrowRight className="size-3.5" />
+                  </Link>
+                  <Link
+                    to="/book"
+                    className="flex items-center justify-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-md shadow-brand/20 transition-all hover:scale-105 hover:bg-brand/90 hover:shadow-lg"
+                  >
+                    <Calendar className="size-3.5" />
+                    <span>BOOK SERVICE</span>
+                  </Link>
+                </div>
+              </article>
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -559,54 +576,58 @@ function Services() {
 
 function BookOnlineSection() {
   return (
-    <section id="book-online" className="relative py-12 sm:py-20 px-4 md:px-8 overflow-hidden bg-background">
+    <section id="book-online" className="relative py-16 sm:py-24 px-4 md:px-8 overflow-hidden bg-background">
       <div className="mx-auto max-w-7xl">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-3">
-          <Badge>ONLINE SERVICE BOOKING</Badge>
-          <h2 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight">
-            Book Certified AC Service in 5 Easy Steps
-          </h2>
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Select your service, AC type, unit count, address, and arrival time. Get instant WhatsApp confirmation with live technician assignment.
-          </p>
-        </div>
+        <ScrollReveal>
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-3">
+            <Badge>ONLINE SERVICE BOOKING</Badge>
+            <h2 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight">
+              Book Certified AC Service in 5 Easy Steps
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              Select your service, AC type, unit count, address, and arrival time. Get instant WhatsApp confirmation with live technician assignment.
+            </p>
+          </div>
+        </ScrollReveal>
 
         {/* Framer-Style Blue Banner Card with Concentric Ripple Circles */}
-        <div className="relative rounded-3xl sm:rounded-[2.5rem] bg-[#0084f6] text-white shadow-2xl overflow-hidden border border-white/20">
-          {/* Subtle Concentric Rings centered behind the technician */}
-          <div className="absolute left-[20%] top-[50%] -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0">
-            <div className="size-[260px] sm:size-[340px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/25 bg-white/5" />
-            <div className="size-[420px] sm:size-[520px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/15" />
-            <div className="size-[600px] sm:size-[720px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/10" />
-            <div className="size-[800px] sm:size-[940px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/5" />
-          </div>
-
-          {/* Grid Layout: Left Technician Cutout, Right Translucent 5-Step Wizard Card */}
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 pb-0">
-            {/* Left Column: Technician Cutout holding Toolbox (Flush to bottom edge) */}
-            <div className="lg:col-span-5 flex flex-col items-center lg:items-start justify-end self-end order-2 lg:order-1 pt-2 lg:pt-0 pb-0 mb-0 leading-none">
-              <picture className="block w-full flex justify-center lg:justify-start items-end leading-none">
-                <source srcSet="/tool-box-man.avif" type="image/avif" />
-                <img
-                  src="/tool-box-man.png"
-                  alt="EGS Certified AC Technician with Tool Box"
-                  width={720}
-                  height={960}
-                  loading="lazy"
-                  className="block w-auto h-auto max-h-[380px] sm:max-h-[460px] lg:max-h-[520px] object-contain object-bottom drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)] select-none pointer-events-none align-bottom -mb-1"
-                />
-              </picture>
+        <ScrollReveal delayMs={100}>
+          <div className="relative rounded-3xl sm:rounded-[2.5rem] bg-[#0084f6] text-white shadow-2xl overflow-hidden border border-white/20">
+            {/* Subtle Concentric Rings centered behind the technician */}
+            <div className="absolute left-[20%] top-[50%] -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0">
+              <div className="size-[260px] sm:size-[340px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/25 bg-white/5" />
+              <div className="size-[420px] sm:size-[520px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/15" />
+              <div className="size-[600px] sm:size-[720px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/10" />
+              <div className="size-[800px] sm:size-[940px] -translate-x-1/2 -translate-y-1/2 absolute rounded-full border border-white/5" />
             </div>
 
-            {/* Right Column: 5-Step Wizard inside Glassmorphism Container */}
-            <div className="lg:col-span-7 order-1 lg:order-2 w-full pt-1 pb-5 sm:pb-7">
-              <div className="rounded-2xl sm:rounded-3xl bg-[#0074db]/65 sm:bg-[#0074db]/50 backdrop-blur-md p-3.5 sm:p-5 md:p-6 border border-white/20 shadow-2xl text-left">
-                <BookingWizard theme="glass-blue" />
+            {/* Grid Layout: Left Technician Cutout, Right Translucent 5-Step Wizard Card */}
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 pb-0">
+              {/* Left Column: Technician Cutout holding Toolbox (Flush to bottom edge) */}
+              <div className="lg:col-span-5 flex flex-col items-center lg:items-start justify-end self-end order-2 lg:order-1 pt-2 lg:pt-0 pb-0 mb-0 leading-none">
+                <picture className="block w-full flex justify-center lg:justify-start items-end leading-none">
+                  <source srcSet="/tool-box-man.avif" type="image/avif" />
+                  <img
+                    src="/tool-box-man.png"
+                    alt="EGS Certified AC Technician with Tool Box"
+                    width={720}
+                    height={960}
+                    loading="lazy"
+                    className="block w-auto h-auto max-h-[380px] sm:max-h-[460px] lg:max-h-[520px] object-contain object-bottom drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)] select-none pointer-events-none align-bottom -mb-1"
+                  />
+                </picture>
+              </div>
+
+              {/* Right Column: 5-Step Wizard inside Glassmorphism Container */}
+              <div className="lg:col-span-7 order-1 lg:order-2 w-full pt-1 pb-5 sm:pb-7">
+                <div className="rounded-2xl sm:rounded-3xl bg-[#0074db]/65 sm:bg-[#0074db]/50 backdrop-blur-md p-3.5 sm:p-5 md:p-6 border border-white/20 shadow-2xl text-left">
+                  <BookingWizard theme="glass-blue" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );
@@ -698,22 +719,24 @@ const steps = [
 
 function Process() {
   return (
-    <section className="bg-[oklch(0.972_0.014_250)] py-24">
+    <section className="bg-[oklch(0.972_0.014_250)] py-20 sm:py-24">
       <div className="mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-2">
-        <ol className="relative border-l border-brand/25 pl-8">
-          {steps.map(({ n, title, text }) => (
-            <li key={n} className="relative pb-12 last:pb-0">
-              <span className="absolute -left-[2.28rem] top-2 grid size-4 place-items-center rounded-full border-2 border-brand bg-background">
-                <span className="size-1.5 rounded-full bg-brand" />
-              </span>
-              <p className="text-sm font-bold tracking-[0.08em] text-brand uppercase">Step – {n}</p>
-              <h3 className="mt-2 text-3xl font-extrabold md:text-4xl">{title}</h3>
-              <p className="mt-2 text-lg text-ink/60">{text}</p>
-            </li>
-          ))}
-        </ol>
+        <ScrollReveal>
+          <ol className="relative border-l border-brand/25 pl-8">
+            {steps.map(({ n, title, text }) => (
+              <li key={n} className="relative pb-12 last:pb-0">
+                <span className="absolute -left-[2.28rem] top-2 grid size-4 place-items-center rounded-full border-2 border-brand bg-background">
+                  <span className="size-1.5 rounded-full bg-brand" />
+                </span>
+                <p className="text-sm font-bold tracking-[0.08em] text-brand uppercase">Step – {n}</p>
+                <h3 className="mt-2 text-3xl font-extrabold md:text-4xl">{title}</h3>
+                <p className="mt-2 text-lg text-ink/60">{text}</p>
+              </li>
+            ))}
+          </ol>
+        </ScrollReveal>
 
-        <div className="lg:pl-6">
+        <ScrollReveal delayMs={100} className="lg:pl-6">
           <Badge tone="white">HOW WE WORK</Badge>
           <h2 className="mt-6 text-4xl leading-tight font-extrabold md:text-6xl">
             Our Working Process
@@ -724,9 +747,9 @@ function Process() {
             width={1000}
             height={800}
             loading="lazy"
-            className="mt-10 w-full rounded-2xl object-cover"
+            className="mt-10 w-full rounded-2xl object-cover shadow-lg"
           />
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );
@@ -743,28 +766,32 @@ function Team() {
   return (
     <section id="team" className="bg-background py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <Badge tone="white">MEET WITH OUR TECHNICIAN</Badge>
-        <h2 className="mt-6 text-4xl font-extrabold md:text-6xl">Our Skilled Team</h2>
+        <ScrollReveal>
+          <Badge tone="white">MEET WITH OUR TECHNICIAN</Badge>
+          <h2 className="mt-6 text-4xl font-extrabold md:text-6xl">Our Skilled Team</h2>
+        </ScrollReveal>
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {team.map(({ img, name, role }) => (
-            <article key={name} className="group relative overflow-hidden rounded-2xl">
-              <img
-                src={img}
-                alt={`${name}, ${role}`}
-                width={800}
-                height={1000}
-                loading="lazy"
-                className="h-[30rem] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <span className="absolute top-5 left-5 grid size-11 place-items-center rounded-lg bg-background">
-                <Plus className="size-5" />
-              </span>
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/80 to-transparent p-6 pt-16">
-                <h3 className="text-3xl font-extrabold text-background">{name}</h3>
-                <p className="text-sm text-background/80">{role}</p>
-              </div>
-            </article>
+          {team.map(({ img, name, role }, idx) => (
+            <ScrollReveal key={name} delayMs={idx * 60} className="h-full">
+              <article className="group relative overflow-hidden rounded-2xl h-full">
+                <img
+                  src={img}
+                  alt={`${name}, ${role}`}
+                  width={800}
+                  height={1000}
+                  loading="lazy"
+                  className="h-[30rem] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <span className="absolute top-5 left-5 grid size-11 place-items-center rounded-lg bg-background">
+                  <Plus className="size-5" />
+                </span>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/80 to-transparent p-6 pt-16">
+                  <h3 className="text-3xl font-extrabold text-background">{name}</h3>
+                  <p className="text-sm text-background/80">{role}</p>
+                </div>
+              </article>
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -775,57 +802,59 @@ function Team() {
 function CallToAction() {
   return (
     <section className="bg-background px-6 py-16">
-      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl cool-stripes px-6 py-28 text-center">
-        <img
-          src={cta2}
-          alt="Technician cleaning an AC filter"
-          width={600}
-          height={600}
-          loading="lazy"
-          className="absolute bottom-10 left-6 hidden size-56 blob-shape border-4 border-background object-cover lg:block"
-        />
-        <img
-          src={cta1}
-          alt="Smiling AC service technician"
-          width={600}
-          height={600}
-          loading="lazy"
-          className="absolute top-10 right-6 hidden size-56 blob-shape border-4 border-background object-cover lg:block"
-        />
-        <Badge tone="white">COMFORT RESTORED</Badge>
-        <h2 className="mx-auto mt-8 max-w-3xl text-4xl leading-tight font-extrabold md:text-6xl">
-          Ready to Upgrade Your Cooling System?
-        </h2>
-        
-        {/* 3 Prominent Home Page Action Buttons */}
-        <div className="mt-10 flex flex-wrap justify-center items-center gap-4">
-          <Link
-            to="/book"
-            className="flex items-center gap-2 rounded-2xl bg-brand px-8 py-4 text-base font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90"
-          >
-            <Calendar className="size-5" />
-            <span>Book a service</span>
-          </Link>
-          <a
-            href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I would like to schedule an AC inspection or upgrade.")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackWhatsAppClick("home_bottom_cta")}
-            className="flex items-center gap-2 rounded-2xl bg-[#25D366] px-8 py-4 text-base font-black uppercase tracking-wider text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
-          >
-            <WhatsAppIcon className="size-5 fill-current" />
-            <span>WhatsApp us</span>
-          </a>
-          <a
-            href={`tel:${EGS_CALL_NUMBER}`}
-            onClick={() => trackCallClick("home_bottom_cta")}
-            className="flex items-center gap-2 rounded-2xl border-2 border-border bg-background px-8 py-4 text-base font-black uppercase tracking-wider text-ink shadow-md transition-all hover:scale-105 hover:bg-surface"
-          >
-            <Phone className="size-5 text-brand" />
-            <span>Call now</span>
-          </a>
+      <ScrollReveal>
+        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl cool-stripes px-6 py-28 text-center">
+          <img
+            src={cta2}
+            alt="Technician cleaning an AC filter"
+            width={600}
+            height={600}
+            loading="lazy"
+            className="absolute bottom-10 left-6 hidden size-56 blob-shape border-4 border-background object-cover lg:block"
+          />
+          <img
+            src={cta1}
+            alt="Smiling AC service technician"
+            width={600}
+            height={600}
+            loading="lazy"
+            className="absolute top-10 right-6 hidden size-56 blob-shape border-4 border-background object-cover lg:block"
+          />
+          <Badge tone="white">COMFORT RESTORED</Badge>
+          <h2 className="mx-auto mt-8 max-w-3xl text-4xl leading-tight font-extrabold md:text-6xl">
+            Ready to Upgrade Your Cooling System?
+          </h2>
+          
+          {/* 3 Prominent Home Page Action Buttons */}
+          <div className="mt-10 flex flex-wrap justify-center items-center gap-4">
+            <Link
+              to="/book"
+              className="flex items-center gap-2 rounded-2xl bg-brand px-8 py-4 text-base font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90"
+            >
+              <Calendar className="size-5" />
+              <span>Book a service</span>
+            </Link>
+            <a
+              href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I would like to schedule an AC inspection or upgrade.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick("home_bottom_cta")}
+              className="flex items-center gap-2 rounded-2xl bg-[#25D366] px-8 py-4 text-base font-black uppercase tracking-wider text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
+            >
+              <WhatsAppIcon className="size-5 fill-current" />
+              <span>WhatsApp us</span>
+            </a>
+            <a
+              href={`tel:${EGS_CALL_NUMBER}`}
+              onClick={() => trackCallClick("home_bottom_cta")}
+              className="flex items-center gap-2 rounded-2xl border-2 border-border bg-background px-8 py-4 text-base font-black uppercase tracking-wider text-ink shadow-md transition-all hover:scale-105 hover:bg-surface"
+            >
+              <Phone className="size-5 text-brand" />
+              <span>Call now</span>
+            </a>
+          </div>
         </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }
@@ -1097,99 +1126,104 @@ function RegionalHubsDirectory() {
   return (
     <section className="bg-surface/50 py-20 sm:py-24 border-y border-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto">
-          <Badge>REGIONAL HUBS &amp; DIRECT HELPLINE</Badge>
-          <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-ink">
-            Direct Branch Helpline &amp; Service Centers
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-ink/70 leading-relaxed">
-            Fast 90-minute technician dispatch from verified EGS INDIA service hubs across Kerala and Tamil Nadu. Call your regional desk directly or book online.
-          </p>
-        </div>
+        <ScrollReveal>
+          <div className="text-center max-w-3xl mx-auto">
+            <Badge>REGIONAL HUBS &amp; DIRECT HELPLINE</Badge>
+            <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-ink">
+              Direct Branch Helpline &amp; Service Centers
+            </h2>
+            <p className="mt-4 text-sm sm:text-base text-ink/70 leading-relaxed">
+              Fast 90-minute technician dispatch from verified EGS INDIA service hubs across Kerala and Tamil Nadu. Call your regional desk directly or book online.
+            </p>
+          </div>
+        </ScrollReveal>
 
         <div className="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {REGIONAL_BRANCHES_DATA.map((branch) => (
-            <div
-              key={branch.city}
-              className={`rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:shadow-xl bg-card ${
-                branch.isHQ
-                  ? "border-brand/40 shadow-md ring-1 ring-brand/20"
-                  : "border-border hover:border-brand/40"
-              }`}
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <h3 className="text-xl font-extrabold text-foreground tracking-tight">
-                    {branch.city}
-                  </h3>
-                  <span
-                    className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
-                      branch.isHQ
-                        ? "bg-brand text-brand-foreground"
-                        : "bg-brand-soft text-brand"
-                    }`}
-                  >
-                    {branch.tag}
-                  </span>
-                </div>
-
-                <div className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium mb-6">
-                  <MapPin className="size-4 text-brand shrink-0 mt-0.5" />
-                  <span>{branch.address}</span>
-                </div>
-              </div>
-
-              <div className="mt-auto space-y-3.5 pt-4 border-t border-border/70">
+          {REGIONAL_BRANCHES_DATA.map((branch, idx) => (
+            <ScrollReveal key={branch.city} delayMs={idx * 50} className="h-full">
+              <div
+                className={`rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:shadow-xl bg-card h-full ${
+                  branch.isHQ
+                    ? "border-brand/40 shadow-md ring-1 ring-brand/20"
+                    : "border-border hover:border-brand/40"
+                }`}
+              >
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-2">
-                    Direct Phone Numbers:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {branch.phones.map((p) => (
-                      <a
-                        key={p.number}
-                        href={`tel:${p.number}`}
-                        onClick={() => trackCallClick(`branch_${branch.city.toLowerCase()}`)}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-foreground hover:border-brand hover:text-brand hover:bg-brand-soft/40 transition-colors shadow-xs"
-                      >
-                        <Phone className="size-3 text-brand" />
-                        <span>{p.formatted}</span>
-                      </a>
-                    ))}
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <h3 className="text-xl font-extrabold text-foreground tracking-tight">
+                      {branch.city}
+                    </h3>
+                    <span
+                      className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                        branch.isHQ
+                          ? "bg-brand text-brand-foreground"
+                          : "bg-brand-soft text-brand"
+                      }`}
+                    >
+                      {branch.tag}
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium mb-6">
+                    <MapPin className="size-4 text-brand shrink-0 mt-0.5" />
+                    <span>{branch.address}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-1 text-xs">
-                  <a
-                    href={`mailto:${branch.email}`}
-                    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-brand transition-colors font-medium"
-                  >
-                    <Mail className="size-3.5" />
-                    <span>{branch.email}</span>
-                  </a>
+                <div className="mt-auto space-y-3.5 pt-4 border-t border-border/70">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-2">
+                      Direct Phone Numbers:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {branch.phones.map((p) => (
+                        <a
+                          key={p.number}
+                          href={`tel:${p.number}`}
+                          onClick={() => trackCallClick(`branch_${branch.city.toLowerCase()}`)}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-foreground hover:border-brand hover:text-brand hover:bg-brand-soft/40 transition-colors shadow-xs"
+                        >
+                          <Phone className="size-3 text-brand" />
+                          <span>{p.formatted}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
 
-                  <Link
-                    to="/book"
-                    className="inline-flex items-center gap-1 font-bold text-brand hover:underline"
-                  >
-                    <span>Book Service</span>
-                    <ArrowRight className="size-3" />
-                  </Link>
+                  <div className="flex items-center justify-between pt-1 text-xs">
+                    <a
+                      href={`mailto:${branch.email}`}
+                      className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-brand transition-colors font-medium"
+                    >
+                      <Mail className="size-3.5" />
+                      <span>{branch.email}</span>
+                    </a>
+
+                    <Link
+                      to="/book"
+                      className="inline-flex items-center gap-1 font-bold text-brand hover:underline"
+                    >
+                      <span>Book Service</span>
+                      <ArrowRight className="size-3" />
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
 
-        <div className="mt-10 sm:mt-12 text-center">
-          <Link
-            to="/service-areas"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-brand hover:underline"
-          >
-            <span>Explore all detailed coverage areas, landmarks &amp; response times across South India</span>
-            <ArrowRight className="size-4" />
-          </Link>
-        </div>
+        <ScrollReveal delayMs={100}>
+          <div className="mt-10 sm:mt-12 text-center">
+            <Link
+              to="/service-areas"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-brand hover:underline"
+            >
+              <span>Explore all detailed coverage areas, landmarks &amp; response times across South India</span>
+              <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );

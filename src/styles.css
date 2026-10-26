@@ -149,6 +149,12 @@
     border-color: var(--color-border);
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   html,
   body {
     overflow-x: hidden;
