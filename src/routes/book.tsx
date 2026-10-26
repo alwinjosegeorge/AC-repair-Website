@@ -47,7 +47,7 @@ function BookingPage() {
             {/* Trust Highlights */}
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-2 text-xs font-bold">
               <span className="flex items-center gap-1.5 text-emerald-600">
-                <CheckCircle2 className="size-4" /> Flat ₹499 Jet Wash
+                <CheckCircle2 className="size-4" /> Flat ₹800 full body service
               </span>
               <span className="text-muted-foreground/30">•</span>
               <span className="flex items-center gap-1.5 text-brand">

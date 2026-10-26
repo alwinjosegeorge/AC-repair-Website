@@ -228,7 +228,7 @@ function Hero() {
         {/* Trust Badges */}
         <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs font-semibold text-ink/75">
           <span className="flex items-center gap-1 text-emerald-600">
-            <CheckCircle2 className="size-3.5" /> Flat ₹499 Jet Wash
+            <CheckCircle2 className="size-3.5" /> Flat ₹800 full body service
           </span>
           <span className="text-muted-foreground/30">•</span>
           <span className="flex items-center gap-1 text-brand">
@@ -477,7 +477,7 @@ const services = [
     icon: AirVent,
     title: "AC Deep Service",
     href: "/services/ac-service",
-    price: "From ₹499",
+    price: "From ₹800",
     badge: "Most Popular",
     text: "High-pressure power jet pump wash, chemical foam cleaning, and deep coil sanitization.",
   },

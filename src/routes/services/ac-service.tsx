@@ -26,15 +26,15 @@ function ACServicePage() {
     <ServiceLandingTemplate
       category="ac-service"
       serviceTitle="AC Deep Jet Service"
-      badgeText="Google & Meta Ad Special • Flat ₹499"
+      badgeText="Google & Meta Ad Special • Flat ₹800"
       headline="High-Pressure Power Jet AC Service & Sanitization"
       subheadline="Restore icy cooling, boost energy efficiency, and eliminate bacteria and dust with 2X deeper high-pressure jet pump cleaning."
-      startingPrice="₹499"
+      startingPrice="₹800"
       packages={[
         {
-          name: "Basic Power Jet Service",
-          price: "₹499",
-          originalPrice: "₹799",
+          name: "Full Body AC Service",
+          price: "₹800",
+          originalPrice: "₹1,199",
           badge: "Most Popular",
           popular: true,
           features: [
@@ -48,11 +48,11 @@ function ACServicePage() {
         },
         {
           name: "Deep Chemical Foam Wash",
-          price: "₹799",
-          originalPrice: "₹1,199",
+          price: "₹1,099",
+          originalPrice: "₹1,499",
           badge: "Deep Disinfection",
           features: [
-            "Everything in Basic Power Jet Service",
+            "Everything in Full Body AC Service",
             "Specialized biodegradable foam spray on coils",
             "Foul odor & mold disinfection treatment",
             "Anti-bacterial coating on indoor louvers",
@@ -62,8 +62,8 @@ function ACServicePage() {
         },
         {
           name: "Dual Unit Combo Wash (2 ACs)",
-          price: "₹899",
-          originalPrice: "₹1,598",
+          price: "₹1,499",
+          originalPrice: "₹1,999",
           badge: "Save 45%",
           features: [
             "Complete Power Jet wash for 2 AC units",
