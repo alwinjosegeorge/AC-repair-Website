@@ -258,7 +258,7 @@ function Hero() {
         value="12k+"
       />
 
-      <div className="relative mx-auto mt-12 sm:mt-16 max-w-5xl px-4 sm:px-6">
+      <div className="relative mx-auto mt-12 sm:mt-16 md:mt-16 md:-mb-16 max-w-5xl px-4 sm:px-6">
         <CoolAirFlow />
       </div>
     </section>
@@ -271,7 +271,7 @@ function QuickActionBar() {
   )}`;
 
   return (
-    <section className="relative z-20 mt-6 sm:mt-10 md:mt-14 px-4 md:px-8">
+    <section className="relative z-20 mt-6 sm:mt-10 md:-mt-6 px-4 md:px-8">
       <div className="mx-auto max-w-6xl rounded-3xl border-2 border-brand/20 bg-background/95 p-6 shadow-2xl backdrop-blur-md md:p-8">
         <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
           <div className="max-w-xl">
