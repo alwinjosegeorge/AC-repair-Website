@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { Phone, Mail, MapPin } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
-
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 
 function ContactPage() {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
@@ -19,35 +19,51 @@ function ContactPage() {
 
   const locations = [
     {
-      title: "Kollam",
-      address: "KMC/46/322, First Floor, VT Tower, Nr District Hospital, Hospital Road, Kollam-691001",
-      phone: "9895688833, 04742950513",
-      email: "info@egsindia.in"
+      title: "Kollam (Headquarters)",
+      address: "KMC/46/322, First Floor, VT Tower, Nr District Hospital, Hospital Road, Kollam - 691001",
+      phones: [
+        { label: "Mobile", number: "9895688833", formatted: "+91 98956 88833" },
+        { label: "Landline", number: "04742950513", formatted: "0474 2950513" },
+      ],
+      email: "info@egsindia.in",
     },
     {
-      title: "Thiruvananthapuram",
-      address: "Mahesh Estates, TC 29/4590 CV Raman Pillai Road, Vazhuthacaud Trivandrum, Kerala, 695014",
-      phone: "04714248080, 8589035555",
-      email: "info@egsindia.in"
+      title: "Thiruvananthapuram (Trivandrum)",
+      address: "Mahesh Estates, TC 29/4590 CV Raman Pillai Road, Vazhuthacaud, Trivandrum, Kerala - 695014",
+      phones: [
+        { label: "Landline", number: "04714248080", formatted: "0471-4248080" },
+        { label: "Mobile", number: "8589035555", formatted: "+91 85890 35555" },
+      ],
+      email: "info@egsindia.in",
     },
     {
-      title: "Ernakulam",
-      address: "Second Floor, Pukalakkatt Building Changampuzha Park, Metro Pillar No. 465, Near Changampuzha Metro Station Edapally, Elamakkara PO, Cochin- 26, Kerala, 682026",
-      phone: "8589935555, 04844010280",
-      email: "info@egsindia.in"
+      title: "Ernakulam (Cochin)",
+      address: "Second Floor, Pukalakkatt Building Changampuzha Park, Metro Piller No. 465, Near Changampuzha Metro Station Edapally, Elamakkara PO, Cochin - 682026",
+      phones: [
+        { label: "Landline", number: "04844010280", formatted: "0484 4010280" },
+        { label: "Mobile", number: "8589935555", formatted: "+91 85899 35555" },
+      ],
+      email: "info@egsindia.in",
     },
     {
       title: "Thrissur",
-      address: "17/81/15 A Tower Calvary Junction Poothole Road Poothole, Thrissur Kerala 680004",
-      phone: "9995997755, 8943571111",
-      email: "info@egsindia.in"
+      address: "17/81/15 A Tower, Calvary Junction, Poothole Road, Poothole, Thrissur, Kerala - 680004",
+      phones: [
+        { label: "Mobile 1", number: "8943312261", formatted: "+91 89433 12261" },
+        { label: "Mobile 2", number: "8943571111", formatted: "+91 89435 71111" },
+        { label: "Office", number: "9995997766", formatted: "+91 99959 97766" },
+      ],
+      email: "info@egsindia.in",
     },
     {
       title: "Chennai",
-      address: "Periyamet, Chennai, Tamil Nadu 600003",
-      phone: "9895887755, 9061555444",
-      email: "info@egsindia.in"
-    }
+      address: "Periyamet, Chennai, Tamil Nadu - 600003",
+      phones: [
+        { label: "Mobile 1", number: "9995108080", formatted: "+91 99951 08080" },
+        { label: "Mobile 2", number: "9895887755", formatted: "+91 98958 87755" },
+      ],
+      email: "info@egsindia.in",
+    },
   ];
 
   return (
@@ -129,25 +145,41 @@ function ContactPage() {
             <h3 className="text-2xl font-bold text-ink mb-8">Regional Offices</h3>
             <div className="grid sm:grid-cols-2 gap-6">
               {locations.map((loc, idx) => (
-                <div key={idx} className="rounded-2xl border border-slate-100 bg-slate-50 p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
-                  <h4 className="text-lg font-bold text-[#1888ff] mb-4">
-                    {loc.title}
-                  </h4>
-                  <p className="text-sm text-ink/70 leading-relaxed font-medium mb-6">
-                    {loc.address}
+                <div key={idx} className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-lg font-bold text-brand">
+                      {loc.title}
+                    </h4>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-brand-soft text-brand">
+                      Active Hub
+                    </span>
+                  </div>
+                  <p className="text-xs text-ink/75 leading-relaxed font-medium mb-5">
+                    📍 {loc.address}
                   </p>
-                  <div className="mt-auto space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="size-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                        <svg className="size-4 text-[#1888ff]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      </div>
-                      <p className="text-sm font-semibold text-ink">{loc.phone}</p>
+
+                  <div className="mt-auto space-y-3 pt-3 border-t border-slate-200/60">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                      Direct Helplines:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {loc.phones.map((p) => (
+                        <a
+                          key={p.number}
+                          href={`tel:${p.number}`}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-white px-2.5 py-1 text-xs font-bold text-ink hover:border-brand hover:text-brand hover:bg-brand-soft/30 transition-colors"
+                        >
+                          <Phone className="size-3 text-brand" />
+                          <span>{p.formatted}</span>
+                        </a>
+                      ))}
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="size-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                        <svg className="size-4 text-[#1888ff]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                      </div>
-                      <p className="text-sm font-semibold text-ink">{loc.email}</p>
+
+                    <div className="flex items-center gap-2 pt-1 text-xs">
+                      <Mail className="size-3.5 text-muted-foreground" />
+                      <a href={`mailto:${loc.email}`} className="font-semibold text-brand hover:underline">
+                        {loc.email}
+                      </a>
                     </div>
                   </div>
                 </div>

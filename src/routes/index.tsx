@@ -1034,6 +1034,167 @@ function Blog() {
   );
 }
 
+const REGIONAL_BRANCHES_DATA = [
+  {
+    city: "Kollam",
+    tag: "Headquarters",
+    isHQ: true,
+    address: "KMC/46/322, First Floor, VT Tower, Nr District Hospital, Hospital Road, Kollam - 691001",
+    phones: [
+      { label: "Mobile", number: "9895688833", formatted: "+91 98956 88833" },
+      { label: "Landline", number: "04742950513", formatted: "0474 2950513" },
+    ],
+    email: "info@egsindia.in",
+  },
+  {
+    city: "Thiruvananthapuram",
+    tag: "Capital Regional Hub",
+    isHQ: false,
+    address: "Mahesh Estates, TC 29/4590 CV Raman Pillai Road, Vazhuthacaud, Trivandrum - 695014",
+    phones: [
+      { label: "Landline", number: "04714248080", formatted: "0471-4248080" },
+      { label: "Mobile", number: "8589035555", formatted: "+91 85890 35555" },
+    ],
+    email: "info@egsindia.in",
+  },
+  {
+    city: "Ernakulam (Cochin)",
+    tag: "Metro Commercial Hub",
+    isHQ: false,
+    address: "Second Floor, Pukalakkatt Building Changampuzha Park, Metro Piller No. 465, Near Changampuzha Metro Station Edapally, Cochin - 682026",
+    phones: [
+      { label: "Landline", number: "04844010280", formatted: "0484 4010280" },
+      { label: "Mobile", number: "8589935555", formatted: "+91 85899 35555" },
+    ],
+    email: "info@egsindia.in",
+  },
+  {
+    city: "Thrissur",
+    tag: "Cultural Capital Branch",
+    isHQ: false,
+    address: "17/81/15 A Tower, Calvary Junction, Poothole Road, Poothole, Thrissur - 680004",
+    phones: [
+      { label: "Mobile 1", number: "8943312261", formatted: "+91 89433 12261" },
+      { label: "Mobile 2", number: "8943571111", formatted: "+91 89435 71111" },
+      { label: "Office", number: "9995997766", formatted: "+91 99959 97766" },
+    ],
+    email: "info@egsindia.in",
+  },
+  {
+    city: "Chennai",
+    tag: "Tamil Nadu Regional Office",
+    isHQ: false,
+    address: "Periyamet, Chennai, Tamil Nadu - 600003",
+    phones: [
+      { label: "Mobile 1", number: "9995108080", formatted: "+91 99951 08080" },
+      { label: "Mobile 2", number: "9895887755", formatted: "+91 98958 87755" },
+    ],
+    email: "info@egsindia.in",
+  },
+];
+
+function RegionalHubsDirectory() {
+  return (
+    <section className="bg-surface/50 py-20 sm:py-24 border-y border-border">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto">
+          <Badge>REGIONAL HUBS &amp; DIRECT HELPLINE</Badge>
+          <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-ink">
+            Direct Branch Helpline &amp; Service Centers
+          </h2>
+          <p className="mt-4 text-sm sm:text-base text-ink/70 leading-relaxed">
+            Fast 90-minute technician dispatch from verified EGS INDIA service hubs across Kerala and Tamil Nadu. Call your regional desk directly or book online.
+          </p>
+        </div>
+
+        <div className="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {REGIONAL_BRANCHES_DATA.map((branch) => (
+            <div
+              key={branch.city}
+              className={`rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:shadow-xl bg-card ${
+                branch.isHQ
+                  ? "border-brand/40 shadow-md ring-1 ring-brand/20"
+                  : "border-border hover:border-brand/40"
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <h3 className="text-xl font-extrabold text-foreground tracking-tight">
+                    {branch.city}
+                  </h3>
+                  <span
+                    className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                      branch.isHQ
+                        ? "bg-brand text-brand-foreground"
+                        : "bg-brand-soft text-brand"
+                    }`}
+                  >
+                    {branch.tag}
+                  </span>
+                </div>
+
+                <div className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium mb-6">
+                  <MapPin className="size-4 text-brand shrink-0 mt-0.5" />
+                  <span>{branch.address}</span>
+                </div>
+              </div>
+
+              <div className="mt-auto space-y-3.5 pt-4 border-t border-border/70">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-2">
+                    Direct Phone Numbers:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {branch.phones.map((p) => (
+                      <a
+                        key={p.number}
+                        href={`tel:${p.number}`}
+                        onClick={() => trackCallClick(`branch_${branch.city.toLowerCase()}`)}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-foreground hover:border-brand hover:text-brand hover:bg-brand-soft/40 transition-colors shadow-xs"
+                      >
+                        <Phone className="size-3 text-brand" />
+                        <span>{p.formatted}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-1 text-xs">
+                  <a
+                    href={`mailto:${branch.email}`}
+                    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-brand transition-colors font-medium"
+                  >
+                    <Mail className="size-3.5" />
+                    <span>{branch.email}</span>
+                  </a>
+
+                  <Link
+                    to="/book"
+                    className="inline-flex items-center gap-1 font-bold text-brand hover:underline"
+                  >
+                    <span>Book Service</span>
+                    <ArrowRight className="size-3" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 sm:mt-12 text-center">
+          <Link
+            to="/service-areas"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-brand hover:underline"
+          >
+            <span>Explore all detailed coverage areas, landmarks &amp; response times across South India</span>
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Index() {
   return (
     <main className="bg-background">
@@ -1046,6 +1207,7 @@ function Index() {
       <BookOnlineSection />
       <Process />
       <Team />
+      <RegionalHubsDirectory />
       <CallToAction />
       <Footer />
     </main>

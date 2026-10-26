@@ -126,7 +126,7 @@ const SERVICE_HUBS: ServiceHub[] = [
     state: "Kerala",
     tag: "Cultural Capital Branch",
     address: "17/81/15, A Tower, Calvary Junction, Poothole Road, Poothole, Thrissur - 680004",
-    phones: ["+91 99959 97755", "+91 89435 71111"],
+    phones: ["+91 89433 12261", "+91 89435 71111", "+91 99959 97766"],
     email: "thrissur@egsindia.in",
     coverageAreas: [
       "Round South & North",
@@ -148,8 +148,8 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Chennai",
     state: "Tamil Nadu",
     tag: "Tamil Nadu Regional Office",
-    address: "No. 14, Sydenhams Road, Periyamet, Chennai, Tamil Nadu - 600003",
-    phones: ["+91 98958 87755", "+91 90615 55444"],
+    address: "Periyamet, Chennai, Tamil Nadu - 600003",
+    phones: ["+91 99951 08080", "+91 98958 87755"],
     email: "chennai@egsindia.in",
     coverageAreas: [
       "Periyamet",
