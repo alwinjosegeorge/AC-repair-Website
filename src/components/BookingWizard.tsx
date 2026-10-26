@@ -1516,11 +1516,11 @@ export function BookingWizard({
                 className={`flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-center transition-all cursor-pointer ${
                   dateOption === "today"
                     ? isGlass ? "border-white bg-white text-slate-900 shadow-lg font-bold" : "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
-                    : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50"
+                    : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50 text-foreground"
                 }`}
               >
-                <span className="text-xs font-black">Today</span>
-                <span className={`text-[9px] font-bold mt-0.5 ${dateOption === "today" && isGlass ? "text-slate-700" : "text-emerald-300"}`}>
+                <span className={`text-xs font-black ${dateOption === "today" && isGlass ? "text-slate-900" : (dateOption === "today" ? "text-brand" : (isGlass ? "text-white" : "text-foreground"))}`}>Today</span>
+                <span className={`text-[9px] font-bold mt-0.5 ${dateOption === "today" && isGlass ? "text-slate-700" : (dateOption === "today" ? "text-emerald-700" : (isGlass ? "text-emerald-300" : "text-emerald-600"))}`}>
                   ⚡ 90-Min
                 </span>
               </button>
@@ -1531,11 +1531,11 @@ export function BookingWizard({
                 className={`flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-center transition-all cursor-pointer ${
                   dateOption === "tomorrow"
                     ? isGlass ? "border-white bg-white text-slate-900 shadow-lg font-bold" : "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
-                    : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50"
+                    : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50 text-foreground"
                 }`}
               >
-                <span className="text-xs font-black">Tomorrow</span>
-                <span className={`text-[9px] font-semibold mt-0.5 ${dateOption === "tomorrow" && isGlass ? "text-slate-700" : "text-white/70"}`}>
+                <span className={`text-xs font-black ${dateOption === "tomorrow" && isGlass ? "text-slate-900" : (dateOption === "tomorrow" ? "text-brand" : (isGlass ? "text-white" : "text-foreground"))}`}>Tomorrow</span>
+                <span className={`text-[9px] font-semibold mt-0.5 ${dateOption === "tomorrow" && isGlass ? "text-slate-700" : (dateOption === "tomorrow" ? "text-brand/80" : (isGlass ? "text-white/70" : "text-muted-foreground"))}`}>
                   Scheduled
                 </span>
               </button>
@@ -1546,11 +1546,11 @@ export function BookingWizard({
                 className={`flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-center transition-all cursor-pointer ${
                   dateOption === "custom"
                     ? isGlass ? "border-white bg-white text-slate-900 shadow-lg font-bold" : "border-brand bg-brand/10 shadow-md ring-2 ring-brand/40"
-                    : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50"
+                    : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50 text-foreground"
                 }`}
               >
-                <span className="text-xs font-black">Pick Date</span>
-                <span className={`text-[9px] font-semibold mt-0.5 ${dateOption === "custom" && isGlass ? "text-slate-700" : "text-white/70"}`}>
+                <span className={`text-xs font-black ${dateOption === "custom" && isGlass ? "text-slate-900" : (dateOption === "custom" ? "text-brand" : (isGlass ? "text-white" : "text-foreground"))}`}>Pick Date</span>
+                <span className={`text-[9px] font-semibold mt-0.5 ${dateOption === "custom" && isGlass ? "text-slate-700" : (dateOption === "custom" ? "text-brand/80" : (isGlass ? "text-white/70" : "text-muted-foreground"))}`}>
                   Calendar
                 </span>
               </button>
@@ -1588,14 +1588,14 @@ export function BookingWizard({
                     className={`flex items-center justify-between rounded-xl border px-2.5 py-1.5 text-left transition-all cursor-pointer ${
                       isSelected
                         ? isGlass ? "border-white bg-white text-slate-900 shadow-md font-bold" : "border-brand bg-brand text-brand-foreground shadow-md"
-                        : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50"
+                        : isGlass ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-border bg-surface/50 text-foreground hover:bg-surface"
                     }`}
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <Clock className={`size-3 shrink-0 ${isSelected && isGlass ? "text-slate-900" : "text-white/80"}`} />
-                      <span className="text-[11px] font-bold leading-tight">{slot.label}</span>
+                      <Clock className={`size-3 shrink-0 ${isSelected ? (isGlass ? "text-slate-900" : "text-brand-foreground") : (isGlass ? "text-white/80" : "text-muted-foreground")}`} />
+                      <span className={`text-[11px] font-bold leading-tight ${isSelected ? (isGlass ? "text-slate-900" : "text-brand-foreground") : (isGlass ? "text-white" : "text-foreground")}`}>{slot.label}</span>
                     </div>
-                    {isSelected && <Check className="size-3.5 text-slate-900 shrink-0 stroke-[3]" />}
+                    {isSelected && <Check className={`size-3.5 shrink-0 stroke-[3] ${isGlass ? "text-slate-900" : "text-brand-foreground"}`} />}
                   </button>
                 );
               })}
@@ -1622,19 +1622,29 @@ export function BookingWizard({
 
           {/* Complete Booking Review Card */}
           <div className={`rounded-xl border p-2.5 sm:p-3 text-xs ${
-            isGlass ? "border-white/20 bg-white/15 text-white" : "border-2 border-brand/20 bg-brand/5"
+            isGlass
+              ? "border-white/20 bg-white/15 text-white"
+              : "border-2 border-brand/25 bg-brand/5 text-foreground shadow-xs"
           }`}>
-            <div className="flex items-center justify-between pb-1.5 border-b border-white/15">
-              <span className="font-extrabold text-white">
+            <div className={`flex items-center justify-between pb-1.5 border-b ${
+              isGlass ? "border-white/15" : "border-brand/15"
+            }`}>
+              <span className={`font-black ${isGlass ? "text-white" : "text-foreground"}`}>
                 {currentServiceObj.emoji} {currentServiceObj.title} • {acType} ({effectiveUnits} {effectiveUnits === 1 ? "Unit" : "Units"})
               </span>
-              <span className="font-black text-sm text-white">
+              <span className={`font-black text-sm ${isGlass ? "text-white" : "text-brand"}`}>
                 {estimatedTotal > 0 ? `₹${estimatedTotal.toLocaleString("en-IN")}` : currentServiceObj.priceText}
               </span>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-1 pt-1.5 text-[10px] text-white/80">
-              <span>📍 {[area, city].filter(Boolean).join(", ") || "Service Address"}</span>
-              <span className="text-emerald-300 font-bold">✓ Pay After Service (Cash/UPI)</span>
+            <div className={`flex flex-wrap items-center justify-between gap-1 pt-1.5 text-[10px] ${
+              isGlass ? "text-white/80" : "text-muted-foreground"
+            }`}>
+              <span className={`font-medium ${isGlass ? "text-white/90" : "text-foreground/80"}`}>
+                📍 {[area, city].filter(Boolean).join(", ") || "Service Address"}
+              </span>
+              <span className={isGlass ? "text-emerald-300 font-bold" : "text-emerald-600 font-bold"}>
+                ✓ Pay After Service (Cash/UPI)
+              </span>
             </div>
           </div>
 
