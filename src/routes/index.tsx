@@ -334,26 +334,73 @@ function QuickActionBar() {
   );
 }
 
-function Marquee() {
-  const items = [
-    "Comfort Restored",
-    "Reliable Cooling",
-    "Perfect Comfort",
-    "Get Fast & Reliable AC Service",
-  ];
+function BreezeIconTwo() {
   return (
-    <div className="relative py-14 overflow-hidden">
+    <svg
+      className="mx-4 sm:mx-8 h-6 w-7 sm:h-9 sm:w-10 text-[#60a5fa] shrink-0 inline-block align-middle"
+      viewBox="0 0 36 28"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M4 14C4 6.5 9 2 16 2V26C9 26 4 21.5 4 14Z" fill="#60a5fa" />
+      <path d="M20 2C27 2 32 6.5 32 14C32 21.5 27 26 20 26V2Z" fill="#60a5fa" />
+    </svg>
+  );
+}
+
+function BreezeIconThree() {
+  return (
+    <svg
+      className="mx-4 sm:mx-8 h-6 w-9 sm:h-9 sm:w-12 text-[#60a5fa] shrink-0 inline-block align-middle"
+      viewBox="0 0 46 28"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M7 14C7 7 9.5 2 13 2C16.5 2 19 7 19 14C19 21 16.5 26 13 26C9.5 26 7 21 7 14Z" fill="#60a5fa" opacity="0.9" />
+      <path d="M19 14C19 7 21.5 2 25 2C28.5 2 31 7 31 14C31 21 28.5 26 25 26C21.5 26 19 21 19 14Z" fill="#60a5fa" opacity="0.95" />
+      <path d="M31 14C31 7 33.5 2 37 2C40.5 2 43 7 43 14C43 21 40.5 26 37 26C33.5 26 31 21 31 14Z" fill="#60a5fa" />
+    </svg>
+  );
+}
+
+function Marquee() {
+  const marqueeItems = [
+    { text: "Comfort Restored", isBlue: false },
+    { text: "Reliable Cooling", isBlue: true },
+    { text: "Perfect Comfort", isBlue: false },
+    { text: "Get Fast & Reliable AC Service", isBlue: true },
+  ];
+
+  const renderItemSet = (keyPrefix: string) => (
+    <div key={keyPrefix} className="flex items-center shrink-0">
+      {marqueeItems.map((item, idx) => (
+        <span key={`${keyPrefix}-${item.text}`} className="flex items-center">
+          <span
+            className={`text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight transition-colors ${
+              item.isBlue ? "text-[#70a9ff] dark:text-[#93c5fd]" : "text-ink"
+            }`}
+          >
+            {item.text}
+          </span>
+          {idx % 2 === 0 ? <BreezeIconTwo /> : <BreezeIconThree />}
+        </span>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="relative py-10 sm:py-16 overflow-hidden select-none">
       {/* Background stripes that fade out at the bottom */}
       <div className="absolute inset-0 cool-stripes mask-bottom-fade -z-10" />
 
-      {/* Foreground text that remains fully opaque */}
-      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 px-4 text-2xl sm:text-4xl md:text-6xl font-extrabold tracking-tight">
-        {items.map((t, i) => (
-          <span key={t} className="flex items-center gap-3 sm:gap-6">
-            <Sparkles className="size-5 sm:size-8 text-brand/60" fill="currentColor" strokeWidth={0} />
-            <span className={i % 2 === 0 ? "text-brand" : "text-ink"}>{t}</span>
-          </span>
-        ))}
+      {/* Left and Right Edge Vignette Fades for seamless entrance & exit */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10" />
+
+      {/* Moving Marquee Ticker Track */}
+      <div className="animate-marquee-smooth flex items-center whitespace-nowrap">
+        {renderItemSet("set-1")}
+        {renderItemSet("set-2")}
       </div>
     </div>
   );
