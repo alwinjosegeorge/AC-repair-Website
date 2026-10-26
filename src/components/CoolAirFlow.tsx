@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Wind, Snowflake, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import acUnit from "@/assets/ac-unit.png";
 import acWaves from "@/assets/ac-waves.png";
 
@@ -8,34 +7,10 @@ interface CoolAirFlowProps {
 }
 
 export function CoolAirFlow({ className = "" }: CoolAirFlowProps) {
-  const [speedMode, setSpeedMode] = useState<"turbo" | "gentle">("turbo");
-  const isTurbo = speedMode === "turbo";
+  const isTurbo = true;
 
   return (
     <div className={`relative mx-auto w-full max-w-4xl select-none overflow-x-clip px-2 sm:px-4 ${className}`}>
-      {/* Floating Speed Control Pill above the AC Unit */}
-      <div className="absolute -top-7 sm:-top-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 sm:gap-2 rounded-full border border-sky-500/30 bg-background/90 px-2.5 py-1 sm:px-3.5 sm:py-1.5 text-[10px] sm:text-[11px] font-bold text-foreground shadow-lg backdrop-blur-md whitespace-nowrap">
-        <div className="flex items-center gap-1 text-sky-500">
-          <Snowflake className="size-3 sm:size-3.5 animate-spin" style={{ animationDuration: isTurbo ? "4s" : "9s" }} />
-          <span className="font-black text-sky-600 dark:text-sky-400">18°C</span>
-        </div>
-        <span className="text-muted-foreground/40">•</span>
-        <span className="text-muted-foreground hidden sm:inline">Cool Airflow:</span>
-        <button
-          type="button"
-          onClick={() => setSpeedMode(isTurbo ? "gentle" : "turbo")}
-          className={`flex items-center gap-1 rounded-full px-2 py-0.5 sm:px-2.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-            isTurbo
-              ? "bg-sky-500 text-white shadow-sm shadow-sky-500/30"
-              : "bg-surface text-muted-foreground hover:text-foreground"
-          }`}
-          title="Click to toggle Airflow speed"
-        >
-          <Wind className="size-2.5 sm:size-3" />
-          <span>{isTurbo ? "Turbo Breeze" : "Gentle Eco"}</span>
-        </button>
-      </div>
-
       {/* Assembly Container: Floats in physical unison */}
       <div className="relative w-full animate-ac-assembly-float">
         {/* ========================================================== */}
