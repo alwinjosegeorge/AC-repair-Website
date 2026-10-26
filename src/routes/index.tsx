@@ -159,14 +159,14 @@ function FloatingCard({
 
 function Hero() {
   return (
-    <section className="relative -mt-24 overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-24">
+    <section className="relative -mt-24 overflow-hidden isolate pt-32 pb-16 sm:pt-40 sm:pb-24">
       {/* Animated Flowing Cool Stripes Background */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-y-0 -left-6 w-[calc(100%+120px)] h-full cool-stripes-pattern animate-cool-stripes" />
-        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_15%,white_0%,transparent_65%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_15%,rgba(255,255,255,0.75)_0%,transparent_65%)]" />
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 text-center">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 text-center">
         <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-extrabold leading-tight sm:leading-[1.05] tracking-tight animate-fade-in-up">
           Service Reinvented.
           <span className="mt-1 sm:mt-2 block text-brand">
@@ -248,14 +248,14 @@ function Hero() {
       </div>
 
       <FloatingCard
-        className="top-1/2 left-4 xl:left-8 hidden xl:block"
+        className="top-1/2 left-4 xl:left-8 hidden xl:block z-20"
         rotate="-14deg"
         icon={<Recycle className="size-9 text-[oklch(0.72_0.19_150)]" strokeWidth={2.5} />}
         label="Energy Saved"
         value="50%"
       />
       <FloatingCard
-        className="top-28 right-4 xl:right-8 hidden xl:block"
+        className="top-28 right-4 xl:right-8 hidden xl:block z-20"
         rotate="10deg"
         icon={
           <span className="grid size-10 place-items-center rounded-full bg-brand text-brand-foreground">
@@ -266,7 +266,7 @@ function Hero() {
         value="12k+"
       />
 
-      <div className="relative mx-auto mt-8 sm:mt-12 md:mt-14 max-w-5xl px-4 sm:px-6">
+      <div className="relative z-10 mx-auto mt-8 sm:mt-12 md:mt-14 max-w-5xl px-4 sm:px-6">
         <CoolAirFlow />
       </div>
     </section>
@@ -396,9 +396,9 @@ function Marquee() {
   );
 
   return (
-    <div className="relative my-8 sm:my-12 py-3 sm:py-5 overflow-hidden select-none">
+    <div className="relative my-8 sm:my-12 py-3 sm:py-5 overflow-hidden isolate select-none">
       {/* Background stripes that fade out at the bottom */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden mask-bottom-fade">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden mask-bottom-fade">
         <div className="absolute inset-y-0 -left-6 w-[calc(100%+120px)] h-full cool-stripes-pattern animate-cool-stripes" />
       </div>
 
@@ -407,7 +407,7 @@ function Marquee() {
       <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10" />
 
       {/* Moving Marquee Ticker Track */}
-      <div className="animate-marquee-smooth flex items-center whitespace-nowrap">
+      <div className="relative z-10 animate-marquee-smooth flex items-center whitespace-nowrap">
         {renderItemSet("set-1")}
         {renderItemSet("set-2")}
       </div>
@@ -811,9 +811,9 @@ function CallToAction() {
   return (
     <section className="bg-background px-6 py-16">
       <ScrollReveal>
-        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl px-6 py-28 text-center">
+        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl isolate px-6 py-28 text-center">
           {/* Animated Flowing Cool Stripes Background */}
-          <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
             <div className="absolute inset-y-0 -left-6 w-[calc(100%+120px)] h-full cool-stripes-pattern animate-cool-stripes" />
             <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_10%,white_0%,transparent_60%)]" />
           </div>
