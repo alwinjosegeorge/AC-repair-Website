@@ -5,7 +5,6 @@ import {
   Clock,
   Sparkles,
   Phone,
-  MessageSquare,
   CheckCircle2,
   XCircle,
   Star,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 import { FloatingActions } from "./FloatingActions";
 import { BookingWizard } from "./BookingWizard";
 import { ServiceCategory, EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "../lib/store";
@@ -168,7 +168,7 @@ export function ServiceLandingTemplate({
                   onClick={() => trackWhatsAppClick("landing_hero", serviceTitle)}
                   className="flex items-center gap-2 rounded-2xl bg-[#25D366]/10 border border-[#25D366]/20 px-5 py-3.5 text-sm font-bold text-[#25D366] transition-colors hover:bg-[#25D366]/20"
                 >
-                  <MessageSquare className="size-4 fill-current" />
+                  <WhatsAppIcon className="size-4 fill-current" />
                   <span>Chat on WhatsApp</span>
                 </a>
               </div>

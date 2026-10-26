@@ -29,6 +29,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BookingWizard } from "@/components/BookingWizard";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "@/lib/store";
 import {
   captureTrackingParams,
@@ -197,7 +198,7 @@ function Hero() {
                 className="group relative flex flex-col items-center justify-center rounded-2xl bg-[#25D366] px-3 sm:px-6 py-3 sm:py-4 text-white shadow-lg shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59] active:scale-95 text-center"
               >
                 <div className="flex items-center gap-1.5 sm:gap-2">
-                  <MessageSquare className="size-4 sm:size-5 shrink-0 fill-current" />
+                  <WhatsAppIcon className="size-4 sm:size-5 shrink-0 fill-current" />
                   <span className="text-xs sm:text-base font-black tracking-wide uppercase">WhatsApp</span>
                 </div>
                 <span className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] font-semibold text-white/90">
@@ -305,7 +306,7 @@ function QuickActionBar() {
               onClick={() => trackWhatsAppClick("homepage_quick_bar")}
               className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
             >
-              <MessageSquare className="size-4 fill-current" />
+              <WhatsAppIcon className="size-4 fill-current" />
               <span>WhatsApp us</span>
             </a>
 
@@ -380,7 +381,7 @@ function Marquee() {
   );
 
   return (
-    <div className="relative py-10 sm:py-16 overflow-hidden select-none">
+    <div className="relative py-4 sm:py-6 overflow-hidden select-none">
       {/* Background stripes that fade out at the bottom */}
       <div className="absolute inset-0 cool-stripes mask-bottom-fade -z-10" />
 
@@ -399,7 +400,7 @@ function Marquee() {
 
 function About() {
   return (
-    <section id="about" className="bg-background py-24">
+    <section id="about" className="bg-background pt-6 sm:pt-10 pb-16 sm:pb-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center">
           <Badge>KNOW ABOUT US</Badge>
@@ -804,7 +805,7 @@ function CallToAction() {
             onClick={() => trackWhatsAppClick("home_bottom_cta")}
             className="flex items-center gap-2 rounded-2xl bg-[#25D366] px-8 py-4 text-base font-black uppercase tracking-wider text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
           >
-            <MessageSquare className="size-5 fill-current" />
+            <WhatsAppIcon className="size-5 fill-current" />
             <span>WhatsApp us</span>
           </a>
           <a

@@ -5,7 +5,6 @@ import { Footer } from "@/components/Footer";
 import {
   MapPin,
   Phone,
-  MessageSquare,
   Clock,
   ShieldCheck,
   CheckCircle2,
@@ -17,6 +16,7 @@ import {
 } from "lucide-react";
 import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "@/lib/store";
 import { trackCallClick, trackWhatsAppClick } from "@/lib/tracking";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export const Route = createFileRoute("/service-areas")({
   head: () => ({
@@ -323,7 +323,7 @@ function ServiceAreasPage() {
                         onClick={() => trackWhatsAppClick(`service_area_${hub.city.toLowerCase()}`)}
                         className="flex items-center gap-1.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 px-3.5 py-2 text-xs font-bold text-[#25D366] hover:bg-[#25D366]/20"
                       >
-                        <MessageSquare className="size-3.5 fill-current" />
+                        <WhatsAppIcon className="size-3.5 fill-current" />
                         <span>WhatsApp</span>
                       </a>
                     </div>

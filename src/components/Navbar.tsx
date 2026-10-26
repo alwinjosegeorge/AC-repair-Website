@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Phone,
-  MessageSquare,
   Menu,
   X,
   ChevronDown,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "../lib/store";
 import { trackCallClick, trackWhatsAppClick } from "../lib/tracking";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 export const SERVICE_LINKS = [
   {
@@ -165,7 +165,7 @@ export function Navbar() {
             onClick={() => trackWhatsAppClick("header_navbar")}
             className="flex items-center gap-1.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 px-3 py-2 text-xs font-bold text-[#25D366] transition-colors hover:bg-[#25D366]/20"
           >
-            <MessageSquare className="size-3.5 fill-current" />
+            <WhatsAppIcon className="size-3.5 fill-current" />
             <span>WhatsApp us</span>
           </a>
 
@@ -276,7 +276,7 @@ export function Navbar() {
                   onClick={() => trackWhatsAppClick("mobile_drawer")}
                   className="flex items-center justify-center gap-1.5 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 py-2.5 text-xs font-bold text-[#25D366]"
                 >
-                  <MessageSquare className="size-3.5 fill-current" />
+                  <WhatsAppIcon className="size-3.5 fill-current" />
                   <span>WhatsApp us</span>
                 </a>
               </div>

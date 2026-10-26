@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Phone, MessageSquare, Calendar, X } from "lucide-react";
+import { Phone, Calendar, X } from "lucide-react";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 import { EGS_WHATSAPP_NUMBER, EGS_CALL_NUMBER } from "../lib/store";
 import { trackCallClick, trackWhatsAppClick } from "../lib/tracking";
 import { BookingWizard } from "./BookingWizard";
@@ -44,7 +45,7 @@ export function FloatingActions() {
             onClick={() => trackWhatsAppClick("mobile_bottom_bar")}
             className="flex flex-1 flex-col items-center justify-center rounded-xl bg-[#25D366]/10 py-2 text-[#25D366] transition-transform active:scale-95 border border-[#25D366]/20"
           >
-            <MessageSquare className="size-5 fill-current" />
+            <WhatsAppIcon className="size-5 fill-current" />
             <span className="mt-0.5 text-[11px] font-bold">WhatsApp us</span>
           </a>
 
@@ -80,7 +81,7 @@ export function FloatingActions() {
           onClick={() => trackWhatsAppClick("desktop_floating_pill")}
           className="group flex items-center gap-2.5 rounded-full bg-[#25D366] px-4 py-2.5 text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:shadow-2xl"
         >
-          <MessageSquare className="size-4 fill-current" />
+          <WhatsAppIcon className="size-4 fill-current" />
           <span className="text-xs font-bold tracking-wide">WhatsApp us</span>
         </a>
 

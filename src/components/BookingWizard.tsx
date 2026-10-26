@@ -37,6 +37,7 @@ import {
   trackBookingComplete,
   trackWhatsAppClick,
 } from "../lib/tracking";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 interface BookingWizardProps {
   initialCategory?: ServiceCategory;
@@ -1287,7 +1288,7 @@ export function BookingWizard({
                       )}
                     </div>
                     <div className="relative">
-                      <MessageSquare className="absolute left-3 top-2.5 size-3.5 text-[#25D366]" />
+                      <WhatsAppIcon className="absolute left-3 top-2.5 size-3.5 text-[#25D366]" />
                       <input
                         type="tel"
                         required
@@ -1747,7 +1748,7 @@ export function BookingWizard({
               onClick={() => trackWhatsAppClick("booking_success_dispatch")}
               className="flex w-full sm:w-auto flex-1 items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-6 py-4 text-sm font-black uppercase tracking-wider text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
             >
-              <MessageSquare className="size-5 fill-current" />
+              <WhatsAppIcon className="size-5 fill-current" />
               <span>Send on WhatsApp</span>
             </a>
 

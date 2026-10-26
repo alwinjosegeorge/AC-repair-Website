@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BookingWizard } from "@/components/BookingWizard";
-import { ShieldCheck, Clock, Phone, MessageSquare, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Clock, Phone, CheckCircle2 } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "@/lib/store";
 import { trackCallClick, trackWhatsAppClick } from "@/lib/tracking";
 
@@ -115,7 +116,7 @@ function BookingPage() {
                 onClick={() => trackWhatsAppClick("booking_page")}
                 className="flex items-center gap-1.5 text-emerald-600 hover:underline"
               >
-                <MessageSquare className="size-4" />
+                <WhatsAppIcon className="size-4 fill-current" />
                 WhatsApp Us Directly
               </a>
             </div>
