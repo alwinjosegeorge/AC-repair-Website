@@ -11,7 +11,9 @@ export function FloatingActions() {
   // Don't render floating consumer actions inside admin or technician field portals
   if (
     typeof window !== "undefined" &&
-    (window.location.pathname.startsWith("/admin") || window.location.pathname.startsWith("/technician"))
+    (window.location.pathname.startsWith("/control-hub") ||
+      window.location.pathname.startsWith("/admin") ||
+      window.location.pathname.startsWith("/technician"))
   ) {
     return null;
   }

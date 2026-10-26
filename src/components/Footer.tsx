@@ -147,14 +147,6 @@ export function Footer() {
                 <Mail className="size-4" />
                 <span>info@egsindia.in</span>
               </div>
-              <div className="pt-2">
-                <Link
-                  to="/admin"
-                  className="inline-block rounded-lg bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white/90 hover:bg-white/20 transition-colors"
-                >
-                  Admin CRM Login ↗
-                </Link>
-              </div>
             </div>
           </div>
         </div>

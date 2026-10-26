@@ -266,12 +266,6 @@ export function TechnicianMobilePortal() {
             >
               <RefreshCw className="size-3.5" />
             </button>
-            <Link
-              to="/admin"
-              className="flex items-center gap-1 rounded-lg border border-brand/40 bg-brand/10 px-2.5 py-1.5 text-[11px] font-bold text-brand hover:bg-brand/20 transition-colors"
-            >
-              <span>Admin 📊</span>
-            </Link>
           </div>
         </div>
 

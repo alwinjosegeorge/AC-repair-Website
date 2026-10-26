@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ControlHubRouteImport } from './routes/control-hub'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ServiceAreasRouteImport } from './routes/service-areas'
 import { Route as TechnicianRouteImport } from './routes/technician'
@@ -46,6 +47,11 @@ const BookRoute = BookRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ControlHubRoute = ControlHubRouteImport.update({
+  id: '/control-hub',
+  path: '/control-hub',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsRoute = ProjectsRouteImport.update({
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/book': typeof BookRoute
   '/contact': typeof ContactRoute
+  '/control-hub': typeof ControlHubRoute
   '/projects': typeof ProjectsRoute
   '/service-areas': typeof ServiceAreasRoute
   '/technician': typeof TechnicianRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/book': typeof BookRoute
   '/contact': typeof ContactRoute
+  '/control-hub': typeof ControlHubRoute
   '/projects': typeof ProjectsRoute
   '/service-areas': typeof ServiceAreasRoute
   '/technician': typeof TechnicianRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/book': typeof BookRoute
   '/contact': typeof ContactRoute
+  '/control-hub': typeof ControlHubRoute
   '/projects': typeof ProjectsRoute
   '/service-areas': typeof ServiceAreasRoute
   '/technician': typeof TechnicianRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/book'
     | '/contact'
+    | '/control-hub'
     | '/projects'
     | '/service-areas'
     | '/technician'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/book'
     | '/contact'
+    | '/control-hub'
     | '/projects'
     | '/service-areas'
     | '/technician'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/book'
     | '/contact'
+    | '/control-hub'
     | '/projects'
     | '/service-areas'
     | '/technician'
@@ -189,6 +201,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   BookRoute: typeof BookRoute
   ContactRoute: typeof ContactRoute
+  ControlHubRoute: typeof ControlHubRoute
   ProjectsRoute: typeof ProjectsRoute
   ServiceAreasRoute: typeof ServiceAreasRoute
   TechnicianRoute: typeof TechnicianRoute
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/control-hub': {
+      id: '/control-hub'
+      path: '/control-hub'
+      fullPath: '/control-hub'
+      preLoaderRoute: typeof ControlHubRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects': {
@@ -301,6 +321,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   BookRoute: BookRoute,
   ContactRoute: ContactRoute,
+  ControlHubRoute: ControlHubRoute,
   ProjectsRoute: ProjectsRoute,
   ServiceAreasRoute: ServiceAreasRoute,
   TechnicianRoute: TechnicianRoute,

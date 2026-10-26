@@ -242,13 +242,6 @@ export function Navbar() {
               >
                 Contact
               </Link>
-              <Link
-                to="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-xs font-semibold text-brand"
-              >
-                ⚙️ Admin CRM Portal
-              </Link>
             </div>
 
             <div className="border-t border-border pt-4 flex flex-col gap-2">
