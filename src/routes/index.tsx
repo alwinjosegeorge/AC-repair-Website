@@ -241,25 +241,25 @@ function Hero() {
       </div>
 
       <FloatingCard
-        className="top-1/2 -left-10 xl:left-6"
+        className="top-1/2 left-4 xl:left-8 hidden xl:block"
         rotate="-14deg"
         icon={<Recycle className="size-9 text-[oklch(0.72_0.19_150)]" strokeWidth={2.5} />}
         label="Energy Saved"
         value="50%"
       />
       <FloatingCard
-        className="top-28 -right-8 xl:right-8"
+        className="top-28 right-4 xl:right-8 hidden xl:block"
         rotate="10deg"
         icon={
           <span className="grid size-10 place-items-center rounded-full bg-brand text-brand-foreground">
             <ThumbsUp className="size-5" />
           </span>
         }
-        label="Happy Client's"
+        label="Happy Clients"
         value="12k+"
       />
 
-      <div className="relative mx-auto mt-12 sm:mt-16 md:mt-16 md:-mb-16 max-w-5xl px-4 sm:px-6">
+      <div className="relative mx-auto mt-8 sm:mt-12 md:mt-14 max-w-5xl px-4 sm:px-6">
         <CoolAirFlow />
       </div>
     </section>
@@ -272,7 +272,7 @@ function QuickActionBar() {
   )}`;
 
   return (
-    <section className="relative z-20 mt-6 sm:mt-10 md:-mt-6 px-4 md:px-8">
+    <section className="relative z-20 mt-6 sm:mt-8 md:mt-10 px-4 md:px-8">
       <div className="mx-auto max-w-6xl rounded-3xl border-2 border-brand/20 bg-background/95 p-6 shadow-2xl backdrop-blur-md md:p-8">
         <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
           <div className="max-w-xl">
@@ -329,13 +329,19 @@ function QuickActionBar() {
 function BreezeIconTwo() {
   return (
     <svg
-      className="mx-4 sm:mx-8 h-6 w-7 sm:h-9 sm:w-10 text-[#60a5fa] shrink-0 inline-block align-middle"
-      viewBox="0 0 36 28"
-      fill="currentColor"
+      className="mx-3 sm:mx-6 h-5 w-6 sm:h-7 sm:w-8 text-[#70a9ff] shrink-0 inline-block align-middle"
+      viewBox="0 0 32 28"
+      fill="none"
       aria-hidden="true"
     >
-      <path d="M4 14C4 6.5 9 2 16 2V26C9 26 4 21.5 4 14Z" fill="#60a5fa" />
-      <path d="M20 2C27 2 32 6.5 32 14C32 21.5 27 26 20 26V2Z" fill="#60a5fa" />
+      <path
+        d="M2 14C2 6.5 7.5 1.5 14 1.5C12 7.5 12 20.5 14 26.5C7.5 26.5 2 21.5 2 14Z"
+        fill="#70a9ff"
+      />
+      <path
+        d="M16 14C16 6.5 21.5 1.5 28 1.5C26 7.5 26 20.5 28 26.5C21.5 26.5 16 21.5 16 14Z"
+        fill="#70a9ff"
+      />
     </svg>
   );
 }
@@ -343,14 +349,14 @@ function BreezeIconTwo() {
 function BreezeIconThree() {
   return (
     <svg
-      className="mx-4 sm:mx-8 h-6 w-9 sm:h-9 sm:w-12 text-[#60a5fa] shrink-0 inline-block align-middle"
-      viewBox="0 0 46 28"
-      fill="currentColor"
+      className="mx-3 sm:mx-6 h-5 w-7 sm:h-7 sm:w-9 text-[#70a9ff] shrink-0 inline-block align-middle"
+      viewBox="0 0 36 28"
+      fill="none"
       aria-hidden="true"
     >
-      <path d="M7 14C7 7 9.5 2 13 2C16.5 2 19 7 19 14C19 21 16.5 26 13 26C9.5 26 7 21 7 14Z" fill="#60a5fa" opacity="0.9" />
-      <path d="M19 14C19 7 21.5 2 25 2C28.5 2 31 7 31 14C31 21 28.5 26 25 26C21.5 26 19 21 19 14Z" fill="#60a5fa" opacity="0.95" />
-      <path d="M31 14C31 7 33.5 2 37 2C40.5 2 43 7 43 14C43 21 40.5 26 37 26C33.5 26 31 21 31 14Z" fill="#60a5fa" />
+      <rect x="2" y="3" width="7" height="22" rx="3.5" fill="#70a9ff" />
+      <rect x="14" y="1" width="8" height="26" rx="4" fill="#70a9ff" />
+      <rect x="27" y="3" width="7" height="22" rx="3.5" fill="#70a9ff" />
     </svg>
   );
 }
@@ -360,7 +366,7 @@ function Marquee() {
     { text: "Comfort Restored", isBlue: false },
     { text: "Reliable Cooling", isBlue: true },
     { text: "Perfect Comfort", isBlue: false },
-    { text: "Get Fast & Reliable AC Service", isBlue: true },
+    { text: "Instant Cooling", isBlue: true },
   ];
 
   const renderItemSet = (keyPrefix: string) => (
@@ -368,7 +374,7 @@ function Marquee() {
       {marqueeItems.map((item, idx) => (
         <span key={`${keyPrefix}-${item.text}`} className="flex items-center">
           <span
-            className={`text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight transition-colors ${
+            className={`text-xl sm:text-3xl md:text-4xl font-bold tracking-tight transition-colors ${
               item.isBlue ? "text-[#70a9ff] dark:text-[#93c5fd]" : "text-ink"
             }`}
           >
@@ -381,7 +387,7 @@ function Marquee() {
   );
 
   return (
-    <div className="relative py-4 sm:py-6 overflow-hidden select-none">
+    <div className="relative my-8 sm:my-12 py-3 sm:py-5 overflow-hidden select-none">
       {/* Background stripes that fade out at the bottom */}
       <div className="absolute inset-0 cool-stripes mask-bottom-fade -z-10" />
 
@@ -400,11 +406,13 @@ function Marquee() {
 
 function About() {
   return (
-    <section id="about" className="bg-background pt-6 sm:pt-10 pb-16 sm:pb-24">
+    <section id="about" className="bg-background py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center">
           <Badge>KNOW ABOUT US</Badge>
-          <h2 className="mt-6 text-4xl font-extrabold md:text-6xl">Get Fast &amp; Reliable AC Service</h2>
+          <h2 className="mt-4 sm:mt-6 text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-ink">
+            South India's Most Trusted AC Service Partner
+          </h2>
         </div>
 
         <div className="mt-16 grid gap-6 lg:grid-cols-3">

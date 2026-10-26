@@ -64,39 +64,41 @@ export function FloatingActions() {
       </div>
 
       {/* Desktop Floating Actions Widget */}
-      <div className="fixed bottom-8 right-8 z-50 hidden md:flex flex-col items-end gap-3">
-        {/* Instant Book Service Floating Button */}
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="group flex items-center gap-2.5 rounded-full bg-brand px-5 py-3 text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:shadow-brand/60 ring-2 ring-brand/30 animate-pulse"
+      <div className="fixed bottom-6 right-6 z-40 hidden md:flex items-center gap-2 rounded-full border border-border/80 bg-background/95 p-1.5 shadow-2xl backdrop-blur-md">
+        {/* Call */}
+        <a
+          href={`tel:${EGS_CALL_NUMBER}`}
+          onClick={() => trackCallClick("desktop_floating_dock")}
+          title="Call Helpline: +91 98956 88833"
+          className="flex items-center gap-1.5 rounded-full bg-surface px-3 py-2 text-xs font-bold text-foreground border border-border/80 hover:border-brand/40 transition-all hover:scale-105"
         >
-          <Calendar className="size-5" />
-          <span className="text-xs font-black uppercase tracking-wider">Book a service</span>
-        </button>
+          <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+          <Phone className="size-3.5 text-brand" />
+          <span>Call</span>
+        </a>
 
-        {/* WhatsApp Floating Pill */}
+        {/* WhatsApp */}
         <a
           href={waURL}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => trackWhatsAppClick("desktop_floating_pill")}
-          className="group flex items-center gap-2.5 rounded-full bg-[#25D366] px-4 py-2.5 text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:shadow-2xl"
+          onClick={() => trackWhatsAppClick("desktop_floating_dock")}
+          title="Chat on WhatsApp"
+          className="flex items-center gap-1.5 rounded-full bg-[#25D366] px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-[#25D366]/25 transition-all hover:scale-105 hover:bg-[#20ba59]"
         >
-          <WhatsAppIcon className="size-4 fill-current" />
-          <span className="text-xs font-bold tracking-wide">WhatsApp us</span>
+          <WhatsAppIcon className="size-3.5 fill-current" />
+          <span>WhatsApp</span>
         </a>
 
-        {/* Call Floating Pill */}
-        <a
-          href={`tel:${EGS_CALL_NUMBER}`}
-          onClick={() => trackCallClick("desktop_floating_pill")}
-          className="flex items-center gap-2.5 rounded-full bg-surface border border-border px-4 py-2.5 text-foreground shadow-lg hover:border-brand/40 transition-all hover:scale-105"
+        {/* Book */}
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/30 transition-all hover:scale-105 hover:bg-brand/90 cursor-pointer"
         >
-          <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-          <Phone className="size-4 text-brand" />
-          <span className="text-xs font-bold">Call now</span>
-        </a>
+          <Calendar className="size-3.5" />
+          <span>Book</span>
+        </button>
       </div>
 
       {/* Instant Booking Modal when triggered from floating action */}
