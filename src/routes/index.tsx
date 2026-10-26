@@ -36,7 +36,6 @@ import {
   trackWhatsAppClick,
 } from "@/lib/tracking";
 import { CoolAirFlow } from "@/components/CoolAirFlow";
-import heroInline from "@/assets/hero-inline.jpg";
 import aboutTech from "@/assets/about-tech.jpg";
 import projectResidential from "@/assets/project-residential.jpg";
 import projectCommercial from "@/assets/project-commercial.jpg";
@@ -160,18 +159,10 @@ function Hero() {
   return (
     <section className="relative -mt-24 overflow-hidden cool-stripes pt-32 pb-16 sm:pt-40 sm:pb-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 text-center">
-        <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-extrabold leading-tight sm:leading-[0.95] animate-fade-in-up">
-          Digital AC <span className="text-brand">Solutions</span>
-          <span className="mt-2 flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-5 gap-y-2">
-            For
-            <img
-              src={heroInline}
-              alt="Homeowner enjoying cool air from a serviced air conditioner"
-              width={640}
-              height={512}
-              className="h-10 w-24 sm:h-16 sm:w-32 md:h-24 md:w-48 rounded-xl border-2 sm:border-4 border-background object-cover shadow-lg"
-            />
-            Tomorrow
+        <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-extrabold leading-tight sm:leading-[1.05] tracking-tight animate-fade-in-up">
+          Service Reinvented.
+          <span className="mt-1 sm:mt-2 block text-brand">
+            Comfort Reimagined.
           </span>
         </h1>
         <p className="mx-auto mt-4 sm:mt-8 max-w-xl text-sm leading-relaxed text-ink/75 sm:text-base md:text-lg animate-fade-in-up-delay-1 px-2">
