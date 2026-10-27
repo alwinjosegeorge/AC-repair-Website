@@ -1081,97 +1081,55 @@ const REGIONAL_BRANCHES_DATA = [
     city: "Kollam",
     tag: "Headquarters",
     isHQ: true,
-    address: "KMC/46/322, First Floor, VT Tower, Nr District Hospital, Hospital Road, Kollam - 691001",
-    phones: [
-      { label: "Mobile", number: "9895688833", formatted: "+91 98956 88833" },
-      { label: "Landline", number: "04742950513", formatted: "0474 2950513" },
-    ],
-    email: "info@egsindia.in",
+    coverage: "Kollam City, Karunagappally, Kottarakkara, Paravur & surrounding areas",
   },
   {
     city: "Thiruvananthapuram",
     tag: "Capital Regional Hub",
     isHQ: false,
-    address: "Mahesh Estates, TC 29/4590 CV Raman Pillai Road, Vazhuthacaud, Trivandrum - 695014",
-    phones: [
-      { label: "Landline", number: "04714248080", formatted: "0471-4248080" },
-      { label: "Mobile", number: "8589035555", formatted: "+91 85890 35555" },
-    ],
-    email: "info@egsindia.in",
+    coverage: "Trivandrum City, Technopark, Kazhakkoottam, Kovalam & Neyyattinkara",
   },
   {
     city: "Ernakulam (Cochin)",
     tag: "Metro Commercial Hub",
     isHQ: false,
-    address: "Second Floor, Pukalakkatt Building Changampuzha Park, Metro Piller No. 465, Near Changampuzha Metro Station Edapally, Cochin - 682026",
-    phones: [
-      { label: "Landline", number: "04844010280", formatted: "0484 4010280" },
-      { label: "Mobile", number: "8589935555", formatted: "+91 85899 35555" },
-    ],
-    email: "info@egsindia.in",
+    coverage: "Kochi City, Kakkanad, InfoPark, Aluva, Tripunithura & Edapally",
   },
   {
     city: "Thrissur",
-    tag: "Cultural Capital Branch",
+    tag: "Cultural Capital Hub",
     isHQ: false,
-    address: "17/81/15 A Tower, Calvary Junction, Poothole Road, Poothole, Thrissur - 680004",
-    phones: [
-      { label: "Mobile 1", number: "8943312261", formatted: "+91 89433 12261" },
-      { label: "Mobile 2", number: "8943571111", formatted: "+91 89435 71111" },
-      { label: "Office", number: "9995997766", formatted: "+91 99959 97766" },
-    ],
-    email: "info@egsindia.in",
+    coverage: "Thrissur Town, Ollur, Ayyanthole, Mannuthy, Guruvayur & Chalakudy",
   },
   {
     city: "Alappuzha",
     tag: "Coastal Service Hub",
     isHQ: false,
-    address: "Cullen Road, Near Iron Bridge, Mullakkal, Alappuzha - 688001",
-    phones: [
-      { label: "Helpline", number: "9895688833", formatted: "+91 98956 88833" },
-    ],
-    email: "info@egsindia.in",
+    coverage: "Alappuzha Town, Cherthala, Ambalappuzha, Kayamkulam & Haripad",
   },
   {
     city: "Kottayam",
     tag: "Central Travancore Hub",
     isHQ: false,
-    address: "KK Road, Kanjikuzhy Junction, Kottayam - 686004",
-    phones: [
-      { label: "Helpline", number: "9895688833", formatted: "+91 98956 88833" },
-    ],
-    email: "info@egsindia.in",
+    coverage: "Kottayam Town, Kanjikuzhy, Changanassery, Pala & Ettumanoor",
   },
   {
     city: "Kozhikode",
     tag: "Malabar Regional Hub",
     isHQ: false,
-    address: "Mavoor Road, Near Cyberpark, Calicut - 673016",
-    phones: [
-      { label: "Helpline", number: "9895688833", formatted: "+91 98956 88833" },
-    ],
-    email: "info@egsindia.in",
+    coverage: "Calicut City, Mavoor Road, Cyberpark, Palayam, Kallai & Feroke",
   },
   {
     city: "Bangalore",
     tag: "Karnataka Commercial Hub",
     isHQ: false,
-    address: "Outer Ring Road, Sector 6, HSR Layout, Bengaluru - 560102",
-    phones: [
-      { label: "Helpline", number: "9895688833", formatted: "+91 98956 88833" },
-    ],
-    email: "info@egsindia.in",
+    coverage: "HSR Layout, Koramangala, Indiranagar, Whitefield & Electronic City",
   },
   {
     city: "Chennai",
-    tag: "Tamil Nadu Regional Office",
+    tag: "Tamil Nadu Regional Hub",
     isHQ: false,
-    address: "Periyamet, Chennai, Tamil Nadu - 600003",
-    phones: [
-      { label: "Mobile 1", number: "9995108080", formatted: "+91 99951 08080" },
-      { label: "Mobile 2", number: "9895887755", formatted: "+91 98958 87755" },
-    ],
-    email: "info@egsindia.in",
+    coverage: "Chennai Metro, Anna Nagar, T Nagar, OMR Tech Corridor & Velachery",
   },
 ];
 
@@ -1181,12 +1139,12 @@ function RegionalHubsDirectory() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-3xl mx-auto">
-            <Badge>REGIONAL HUBS &amp; DIRECT HELPLINE</Badge>
+            <Badge>REGIONAL HUBS &amp; RAPID DISPATCH</Badge>
             <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-ink">
-              Direct Branch Helpline &amp; Service Centers
+              Regional Service Hubs &amp; Coverage
             </h2>
             <p className="mt-4 text-sm sm:text-base text-ink/70 leading-relaxed">
-              Fast 90-minute technician dispatch from verified EGS INDIA service hubs across Kerala and Tamil Nadu. Call your regional desk directly or book online.
+              Fast 90-minute technician dispatch from verified EGS INDIA service hubs across Kerala, Karnataka, and Tamil Nadu. Book online or call our centralized helpline.
             </p>
           </div>
         </ScrollReveal>
@@ -1217,40 +1175,51 @@ function RegionalHubsDirectory() {
                     </span>
                   </div>
 
-                  <div className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium mb-6">
-                    <MapPin className="size-4 text-brand shrink-0 mt-0.5" />
-                    <span>{branch.address}</span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600">
+                      ⚡ 90-Min Rapid Dispatch
+                    </span>
+                    <span className="text-[11px] font-semibold text-muted-foreground">
+                      Verified Mechanics
+                    </span>
                   </div>
+
+                  <p className="text-xs text-muted-foreground leading-relaxed font-medium mb-6">
+                    {branch.coverage}
+                  </p>
                 </div>
 
                 <div className="mt-auto space-y-3.5 pt-4 border-t border-border/70">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-2">
-                      Direct Phone Numbers:
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {branch.phones.map((p) => (
-                        <a
-                          key={p.number}
-                          href={`tel:${p.number}`}
-                          onClick={() => trackCallClick(`branch_${branch.city.toLowerCase()}`)}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-foreground hover:border-brand hover:text-brand hover:bg-brand-soft/40 transition-colors shadow-xs"
-                        >
-                          <Phone className="size-3 text-brand" />
-                          <span>{p.formatted}</span>
-                        </a>
-                      ))}
-                    </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <a
+                      href={`tel:${EGS_CALL_NUMBER}`}
+                      onClick={() => trackCallClick(`hub_${branch.city.toLowerCase()}`)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-foreground hover:border-brand hover:text-brand hover:bg-brand-soft/40 transition-colors shadow-xs"
+                      title="Central Helpline"
+                    >
+                      <Phone className="size-3 text-brand" />
+                      <span>+91 98956 88833</span>
+                    </a>
+
+                    <a
+                      href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                        `Hello EGS INDIA! I need AC service in ${branch.city}.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackWhatsAppClick(`hub_${branch.city.toLowerCase()}`)}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 px-3 py-1.5 text-xs font-bold text-[#25D366] hover:bg-[#25D366]/20 transition-colors"
+                      title="WhatsApp Desk"
+                    >
+                      <WhatsAppIcon className="size-3 fill-current" />
+                      <span>WhatsApp</span>
+                    </a>
                   </div>
 
                   <div className="flex items-center justify-between pt-1 text-xs">
-                    <a
-                      href={`mailto:${branch.email}`}
-                      className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-brand transition-colors font-medium"
-                    >
-                      <Mail className="size-3.5" />
-                      <span>{branch.email}</span>
-                    </a>
+                    <span className="text-[11px] text-muted-foreground font-medium">
+                      Doorstep Service Available
+                    </span>
 
                     <Link
                       to="/book"

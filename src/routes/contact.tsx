@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "@/lib/store";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
@@ -19,50 +21,49 @@ function ContactPage() {
 
   const locations = [
     {
-      title: "Kollam (Headquarters)",
-      address: "KMC/46/322, First Floor, VT Tower, Nr District Hospital, Hospital Road, Kollam - 691001",
-      phones: [
-        { label: "Mobile", number: "9895688833", formatted: "+91 98956 88833" },
-        { label: "Landline", number: "04742950513", formatted: "0474 2950513" },
-      ],
-      email: "info@egsindia.in",
+      title: "Kollam",
+      tag: "Headquarters",
+      coverage: "Kollam Town, Kottarakkara, Karunagappally & surrounding areas",
     },
     {
-      title: "Thiruvananthapuram (Trivandrum)",
-      address: "Mahesh Estates, TC 29/4590 CV Raman Pillai Road, Vazhuthacaud, Trivandrum, Kerala - 695014",
-      phones: [
-        { label: "Landline", number: "04714248080", formatted: "0471-4248080" },
-        { label: "Mobile", number: "8589035555", formatted: "+91 85890 35555" },
-      ],
-      email: "info@egsindia.in",
+      title: "Thiruvananthapuram",
+      tag: "Capital Region Hub",
+      coverage: "Trivandrum City, Technopark, Kazhakkoottam & Kovalam",
     },
     {
       title: "Ernakulam (Cochin)",
-      address: "Second Floor, Pukalakkatt Building Changampuzha Park, Metro Piller No. 465, Near Changampuzha Metro Station Edapally, Elamakkara PO, Cochin - 682026",
-      phones: [
-        { label: "Landline", number: "04844010280", formatted: "0484 4010280" },
-        { label: "Mobile", number: "8589935555", formatted: "+91 85899 35555" },
-      ],
-      email: "info@egsindia.in",
+      tag: "Commercial Metro Hub",
+      coverage: "Kochi City, Kakkanad, InfoPark, Aluva & Edapally",
     },
     {
       title: "Thrissur",
-      address: "17/81/15 A Tower, Calvary Junction, Poothole Road, Poothole, Thrissur, Kerala - 680004",
-      phones: [
-        { label: "Mobile 1", number: "8943312261", formatted: "+91 89433 12261" },
-        { label: "Mobile 2", number: "8943571111", formatted: "+91 89435 71111" },
-        { label: "Office", number: "9995997766", formatted: "+91 99959 97766" },
-      ],
-      email: "info@egsindia.in",
+      tag: "Cultural Capital Hub",
+      coverage: "Thrissur City, Ollur, Ayyanthole & Guruvayur Highway",
+    },
+    {
+      title: "Alappuzha",
+      tag: "Coastal Service Hub",
+      coverage: "Alappuzha Town, Cherthala, Ambalappuzha & Kayamkulam",
+    },
+    {
+      title: "Kottayam",
+      tag: "Central Travancore Hub",
+      coverage: "Kottayam Town, Kanjikuzhy, Changanassery & Pala",
+    },
+    {
+      title: "Kozhikode",
+      tag: "Malabar Regional Hub",
+      coverage: "Calicut City, Mavoor Road, Cyberpark & Palayam",
+    },
+    {
+      title: "Bangalore",
+      tag: "Karnataka Commercial Hub",
+      coverage: "HSR Layout, Koramangala, Indiranagar & Whitefield",
     },
     {
       title: "Chennai",
-      address: "Periyamet, Chennai, Tamil Nadu - 600003",
-      phones: [
-        { label: "Mobile 1", number: "9995108080", formatted: "+91 99951 08080" },
-        { label: "Mobile 2", number: "9895887755", formatted: "+91 98958 87755" },
-      ],
-      email: "info@egsindia.in",
+      tag: "Tamil Nadu Regional Hub",
+      coverage: "Chennai Metro, Anna Nagar, T Nagar & OMR Corridor",
     },
   ];
 
@@ -142,43 +143,54 @@ function ContactPage() {
 
           {/* Locations Grid Column */}
           <div className="xl:col-span-3">
-            <h3 className="text-2xl font-bold text-ink mb-8">Regional Offices</h3>
+            <h3 className="text-2xl font-bold text-ink mb-8">Regional Service Hubs</h3>
             <div className="grid sm:grid-cols-2 gap-6">
               {locations.map((loc, idx) => (
-                <div key={idx} className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-lg font-bold text-brand">
-                      {loc.title}
-                    </h4>
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-brand-soft text-brand">
-                      Active Hub
-                    </span>
+                <div key={idx} className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-lg font-bold text-brand">
+                        {loc.title}
+                      </h4>
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-brand-soft text-brand">
+                        {loc.tag}
+                      </span>
+                    </div>
+                    <p className="text-xs text-ink/75 leading-relaxed font-medium mb-5">
+                      📍 {loc.coverage}
+                    </p>
                   </div>
-                  <p className="text-xs text-ink/75 leading-relaxed font-medium mb-5">
-                    📍 {loc.address}
-                  </p>
 
                   <div className="mt-auto space-y-3 pt-3 border-t border-slate-200/60">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                      Direct Helplines:
+                      Central Helpline Desk:
                     </span>
                     <div className="flex flex-wrap gap-2">
-                      {loc.phones.map((p) => (
-                        <a
-                          key={p.number}
-                          href={`tel:${p.number}`}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-white px-2.5 py-1 text-xs font-bold text-ink hover:border-brand hover:text-brand hover:bg-brand-soft/30 transition-colors"
-                        >
-                          <Phone className="size-3 text-brand" />
-                          <span>{p.formatted}</span>
-                        </a>
-                      ))}
+                      <a
+                        href={`tel:${EGS_CALL_NUMBER}`}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-white px-2.5 py-1 text-xs font-bold text-ink hover:border-brand hover:text-brand hover:bg-brand-soft/30 transition-colors"
+                      >
+                        <Phone className="size-3 text-brand" />
+                        <span>+91 98956 88833</span>
+                      </a>
+
+                      <a
+                        href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                          `Hello EGS INDIA! I need AC service support in ${loc.title}.`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366]/10 border border-[#25D366]/20 px-2.5 py-1 text-xs font-bold text-[#25D366] hover:bg-[#25D366]/20 transition-colors"
+                      >
+                        <WhatsAppIcon className="size-3 fill-current" />
+                        <span>WhatsApp</span>
+                      </a>
                     </div>
 
                     <div className="flex items-center gap-2 pt-1 text-xs">
                       <Mail className="size-3.5 text-muted-foreground" />
-                      <a href={`mailto:${loc.email}`} className="font-semibold text-brand hover:underline">
-                        {loc.email}
+                      <a href="mailto:info@egsindia.in" className="font-semibold text-brand hover:underline">
+                        info@egsindia.in
                       </a>
                     </div>
                   </div>

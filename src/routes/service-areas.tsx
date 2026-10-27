@@ -42,11 +42,8 @@ interface ServiceHub {
   city: string;
   state: string;
   tag: string;
-  address: string;
-  phones: string[];
   email: string;
   coverageAreas: string[];
-  landmarks: string;
   avgResponseTime: string;
   activeTechnicians: number;
 }
@@ -56,8 +53,6 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Kollam",
     state: "Kerala",
     tag: "Central Headquarters",
-    address: "KMC/46/322, First Floor, VT Tower, Nr District Hospital, Hospital Road, Kollam - 691001",
-    phones: ["+91 98956 88833", "0474 2950513"],
     email: "kollam@egsindia.in",
     coverageAreas: [
       "Kollam Town",
@@ -71,7 +66,6 @@ const SERVICE_HUBS: ServiceHub[] = [
       "Paravur",
       "Anchal",
     ],
-    landmarks: "Near District Hospital & VT Tower",
     avgResponseTime: "60 - 90 Mins",
     activeTechnicians: 14,
   },
@@ -79,8 +73,6 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Thiruvananthapuram",
     state: "Kerala",
     tag: "Capital Regional Hub",
-    address: "Mahesh Estates, TC 29/4590, CV Raman Pillai Road, Vazhuthacaud, Trivandrum - 695014",
-    phones: ["+91 85890 35555", "0471 4248080"],
     email: "trivandrum@egsindia.in",
     coverageAreas: [
       "Vazhuthacaud",
@@ -94,7 +86,6 @@ const SERVICE_HUBS: ServiceHub[] = [
       "Kariavattom",
       "Attingal",
     ],
-    landmarks: "Opposite Women's College, Vazhuthacaud",
     avgResponseTime: "60 - 90 Mins",
     activeTechnicians: 18,
   },
@@ -102,8 +93,6 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Ernakulam (Kochi)",
     state: "Kerala",
     tag: "Metro Commercial Hub",
-    address: "Second Floor, Pukalakkatt Building, Metro Pillar No. 465, Near Changampuzha Metro Station, Edapally, Cochin - 682026",
-    phones: ["+91 85899 35555", "0484 4010280"],
     email: "cochin@egsindia.in",
     coverageAreas: [
       "Edapally",
@@ -117,7 +106,6 @@ const SERVICE_HUBS: ServiceHub[] = [
       "Vyttila",
       "Kalamassery",
     ],
-    landmarks: "Metro Pillar 465, Changampuzha Park",
     avgResponseTime: "60 - 90 Mins",
     activeTechnicians: 22,
   },
@@ -125,8 +113,6 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Thrissur",
     state: "Kerala",
     tag: "Cultural Capital Branch",
-    address: "17/81/15, A Tower, Calvary Junction, Poothole Road, Poothole, Thrissur - 680004",
-    phones: ["+91 89433 12261", "+91 89435 71111", "+91 99959 97766"],
     email: "thrissur@egsindia.in",
     coverageAreas: [
       "Round South & North",
@@ -140,7 +126,6 @@ const SERVICE_HUBS: ServiceHub[] = [
       "Guruvayur Highway",
       "Chalakudy",
     ],
-    landmarks: "Near Calvary Junction, Poothole",
     avgResponseTime: "75 - 90 Mins",
     activeTechnicians: 12,
   },
@@ -148,8 +133,6 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Alappuzha",
     state: "Kerala",
     tag: "Coastal Service Hub",
-    address: "Cullen Road, Near Iron Bridge, Mullakkal, Alappuzha - 688001",
-    phones: ["+91 98956 88833"],
     email: "alappuzha@egsindia.in",
     coverageAreas: [
       "Mullakkal",
@@ -163,7 +146,6 @@ const SERVICE_HUBS: ServiceHub[] = [
       "Aryad",
       "Mannancherry",
     ],
-    landmarks: "Near Iron Bridge & District Court",
     avgResponseTime: "60 - 90 Mins",
     activeTechnicians: 10,
   },
@@ -171,8 +153,6 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Kottayam",
     state: "Kerala",
     tag: "Central Travancore Hub",
-    address: "KK Road, Kanjikuzhy Junction, Kottayam - 686004",
-    phones: ["+91 98956 88833"],
     email: "kottayam@egsindia.in",
     coverageAreas: [
       "Kanjikuzhy",
@@ -186,7 +166,6 @@ const SERVICE_HUBS: ServiceHub[] = [
       "Kumarakom",
       "Pambady",
     ],
-    landmarks: "Near Kanjikuzhy Junction",
     avgResponseTime: "60 - 90 Mins",
     activeTechnicians: 12,
   },
@@ -194,8 +173,6 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Kozhikode",
     state: "Kerala",
     tag: "Malabar Regional Hub",
-    address: "Mavoor Road, Near Cyberpark, Calicut - 673016",
-    phones: ["+91 98956 88833"],
     email: "kozhikode@egsindia.in",
     coverageAreas: [
       "Mavoor Road",
@@ -209,7 +186,6 @@ const SERVICE_HUBS: ServiceHub[] = [
       "Medical College Area",
       "Karanthur",
     ],
-    landmarks: "Near Cyberpark, Mavoor Road Bypass",
     avgResponseTime: "60 - 90 Mins",
     activeTechnicians: 14,
   },
@@ -217,8 +193,6 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Bangalore",
     state: "Karnataka",
     tag: "Karnataka Commercial Hub",
-    address: "Outer Ring Road, Sector 6, HSR Layout, Bengaluru - 560102",
-    phones: ["+91 98956 88833"],
     email: "bangalore@egsindia.in",
     coverageAreas: [
       "HSR Layout",
@@ -232,7 +206,6 @@ const SERVICE_HUBS: ServiceHub[] = [
       "Sarjapur Road",
       "JP Nagar",
     ],
-    landmarks: "Near HSR BDA Complex, Sector 6",
     avgResponseTime: "60 - 90 Mins",
     activeTechnicians: 20,
   },
@@ -240,8 +213,6 @@ const SERVICE_HUBS: ServiceHub[] = [
     city: "Chennai",
     state: "Tamil Nadu",
     tag: "Tamil Nadu Regional Office",
-    address: "Periyamet, Chennai, Tamil Nadu - 600003",
-    phones: ["+91 99951 08080", "+91 98958 87755"],
     email: "chennai@egsindia.in",
     coverageAreas: [
       "Periyamet",
@@ -255,7 +226,6 @@ const SERVICE_HUBS: ServiceHub[] = [
       "Nungambakkam",
       "Tambaram",
     ],
-    landmarks: "Near Central Station & Nehru Stadium",
     avgResponseTime: "60 - 90 Mins",
     activeTechnicians: 16,
   },
@@ -362,18 +332,17 @@ function ServiceAreasPage() {
                       </div>
                     </div>
 
-                    {/* Address & Landmark */}
-                    <div className="rounded-2xl border border-border bg-surface/50 p-4 space-y-2 text-xs">
-                      <div className="flex items-start gap-2.5">
-                        <MapPin className="size-4 text-brand shrink-0 mt-0.5" />
-                        <div>
-                          <strong className="text-foreground block">Branch Office:</strong>
-                          <p className="text-muted-foreground leading-relaxed">{hub.address}</p>
-                          <span className="text-[11px] text-brand font-semibold block mt-1">
-                            📍 {hub.landmarks}
-                          </span>
-                        </div>
+                    {/* Coverage Network Info */}
+                    <div className="rounded-2xl border border-border bg-surface/50 p-4 space-y-1.5 text-xs">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="size-4 text-brand shrink-0" />
+                        <span className="font-bold text-foreground">
+                          {hub.city} Regional Service Network
+                        </span>
                       </div>
+                      <p className="text-muted-foreground pl-6 leading-relaxed">
+                        On-demand doorstep repair, jet wash servicing, and routine maintenance dispatched directly by verified mobile technicians.
+                      </p>
                     </div>
 
                     {/* Coverage Localities */}
@@ -398,12 +367,12 @@ function ServiceAreasPage() {
                   <div className="border-t border-border pt-4 flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <a
-                        href={`tel:${hub.phones[0]}`}
+                        href={`tel:${EGS_CALL_NUMBER}`}
                         onClick={() => trackCallClick(`service_area_${hub.city.toLowerCase()}`)}
                         className="flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 py-2 text-xs font-bold text-foreground hover:border-brand/40"
                       >
                         <Phone className="size-3.5 text-brand" />
-                        <span>{hub.phones[0]}</span>
+                        <span>+91 98956 88833</span>
                       </a>
 
                       <a
