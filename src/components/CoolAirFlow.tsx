@@ -1,6 +1,6 @@
 import { Sparkles } from "lucide-react";
 import acUnit from "@/assets/ac-unit.png";
-import acWaves from "@/assets/ac-waves.png";
+import acAirflowPng from "@/assets/ac-airflow.png";
 
 interface CoolAirFlowProps {
   className?: string;
@@ -14,24 +14,13 @@ export function CoolAirFlow({ className = "" }: CoolAirFlowProps) {
       {/* Assembly Container: Floats in physical unison */}
       <div className="relative w-full animate-ac-assembly-float">
         {/* ========================================================== */}
-        {/* COOL AIRFLOW BREEZE LAYERS (Rendered behind the front flap) */}
+        {/* COOL AIRFLOW BREEZE LAYERS (Rendered behind the unit) */}
         {/* ========================================================== */}
         <div className="absolute left-1/2 top-[46%] sm:top-[48%] -translate-x-1/2 w-full max-w-3xl pointer-events-none z-0">
           {/* 1. Vent Mouth Icy Mist Glow */}
           <div
             className={`mx-auto h-24 sm:h-32 w-[85%] rounded-[50%] bg-gradient-to-b from-sky-400/50 via-cyan-300/25 to-transparent blur-xl transition-opacity duration-700 ${
               isTurbo ? "opacity-90 animate-frost-mist" : "opacity-55"
-            }`}
-          />
-
-          {/* 2. Original Air Waves Graphic (with enhanced flowing pulse) */}
-          <img
-            src={acWaves}
-            alt="Cool air flowing downwards from split air conditioner"
-            className={`absolute top-2 left-1/2 -translate-x-1/2 w-[98%] max-w-3xl pointer-events-none transition-all duration-700 ${
-              isTurbo
-                ? "opacity-95 animate-air-wave-pulse"
-                : "opacity-70 scale-95"
             }`}
           />
 
@@ -198,24 +187,48 @@ export function CoolAirFlow({ className = "" }: CoolAirFlowProps) {
         </div>
 
         {/* ========================================================== */}
-        {/* WALL-MOUNTED AC UNIT IMAGE */}
+        {/* WALL-MOUNTED AC UNIT & AIRFLOW ASSEMBLY */}
         {/* ========================================================== */}
         <div className="relative z-10 mx-auto w-full max-w-3xl">
+          {/* Main Indoor AC Split Unit */}
           <img
             src={acUnit}
             alt="Wall mounted split air conditioner blowing cool air"
             width={1408}
             height={912}
-            className="w-full drop-shadow-[0_20px_40px_rgba(0,0,0,0.18)]"
+            className="w-full drop-shadow-[0_20px_40px_rgba(0,0,0,0.18)] relative z-10"
           />
+
+          {/* User's Authentic Airflow Stream Image (ac.avif) with dynamic airflow movement */}
+          <div className="absolute left-1/2 top-[71%] sm:top-[72%] -translate-x-1/2 w-[84%] pointer-events-none z-20">
+            {/* Primary Breathing/Pulsing Airflow Stream */}
+            <picture className="block w-full">
+              <source srcSet="/ac-airflow.avif" type="image/avif" />
+              <img
+                src={acAirflowPng}
+                alt="Cold air blowing from split air conditioner"
+                className="w-full pointer-events-none animate-ac-flow select-none drop-shadow-[0_12px_24px_rgba(56,189,248,0.5)]"
+              />
+            </picture>
+
+            {/* Secondary Cascading Wind Shimmer */}
+            <picture className="absolute inset-0 block w-full opacity-65">
+              <source srcSet="/ac-airflow.avif" type="image/avif" />
+              <img
+                src={acAirflowPng}
+                alt="Cold breeze ripple"
+                className="w-full pointer-events-none animate-ac-flow-shimmer select-none"
+              />
+            </picture>
+          </div>
 
           {/* Vent Backlight Cyan Glow Bar (Inside the open louver slit) */}
           <div
-            className="absolute left-1/2 bottom-[14%] sm:bottom-[15%] -translate-x-1/2 w-[74%] sm:w-[76%] h-2 sm:h-2.5 rounded-full bg-gradient-to-r from-transparent via-cyan-400/70 to-transparent blur-xs animate-vent-backlight pointer-events-none"
+            className="absolute left-1/2 bottom-[14%] sm:bottom-[15%] -translate-x-1/2 w-[74%] sm:w-[76%] h-2 sm:h-2.5 rounded-full bg-gradient-to-r from-transparent via-cyan-400/80 to-transparent blur-xs animate-vent-backlight pointer-events-none z-15"
           />
 
           {/* Inverter Turbo Cool Badge Tag */}
-          <div className="absolute right-2 top-2 sm:right-4 sm:top-4 flex items-center gap-1 rounded-md sm:rounded-lg border border-sky-400/30 bg-white/85 dark:bg-slate-900/85 px-1.5 py-0.5 sm:px-2 sm:py-1 text-[8px] sm:text-[10px] font-extrabold text-sky-600 dark:text-sky-400 shadow-sm backdrop-blur-xs">
+          <div className="absolute right-2 top-2 sm:right-4 sm:top-4 z-30 flex items-center gap-1 rounded-md sm:rounded-lg border border-sky-400/30 bg-white/85 dark:bg-slate-900/85 px-1.5 py-0.5 sm:px-2 sm:py-1 text-[8px] sm:text-[10px] font-extrabold text-sky-600 dark:text-sky-400 shadow-sm backdrop-blur-xs">
             <Sparkles className="size-2.5 sm:size-3 text-sky-500 animate-pulse" />
             <span>Dual Inverter • Fast Chill</span>
           </div>
