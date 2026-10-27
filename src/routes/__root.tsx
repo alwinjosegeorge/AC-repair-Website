@@ -101,7 +101,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "EGS INDIA - Expert Air Conditioner Service, Repair, Installation, AMC & Commercial HVAC Solutions in India.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "/og-image.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "EGS INDIA - Expert Goods & Services HVAC Solutions" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "EGS INDIA | Expert AC Service & HVAC Solutions" },
+      {
+        name: "twitter:description",
+        content:
+          "EGS INDIA - Expert Air Conditioner Service, Repair, Installation, AMC & Commercial HVAC Solutions in India.",
+      },
+      { name: "twitter:image", content: "/og-image.png" },
     ],
     links: [
       {
@@ -114,7 +125,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
       },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", href: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
       { rel: "icon", href: "/logo-only.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
     ],
   }),
   shellComponent: RootShell,

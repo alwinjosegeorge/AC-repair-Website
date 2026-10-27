@@ -52,18 +52,23 @@ import blog2 from "@/assets/blog-2.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EGS INDIA" },
+      { title: "EGS INDIA | Expert AC Service & HVAC Solutions" },
       {
         name: "description",
         content:
           "EGS INDIA - Expert Air Conditioner Service & HVAC Solutions in India.",
       },
-      { property: "og:title", content: "EGS INDIA" },
+      { property: "og:title", content: "EGS INDIA | Expert AC Service & HVAC Solutions" },
       {
         property: "og:description",
         content:
           "EGS INDIA - Expert Air Conditioner Service & HVAC Solutions in India.",
       },
+      { property: "og:image", content: "/og-image.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/og-image.png" },
     ],
   }),
   component: Index,
