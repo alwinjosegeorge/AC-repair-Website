@@ -332,7 +332,7 @@ function QuickActionBar() {
 function BreezeIconTwo() {
   return (
     <svg
-      className="mx-4 sm:mx-8 h-6 w-7 sm:h-9 sm:w-11 text-[#70a9ff] shrink-0 inline-block align-middle"
+      className="mx-4 sm:mx-8 md:mx-10 h-7 w-8 sm:h-10 sm:w-12 md:h-12 md:w-15 text-[#70a9ff] shrink-0 inline-block align-middle"
       viewBox="0 0 32 28"
       fill="none"
       aria-hidden="true"
@@ -352,7 +352,7 @@ function BreezeIconTwo() {
 function BreezeIconThree() {
   return (
     <svg
-      className="mx-4 sm:mx-8 h-6 w-8 sm:h-9 sm:w-12 text-[#70a9ff] shrink-0 inline-block align-middle"
+      className="mx-4 sm:mx-8 md:mx-10 h-7 w-9 sm:h-10 sm:w-13 md:h-12 md:w-16 text-[#70a9ff] shrink-0 inline-block align-middle"
       viewBox="0 0 36 28"
       fill="none"
       aria-hidden="true"
@@ -377,7 +377,7 @@ function Marquee() {
       {marqueeItems.map((item, idx) => (
         <span key={`${keyPrefix}-${item.text}`} className="flex items-center">
           <span
-            className={`text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight transition-colors ${
+            className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight transition-colors ${
               item.isBlue ? "text-[#70a9ff] dark:text-[#93c5fd]" : "text-ink"
             }`}
           >
@@ -390,10 +390,10 @@ function Marquee() {
   );
 
   return (
-    <div className="relative mt-4 sm:mt-6 mb-2 sm:mb-4 py-3 sm:py-5 overflow-hidden isolate select-none">
+    <div className="relative mt-4 sm:mt-6 mb-2 sm:mb-4 py-4 sm:py-6 md:py-8 overflow-hidden isolate select-none">
       {/* Left and Right Edge Vignette Fades for seamless entrance & exit */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-36 bg-gradient-to-r from-background to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-36 bg-gradient-to-l from-background to-transparent z-10" />
 
       {/* Moving Marquee Ticker Track */}
       <div className="relative z-10 animate-marquee-smooth flex items-center whitespace-nowrap">
