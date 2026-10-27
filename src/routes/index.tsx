@@ -42,9 +42,6 @@ import aboutTech from "@/assets/about-tech.jpg";
 import projectResidential from "@/assets/project-residential.jpg";
 import projectCommercial from "@/assets/project-commercial.jpg";
 import processImg from "@/assets/process.jpg";
-import team1 from "@/assets/team-1.jpg";
-import team2 from "@/assets/team-2.jpg";
-import team3 from "@/assets/team-3.jpg";
 import cta1 from "@/assets/cta-1.jpg";
 import cta2 from "@/assets/cta-2.jpg";
 import blog1 from "@/assets/blog-1.jpg";
@@ -77,7 +74,6 @@ const navLinks = [
   { name: "About", href: "/about" },
   { name: "Projects", href: "/projects" },
   { name: "Services", href: "#services" },
-  { name: "Team", href: "#team" },
   { name: "Contact", href: "/contact" }
 ];
 
@@ -763,50 +759,6 @@ function Process() {
   );
 }
 
-const team = [
-  { img: team1, name: "Matthew Lewis", role: "Support Manager" },
-  { img: team2, name: "Bipasa Sarkar", role: "HVAC Service Engineer" },
-  { img: team3, name: "James Carter", role: "AC Technician" },
-  { img: aboutTech, name: "Imran Hossain", role: "AC Installation Specialist" },
-];
-
-function Team() {
-  return (
-    <section id="team" className="bg-background py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <ScrollReveal>
-          <Badge tone="white">MEET WITH OUR TECHNICIAN</Badge>
-          <h2 className="mt-6 text-4xl font-extrabold md:text-6xl">Our Skilled Team</h2>
-        </ScrollReveal>
-
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {team.map(({ img, name, role }, idx) => (
-            <ScrollReveal key={name} delayMs={idx * 60} className="h-full">
-              <article className="group relative overflow-hidden rounded-2xl h-full">
-                <img
-                  src={img}
-                  alt={`${name}, ${role}`}
-                  width={800}
-                  height={1000}
-                  loading="lazy"
-                  className="h-[30rem] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <span className="absolute top-5 left-5 grid size-11 place-items-center rounded-lg bg-background">
-                  <Plus className="size-5" />
-                </span>
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/80 to-transparent p-6 pt-16">
-                  <h3 className="text-3xl font-extrabold text-background">{name}</h3>
-                  <p className="text-sm text-background/80">{role}</p>
-                </div>
-              </article>
-            </ScrollReveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function CallToAction() {
   return (
     <section className="bg-background px-6 py-16">
@@ -1262,7 +1214,6 @@ function Index() {
       <Services />
       <BookOnlineSection />
       <Process />
-      <Team />
       <RegionalHubsDirectory />
       <CallToAction />
       <Footer />
