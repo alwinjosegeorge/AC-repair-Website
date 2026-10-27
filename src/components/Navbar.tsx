@@ -160,16 +160,8 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile Header Actions */}
-        <div className="flex items-center gap-2 lg:hidden">
-          <Link
-            to="/book"
-            className="flex items-center gap-1.5 rounded-xl bg-brand px-3 py-2 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-xs"
-          >
-            <Calendar className="size-3.5" />
-            <span>Book</span>
-          </Link>
-
+        {/* Mobile Header Actions (Menu Toggle Only) */}
+        <div className="flex items-center lg:hidden">
           {/* Mobile Menu Toggle Button */}
           <button
             type="button"
