@@ -145,6 +145,98 @@ const SERVICE_HUBS: ServiceHub[] = [
     activeTechnicians: 12,
   },
   {
+    city: "Alappuzha",
+    state: "Kerala",
+    tag: "Coastal Service Hub",
+    address: "Cullen Road, Near Iron Bridge, Mullakkal, Alappuzha - 688001",
+    phones: ["+91 98956 88833"],
+    email: "alappuzha@egsindia.in",
+    coverageAreas: [
+      "Mullakkal",
+      "Alappuzha Town",
+      "Ambalappuzha",
+      "Cherthala",
+      "Kayamkulam",
+      "Mararikulam",
+      "Haripad",
+      "Mavelikkara",
+      "Aryad",
+      "Mannancherry",
+    ],
+    landmarks: "Near Iron Bridge & District Court",
+    avgResponseTime: "60 - 90 Mins",
+    activeTechnicians: 10,
+  },
+  {
+    city: "Kottayam",
+    state: "Kerala",
+    tag: "Central Travancore Hub",
+    address: "KK Road, Kanjikuzhy Junction, Kottayam - 686004",
+    phones: ["+91 98956 88833"],
+    email: "kottayam@egsindia.in",
+    coverageAreas: [
+      "Kanjikuzhy",
+      "Nagampadam",
+      "Kottayam Town",
+      "Changanassery",
+      "Pala",
+      "Ettumanoor",
+      "Baker Junction",
+      "Manarcad",
+      "Kumarakom",
+      "Pambady",
+    ],
+    landmarks: "Near Kanjikuzhy Junction",
+    avgResponseTime: "60 - 90 Mins",
+    activeTechnicians: 12,
+  },
+  {
+    city: "Kozhikode",
+    state: "Kerala",
+    tag: "Malabar Regional Hub",
+    address: "Mavoor Road, Near Cyberpark, Calicut - 673016",
+    phones: ["+91 98956 88833"],
+    email: "kozhikode@egsindia.in",
+    coverageAreas: [
+      "Mavoor Road",
+      "Palayam",
+      "Nadakkavu",
+      "Cyberpark (UL Cyberpark)",
+      "Pantheerankavu",
+      "Kallai",
+      "Elathur",
+      "Feroke",
+      "Medical College Area",
+      "Karanthur",
+    ],
+    landmarks: "Near Cyberpark, Mavoor Road Bypass",
+    avgResponseTime: "60 - 90 Mins",
+    activeTechnicians: 14,
+  },
+  {
+    city: "Bangalore",
+    state: "Karnataka",
+    tag: "Karnataka Commercial Hub",
+    address: "Outer Ring Road, Sector 6, HSR Layout, Bengaluru - 560102",
+    phones: ["+91 98956 88833"],
+    email: "bangalore@egsindia.in",
+    coverageAreas: [
+      "HSR Layout",
+      "Koramangala",
+      "Indiranagar",
+      "Whitefield",
+      "Electronic City",
+      "Bellandur",
+      "BTM Layout",
+      "Marathahalli",
+      "Sarjapur Road",
+      "JP Nagar",
+    ],
+    landmarks: "Near HSR BDA Complex, Sector 6",
+    avgResponseTime: "60 - 90 Mins",
+    activeTechnicians: 20,
+  },
+  {
     city: "Chennai",
     state: "Tamil Nadu",
     tag: "Tamil Nadu Regional Office",
@@ -195,7 +287,7 @@ function ServiceAreasPage() {
             </h1>
 
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Fast, on-demand HVAC service dispatch. Over 80+ certified mobile technicians stationed across Kerala and Chennai for guaranteed 90-minute arrival.
+              Fast, on-demand HVAC service dispatch. Over 80+ certified mobile technicians stationed across Kerala, Karnataka, and Tamil Nadu for guaranteed 90-minute arrival.
             </p>
 
             {/* Quick Guarantees */}
@@ -222,7 +314,7 @@ function ServiceAreasPage() {
               Select City Hub:
             </span>
             <div className="flex items-center gap-2">
-              {["All", "Kollam", "Thiruvananthapuram", "Ernakulam (Kochi)", "Thrissur", "Chennai"].map((city) => (
+              {["All", "Kollam", "Thiruvananthapuram", "Ernakulam (Kochi)", "Thrissur", "Alappuzha", "Kottayam", "Kozhikode", "Bangalore", "Chennai"].map((city) => (
                 <button
                   key={city}
                   type="button"

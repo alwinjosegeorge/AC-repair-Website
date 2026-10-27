@@ -1123,6 +1123,46 @@ const REGIONAL_BRANCHES_DATA = [
     email: "info@egsindia.in",
   },
   {
+    city: "Alappuzha",
+    tag: "Coastal Service Hub",
+    isHQ: false,
+    address: "Cullen Road, Near Iron Bridge, Mullakkal, Alappuzha - 688001",
+    phones: [
+      { label: "Helpline", number: "9895688833", formatted: "+91 98956 88833" },
+    ],
+    email: "info@egsindia.in",
+  },
+  {
+    city: "Kottayam",
+    tag: "Central Travancore Hub",
+    isHQ: false,
+    address: "KK Road, Kanjikuzhy Junction, Kottayam - 686004",
+    phones: [
+      { label: "Helpline", number: "9895688833", formatted: "+91 98956 88833" },
+    ],
+    email: "info@egsindia.in",
+  },
+  {
+    city: "Kozhikode",
+    tag: "Malabar Regional Hub",
+    isHQ: false,
+    address: "Mavoor Road, Near Cyberpark, Calicut - 673016",
+    phones: [
+      { label: "Helpline", number: "9895688833", formatted: "+91 98956 88833" },
+    ],
+    email: "info@egsindia.in",
+  },
+  {
+    city: "Bangalore",
+    tag: "Karnataka Commercial Hub",
+    isHQ: false,
+    address: "Outer Ring Road, Sector 6, HSR Layout, Bengaluru - 560102",
+    phones: [
+      { label: "Helpline", number: "9895688833", formatted: "+91 98956 88833" },
+    ],
+    email: "info@egsindia.in",
+  },
+  {
     city: "Chennai",
     tag: "Tamil Nadu Regional Office",
     isHQ: false,

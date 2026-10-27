@@ -82,36 +82,60 @@ export function Footer() {
             <h3 className="text-xs font-black uppercase tracking-wider text-background/90">
               Regional Service Hubs
             </h3>
-            <ul className="mt-4 space-y-2.5 text-xs text-background/75">
+            <ul className="mt-4 space-y-2 text-xs text-background/75">
               <li>
-                <a href="tel:9895688833" className="hover:text-white transition-colors flex items-center justify-between">
-                  <span>📍 Kollam (HQ)</span>
-                  <span className="text-[11px] text-sky-300 font-mono font-bold">9895688833</span>
-                </a>
+                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span className="text-sky-400">📍</span>
+                  <span>Kollam (HQ)</span>
+                </Link>
               </li>
               <li>
-                <a href="tel:8589035555" className="hover:text-white transition-colors flex items-center justify-between">
-                  <span>📍 Trivandrum</span>
-                  <span className="text-[11px] text-sky-300 font-mono font-bold">8589035555</span>
-                </a>
+                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span className="text-sky-400">📍</span>
+                  <span>Trivandrum</span>
+                </Link>
               </li>
               <li>
-                <a href="tel:8589935555" className="hover:text-white transition-colors flex items-center justify-between">
-                  <span>📍 Ernakulam</span>
-                  <span className="text-[11px] text-sky-300 font-mono font-bold">8589935555</span>
-                </a>
+                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span className="text-sky-400">📍</span>
+                  <span>Ernakulam</span>
+                </Link>
               </li>
               <li>
-                <a href="tel:8943312261" className="hover:text-white transition-colors flex items-center justify-between">
-                  <span>📍 Thrissur</span>
-                  <span className="text-[11px] text-sky-300 font-mono font-bold">8943312261</span>
-                </a>
+                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span className="text-sky-400">📍</span>
+                  <span>Thrissur</span>
+                </Link>
               </li>
               <li>
-                <a href="tel:9995108080" className="hover:text-white transition-colors flex items-center justify-between">
-                  <span>📍 Chennai</span>
-                  <span className="text-[11px] text-sky-300 font-mono font-bold">9995108080</span>
-                </a>
+                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span className="text-sky-400">📍</span>
+                  <span>Alappuzha</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span className="text-sky-400">📍</span>
+                  <span>Kottayam</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span className="text-sky-400">📍</span>
+                  <span>Kozhikode</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span className="text-sky-400">📍</span>
+                  <span>Bangalore</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span className="text-sky-400">📍</span>
+                  <span>Chennai</span>
+                </Link>
               </li>
             </ul>
 

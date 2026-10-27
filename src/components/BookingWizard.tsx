@@ -232,6 +232,7 @@ const MAJOR_CITIES = [
   "Palakkad",
   "Alappuzha",
   "Kannur",
+  "Bangalore",
   "Chennai",
   "Other City",
 ];
