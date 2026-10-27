@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AirVent,
   ArrowRight,
   ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Fan,
   HardHat,
@@ -1007,28 +1009,125 @@ const REGIONAL_BRANCHES_DATA = [
 ];
 
 function RegionalHubsDirectory() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const checkScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 15);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 15);
+
+    const card = el.firstElementChild as HTMLElement;
+    if (card) {
+      const cardWidth = card.clientWidth + 16;
+      const index = Math.round(el.scrollLeft / cardWidth);
+      setActiveIndex(Math.min(Math.max(index, 0), REGIONAL_BRANCHES_DATA.length - 1));
+    }
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, []);
+
+  const handleScroll = (direction: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const scrollAmount = el.clientWidth * 0.82;
+    el.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
+  const scrollToIndex = (index: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const children = el.children;
+    if (children[index]) {
+      (children[index] as HTMLElement).scrollIntoView({
+        behavior: "smooth",
+        inline: "start",
+        block: "nearest",
+      });
+    }
+  };
+
   return (
-    <section className="bg-surface/50 py-20 sm:py-24 border-y border-border">
+    <section className="bg-surface/50 py-16 sm:py-24 border-y border-border overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <div className="text-center max-w-3xl mx-auto">
-            <Badge>REGIONAL HUBS &amp; RAPID DISPATCH</Badge>
-            <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-ink">
-              Regional Service Hubs &amp; Coverage
-            </h2>
-            <p className="mt-4 text-sm sm:text-base text-ink/70 leading-relaxed">
-              Fast 90-minute technician dispatch from verified EGS INDIA service hubs across Kerala, Karnataka, and Tamil Nadu. Book online or call our centralized helpline.
-            </p>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8 sm:mb-12">
+            <div className="max-w-2xl text-left">
+              <Badge>REGIONAL HUBS &amp; RAPID DISPATCH</Badge>
+              <h2 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-ink">
+                Regional Service Hubs &amp; Coverage
+              </h2>
+              <p className="mt-3 text-sm sm:text-base text-ink/70 leading-relaxed">
+                Fast 90-minute technician dispatch from verified EGS INDIA service hubs across Kerala, Karnataka, and Tamil Nadu. Swipe to view our regional coverage:
+              </p>
+            </div>
+
+            {/* Slider Navigation Arrows & Swipe Hint */}
+            <div className="flex items-center justify-between md:justify-end gap-3 shrink-0">
+              <span className="text-xs font-bold text-muted-foreground md:hidden">
+                Swipe to explore 👉
+              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleScroll("left")}
+                  disabled={!canScrollLeft}
+                  aria-label="Previous service hubs"
+                  className={`size-10 sm:size-11 rounded-full border flex items-center justify-center transition-all ${
+                    canScrollLeft
+                      ? "border-border bg-card text-foreground hover:border-brand hover:text-brand hover:scale-105 shadow-sm active:scale-95"
+                      : "border-border/40 bg-surface/40 text-muted-foreground/30 cursor-not-allowed"
+                  }`}
+                >
+                  <ChevronLeft className="size-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleScroll("right")}
+                  disabled={!canScrollRight}
+                  aria-label="Next service hubs"
+                  className={`size-10 sm:size-11 rounded-full border flex items-center justify-center transition-all ${
+                    canScrollRight
+                      ? "border-border bg-card text-foreground hover:border-brand hover:text-brand hover:scale-105 shadow-sm active:scale-95"
+                      : "border-border/40 bg-surface/40 text-muted-foreground/30 cursor-not-allowed"
+                  }`}
+                >
+                  <ChevronRight className="size-5" />
+                </button>
+              </div>
+            </div>
           </div>
         </ScrollReveal>
 
-        <div className="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {REGIONAL_BRANCHES_DATA.map((branch, idx) => (
-            <ScrollReveal key={branch.city} delayMs={idx * 50} className="h-full">
+        {/* Swipeable Carousel Track */}
+        <div className="relative">
+          <div
+            ref={scrollRef}
+            className="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-none py-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 scroll-smooth"
+          >
+            {REGIONAL_BRANCHES_DATA.map((branch) => (
               <div
-                className={`rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:shadow-xl bg-card h-full ${
+                key={branch.city}
+                className={`w-[85vw] max-w-[340px] sm:w-[360px] md:w-[380px] lg:w-[calc(33.333%-16px)] shrink-0 snap-start rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:shadow-xl bg-card ${
                   branch.isHQ
-                    ? "border-brand/40 shadow-md ring-1 ring-brand/20"
+                    ? "border-brand/50 shadow-md ring-2 ring-brand/20"
                     : "border-border hover:border-brand/40"
                 }`}
               >
@@ -1040,7 +1139,7 @@ function RegionalHubsDirectory() {
                     <span
                       className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
                         branch.isHQ
-                          ? "bg-brand text-brand-foreground"
+                          ? "bg-brand text-brand-foreground shadow-xs"
                           : "bg-brand-soft text-brand"
                       }`}
                     >
@@ -1104,12 +1203,29 @@ function RegionalHubsDirectory() {
                   </div>
                 </div>
               </div>
-            </ScrollReveal>
-          ))}
+            ))}
+          </div>
+
+          {/* Interactive Pagination Dots */}
+          <div className="flex items-center justify-center gap-1.5 mt-6 sm:mt-8">
+            {REGIONAL_BRANCHES_DATA.map((branch, idx) => (
+              <button
+                key={branch.city}
+                type="button"
+                onClick={() => scrollToIndex(idx)}
+                aria-label={`Go to ${branch.city} hub`}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  activeIndex === idx
+                    ? "w-7 bg-brand shadow-xs"
+                    : "w-2 bg-border hover:bg-brand/40"
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
         <ScrollReveal delayMs={100}>
-          <div className="mt-10 sm:mt-12 text-center">
+          <div className="mt-8 sm:mt-10 text-center">
             <Link
               to="/service-areas"
               className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-brand hover:underline"

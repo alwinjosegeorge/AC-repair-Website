@@ -609,3 +609,12 @@
 .animate-shake {
   animation: shake 0.4s ease-in-out;
 }
+
+/* Hide scrollbar for Chrome, Safari, Opera, Edge, and Firefox */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
