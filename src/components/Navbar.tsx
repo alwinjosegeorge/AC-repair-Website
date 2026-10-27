@@ -70,10 +70,11 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-7 lg:flex">
           <Link
             to="/"
             className="text-sm font-semibold text-foreground/80 transition-colors hover:text-brand"
+            activeProps={{ className: "text-brand font-bold" }}
           >
             Home
           </Link>
@@ -86,14 +87,14 @@ export function Navbar() {
           >
             <button
               type="button"
-              className="flex items-center gap-1 text-sm font-semibold text-foreground/80 transition-colors hover:text-brand"
+              className="flex items-center gap-1.5 text-sm font-semibold text-foreground/80 transition-colors hover:text-brand py-1"
             >
               <span>Services</span>
-              <ChevronDown className="size-4" />
+              <ChevronDown className={`size-3.5 transition-transform duration-200 ${servicesDropdownOpen ? "rotate-180" : ""}`} />
             </button>
 
             {servicesDropdownOpen && (
-              <div className="absolute left-0 top-full pt-3 z-50 w-80">
+              <div className="absolute left-0 top-full pt-2 z-50 w-80">
                 <div className="rounded-2xl border border-border bg-card p-3 shadow-2xl space-y-1">
                   {SERVICE_LINKS.map((s) => {
                     const Icon = s.icon;
@@ -126,6 +127,7 @@ export function Navbar() {
           <Link
             to="/service-areas"
             className="text-sm font-semibold text-foreground/80 transition-colors hover:text-brand"
+            activeProps={{ className: "text-brand font-bold" }}
           >
             Service Areas
           </Link>
@@ -133,6 +135,7 @@ export function Navbar() {
           <Link
             to="/about"
             className="text-sm font-semibold text-foreground/80 transition-colors hover:text-brand"
+            activeProps={{ className: "text-brand font-bold" }}
           >
             About Us
           </Link>
@@ -140,53 +143,43 @@ export function Navbar() {
           <Link
             to="/contact"
             className="text-sm font-semibold text-foreground/80 transition-colors hover:text-brand"
+            activeProps={{ className: "text-brand font-bold" }}
           >
             Contact
           </Link>
         </nav>
 
-        {/* Header Right Action Buttons */}
-        <div className="hidden items-center gap-2.5 md:flex">
-          {/* Direct Phone Call */}
-          <a
-            href={`tel:${EGS_CALL_NUMBER}`}
-            onClick={() => trackCallClick("header_navbar")}
-            className="flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-bold text-foreground transition-colors hover:border-brand/40"
-          >
-            <Phone className="size-3.5 text-brand" />
-            <span>Call now</span>
-          </a>
-
-          {/* Direct WhatsApp */}
-          <a
-            href={waURL}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackWhatsAppClick("header_navbar")}
-            className="flex items-center gap-1.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 px-3 py-2 text-xs font-bold text-[#25D366] transition-colors hover:bg-[#25D366]/20"
-          >
-            <WhatsAppIcon className="size-3.5 fill-current" />
-            <span>WhatsApp us</span>
-          </a>
-
-          {/* Book a Service CTA */}
+        {/* Header Right Action: ONLY Book a service */}
+        <div className="hidden items-center lg:flex">
           <Link
             to="/book"
-            className="flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-xs font-black text-brand-foreground shadow-md shadow-brand/25 transition-all hover:opacity-95 hover:shadow-brand/40"
+            className="flex items-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-md shadow-brand/25 transition-all hover:opacity-95 hover:shadow-brand/40 hover:scale-[1.02]"
           >
             <Calendar className="size-3.5" />
             <span>Book a service</span>
           </Link>
         </div>
 
-        {/* Mobile Menu Toggle Button */}
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="flex size-10 items-center justify-center rounded-xl border border-border bg-surface text-foreground lg:hidden"
-        >
-          {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
+        {/* Mobile Header Actions */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <Link
+            to="/book"
+            className="flex items-center gap-1.5 rounded-xl bg-brand px-3 py-2 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-xs"
+          >
+            <Calendar className="size-3.5" />
+            <span>Book</span>
+          </Link>
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="flex size-10 items-center justify-center rounded-xl border border-border bg-surface text-foreground"
+            aria-label="Toggle Navigation Menu"
+          >
+            {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Drawer */}
