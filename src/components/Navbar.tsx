@@ -11,6 +11,10 @@ import {
   ShieldCheck,
   Building2,
   Calendar,
+  Home,
+  Users,
+  MapPin,
+  Headphones,
 } from "lucide-react";
 import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "../lib/store";
 import { trackCallClick, trackWhatsAppClick } from "../lib/tracking";
@@ -176,64 +180,104 @@ export function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="mt-2 rounded-3xl border border-border bg-card p-5 shadow-2xl lg:hidden">
+        <div className="mt-2 rounded-3xl border border-border bg-card p-4 sm:p-5 shadow-2xl lg:hidden animate-fade-in-up">
           <div className="space-y-4">
-            <Link
-              to="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-bold text-foreground"
-            >
-              Home
-            </Link>
-
-            <div className="border-t border-border pt-3">
-              <span className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-                Our Services
+            {/* 1. Quick Navigation Hub: Home, About Us, Service Areas, Contact */}
+            <div>
+              <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground block mb-2 px-1">
+                Navigation
               </span>
-              <div className="mt-2 space-y-1">
-                {SERVICE_LINKS.map((s) => (
-                  <Link
-                    key={s.href}
-                    to={s.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface"
-                  >
-                    <span>{s.name}</span>
-                    <span className="text-[10px] text-brand">View →</span>
-                  </Link>
-                ))}
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  to="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 rounded-2xl border border-border/80 bg-surface/70 p-3 text-xs font-bold text-foreground transition-all hover:border-brand/50 hover:bg-surface active:scale-95"
+                  activeProps={{ className: "border-brand bg-brand-soft/40 text-brand font-black" }}
+                >
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-brand-soft text-brand shrink-0">
+                    <Home className="size-3.5" />
+                  </div>
+                  <span>Home</span>
+                </Link>
+
+                <Link
+                  to="/about"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 rounded-2xl border border-border/80 bg-surface/70 p-3 text-xs font-bold text-foreground transition-all hover:border-brand/50 hover:bg-surface active:scale-95"
+                  activeProps={{ className: "border-brand bg-brand-soft/40 text-brand font-black" }}
+                >
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-brand-soft text-brand shrink-0">
+                    <Users className="size-3.5" />
+                  </div>
+                  <span>About Us</span>
+                </Link>
+
+                <Link
+                  to="/service-areas"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 rounded-2xl border border-border/80 bg-surface/70 p-3 text-xs font-bold text-foreground transition-all hover:border-brand/50 hover:bg-surface active:scale-95"
+                  activeProps={{ className: "border-brand bg-brand-soft/40 text-brand font-black" }}
+                >
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-brand-soft text-brand shrink-0">
+                    <MapPin className="size-3.5" />
+                  </div>
+                  <span>Service Areas</span>
+                </Link>
+
+                <Link
+                  to="/contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 rounded-2xl border border-border/80 bg-surface/70 p-3 text-xs font-bold text-foreground transition-all hover:border-brand/50 hover:bg-surface active:scale-95"
+                  activeProps={{ className: "border-brand bg-brand-soft/40 text-brand font-black" }}
+                >
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-brand-soft text-brand shrink-0">
+                    <Headphones className="size-3.5" />
+                  </div>
+                  <span>Contact</span>
+                </Link>
               </div>
             </div>
 
-            <div className="border-t border-border pt-3 space-y-2.5">
-              <Link
-                to="/service-areas"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-xs font-bold text-foreground"
-              >
-                Service Areas
-              </Link>
-              <Link
-                to="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-xs font-semibold text-muted-foreground"
-              >
-                About Us
-              </Link>
-              <Link
-                to="/contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-xs font-semibold text-muted-foreground"
-              >
-                Contact
-              </Link>
+            {/* 2. HVAC Services Specializations */}
+            <div className="border-t border-border pt-3">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                  Our HVAC Services
+                </span>
+                <span className="text-[10px] font-bold text-brand bg-brand-soft px-2 py-0.5 rounded-full">
+                  5 Specializations
+                </span>
+              </div>
+              <div className="space-y-1">
+                {SERVICE_LINKS.map((s) => {
+                  const Icon = s.icon;
+                  return (
+                    <Link
+                      key={s.href}
+                      to={s.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface transition-colors"
+                      activeProps={{ className: "bg-surface text-brand font-bold" }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex size-6 items-center justify-center rounded-md bg-brand-soft/60 text-brand shrink-0">
+                          <Icon className="size-3.5" />
+                        </div>
+                        <span>{s.name}</span>
+                      </div>
+                      <span className="text-[11px] font-bold text-brand">View →</span>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
 
+            {/* 3. Action Buttons */}
             <div className="border-t border-border pt-4 flex flex-col gap-2">
               <Link
                 to="/book"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-md shadow-brand/30"
+                className="flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-md shadow-brand/30 transition-all hover:opacity-95 active:scale-95"
               >
                 <Calendar className="size-4" />
                 <span>Book a service</span>
@@ -242,7 +286,7 @@ export function Navbar() {
                 <a
                   href={`tel:${EGS_CALL_NUMBER}`}
                   onClick={() => trackCallClick("mobile_drawer")}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface py-2.5 text-xs font-bold text-foreground"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface py-2.5 text-xs font-bold text-foreground shadow-xs hover:border-brand/40 active:scale-95"
                 >
                   <Phone className="size-3.5 text-brand" />
                   <span>Call now</span>
@@ -252,7 +296,7 @@ export function Navbar() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick("mobile_drawer")}
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 py-2.5 text-xs font-bold text-[#25D366]"
+                  className="flex items-center justify-center gap-1.5 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 py-2.5 text-xs font-bold text-[#25D366] shadow-xs hover:bg-[#25D366]/25 active:scale-95"
                 >
                   <WhatsAppIcon className="size-3.5 fill-current" />
                   <span>WhatsApp us</span>
