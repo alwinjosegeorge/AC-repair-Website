@@ -334,7 +334,7 @@ function QuickActionBar() {
 function BreezeIconTwo() {
   return (
     <svg
-      className="mx-3 sm:mx-6 h-5 w-6 sm:h-7 sm:w-8 text-[#70a9ff] shrink-0 inline-block align-middle"
+      className="mx-4 sm:mx-8 h-6 w-7 sm:h-9 sm:w-11 text-[#70a9ff] shrink-0 inline-block align-middle"
       viewBox="0 0 32 28"
       fill="none"
       aria-hidden="true"
@@ -354,7 +354,7 @@ function BreezeIconTwo() {
 function BreezeIconThree() {
   return (
     <svg
-      className="mx-3 sm:mx-6 h-5 w-7 sm:h-7 sm:w-9 text-[#70a9ff] shrink-0 inline-block align-middle"
+      className="mx-4 sm:mx-8 h-6 w-8 sm:h-9 sm:w-12 text-[#70a9ff] shrink-0 inline-block align-middle"
       viewBox="0 0 36 28"
       fill="none"
       aria-hidden="true"
@@ -379,7 +379,7 @@ function Marquee() {
       {marqueeItems.map((item, idx) => (
         <span key={`${keyPrefix}-${item.text}`} className="flex items-center">
           <span
-            className={`text-xl sm:text-3xl md:text-4xl font-bold tracking-tight transition-colors ${
+            className={`text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight transition-colors ${
               item.isBlue ? "text-[#70a9ff] dark:text-[#93c5fd]" : "text-ink"
             }`}
           >
@@ -392,7 +392,7 @@ function Marquee() {
   );
 
   return (
-    <div className="relative mt-4 sm:mt-6 mb-2 sm:mb-4 py-2 sm:py-3 overflow-hidden isolate select-none">
+    <div className="relative mt-4 sm:mt-6 mb-2 sm:mb-4 py-3 sm:py-5 overflow-hidden isolate select-none">
       {/* Left and Right Edge Vignette Fades for seamless entrance & exit */}
       <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10" />
