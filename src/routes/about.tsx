@@ -21,6 +21,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import aboutTech from "@/assets/about-tech.jpg";
+import amalBhPhoto from "@/assets/amal-bh.jpg";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
@@ -226,7 +227,7 @@ function AboutPage() {
       {/* Leadership Section */}
       <section className="py-20 sm:py-24 bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-14">
+          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-14">
             <span className="inline-block rounded-full bg-brand-soft px-3.5 py-1 text-xs font-black tracking-wider uppercase text-brand">
               EXECUTIVE GOVERNANCE
             </span>
@@ -234,8 +235,75 @@ function AboutPage() {
               Leadership &amp; Management
             </h2>
             <p className="mt-3 text-base text-ink/70 leading-relaxed">
-              Our multidisciplinary leadership team combines over a decade of hands-on HVAC technical mastery, supply chain expertise, and client-first engineering governance.
+              Guided by founding vision and multidisciplinary HVAC engineering mastery across South India.
             </p>
+          </div>
+
+          {/* Founder & Managing Director Executive Feature Card */}
+          <div className="mb-12 sm:mb-16 rounded-3xl border border-brand/25 bg-gradient-to-br from-card via-card to-brand-soft/20 p-6 sm:p-10 md:p-12 shadow-xl">
+            <div className="grid md:grid-cols-12 gap-8 md:gap-12 items-center">
+              {/* Photo Column */}
+              <div className="md:col-span-5 lg:col-span-4 flex justify-center">
+                <div className="relative group max-w-[280px] sm:max-w-[320px] w-full">
+                  <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-tr from-brand to-sky-400 opacity-25 blur-lg group-hover:opacity-40 transition-opacity duration-300" />
+                  <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border-2 border-brand/30 bg-card shadow-2xl">
+                    <img
+                      src={amalBhPhoto}
+                      alt="Amal B H - Founder & Managing Director, Expert Goods & Services"
+                      className="w-full aspect-[3/4] object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute bottom-3 left-3 right-3 text-white pointer-events-none">
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-brand px-2.5 py-1 rounded-md inline-block shadow-sm">
+                        Founding Leader
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bio & Leadership Profile Column */}
+              <div className="md:col-span-7 lg:col-span-8 space-y-4 sm:space-y-5">
+                <div className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3.5 py-1 text-xs font-black text-brand tracking-wider uppercase">
+                  <Award className="size-3.5" />
+                  <span>FOUNDER &amp; MANAGING DIRECTOR</span>
+                </div>
+
+                <div>
+                  <h3 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+                    Amal B H
+                  </h3>
+                  <p className="text-sm sm:text-base font-bold text-brand mt-1">
+                    Founder &amp; Managing Director • Expert Goods &amp; Services
+                  </p>
+                </div>
+
+                <blockquote className="border-l-4 border-brand pl-4 py-1 italic text-base sm:text-lg text-ink/85 font-medium leading-relaxed">
+                  “Since establishing Expert Goods and Services in 2015, our mission has been clear: delivering genuine value, high quality, and super-fast HVAC solutions with unmatched customer trust.”
+                </blockquote>
+
+                <p className="text-sm sm:text-base text-ink/75 leading-relaxed">
+                  Under the leadership of Amal B H, EGS INDIA has grown from an innovative home appliance repair provider in Kollam into a leading South Indian HVAC engineering enterprise. With specialized focus on VRF systems, central cooling plants, and rapid doorstep domestic service, his vision continues to set new benchmarks for professional HVAC care.
+                </p>
+
+                {/* Key Executive Highlights */}
+                <div className="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-3 border-t border-border/70 text-xs">
+                  <div className="p-3 rounded-xl bg-surface/70 border border-border">
+                    <div className="font-black text-brand text-base sm:text-lg">2015</div>
+                    <div className="text-muted-foreground text-[11px] font-medium">Founded EGS INDIA</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-surface/70 border border-border">
+                    <div className="font-black text-brand text-base sm:text-lg">10+ Years</div>
+                    <div className="text-muted-foreground text-[11px] font-medium">Industry Excellence</div>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 p-3 rounded-xl bg-surface/70 border border-border">
+                    <div className="font-black text-brand text-base sm:text-lg">Pan-South India</div>
+                    <div className="text-muted-foreground text-[11px] font-medium">9 Regional Hubs</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
