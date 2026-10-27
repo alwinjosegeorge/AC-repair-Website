@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useLocation } from "@tanstack/react-router";
 import { Phone, Calendar, X, Headphones } from "lucide-react";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 import { EGS_WHATSAPP_NUMBER, EGS_CALL_NUMBER } from "../lib/store";
@@ -9,6 +10,28 @@ export function FloatingActions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+  const [showMobileBar, setShowMobileBar] = useState(!isHomePage);
+
+  // On homepage, only show bottom navigation bar when user scrolls past the hero section
+  useEffect(() => {
+    if (!isHomePage) {
+      setShowMobileBar(true);
+      return;
+    }
+
+    const handleScroll = () => {
+      // Reveal bottom bar when scrolled past hero (around 280px, entering the second section)
+      const scrolledPastHero = window.scrollY > 280;
+      setShowMobileBar(scrolledPastHero);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isHomePage]);
 
   // Close speed dial when clicking outside
   useEffect(() => {
@@ -43,8 +66,14 @@ export function FloatingActions() {
 
   return (
     <>
-      {/* Mobile Sticky Bottom Action Bar (always visible on small screens) */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 block border-t border-border/80 bg-background/95 backdrop-blur-md p-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] md:hidden">
+      {/* Mobile Sticky Bottom Action Bar (hidden at top of homepage, slides up upon scrolling) */}
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-50 block border-t border-border/80 bg-background/95 backdrop-blur-md p-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] shadow-[0_-8px_30px_rgba(0,0,0,0.15)] md:hidden transition-all duration-300 ease-in-out ${
+          showMobileBar
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
         <div className="mx-auto flex max-w-md items-center justify-between gap-2">
           {/* Call button */}
           <a
