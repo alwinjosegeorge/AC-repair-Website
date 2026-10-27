@@ -758,19 +758,20 @@ function CallToAction() {
   return (
     <section className="bg-background px-6 py-16">
       <ScrollReveal>
-        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl isolate px-6 py-28 text-center">
+        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl isolate px-6 py-20 sm:py-28 text-center bg-surface border border-border/50 shadow-xl">
           {/* Animated Flowing Cool Stripes Background */}
-          <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-            <div className="absolute inset-y-0 -left-6 w-[calc(100%+120px)] h-full cool-stripes-pattern animate-cool-stripes" />
-            <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_10%,white_0%,transparent_60%)]" />
+          <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+            <div className="absolute inset-y-0 -left-6 w-[calc(100%+120px)] h-full cool-stripes-pattern animate-cool-stripes opacity-90" />
+            <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_10%,white_0%,transparent_60%)] dark:bg-[radial-gradient(120%_80%_at_50%_10%,rgba(15,23,42,0.6)_0%,transparent_60%)]" />
           </div>
+
           <img
             src={cta2}
             alt="Technician cleaning an AC filter"
             width={600}
             height={600}
             loading="lazy"
-            className="absolute bottom-10 left-6 hidden size-56 blob-shape border-4 border-background object-cover lg:block"
+            className="absolute bottom-10 left-6 hidden size-56 blob-shape border-4 border-background object-cover shadow-lg lg:block z-0"
           />
           <img
             src={cta1}
@@ -778,40 +779,46 @@ function CallToAction() {
             width={600}
             height={600}
             loading="lazy"
-            className="absolute top-10 right-6 hidden size-56 blob-shape border-4 border-background object-cover lg:block"
+            className="absolute top-10 right-6 hidden size-56 blob-shape border-4 border-background object-cover shadow-lg lg:block z-0"
           />
-          <Badge tone="white">COMFORT RESTORED</Badge>
-          <h2 className="mx-auto mt-8 max-w-3xl text-4xl leading-tight font-extrabold md:text-6xl">
-            Ready to Upgrade Your Cooling System?
-          </h2>
-          
-          {/* 3 Prominent Home Page Action Buttons */}
-          <div className="mt-10 flex flex-wrap justify-center items-center gap-4">
-            <Link
-              to="/book"
-              className="flex items-center gap-2 rounded-2xl bg-brand px-8 py-4 text-base font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90"
-            >
-              <Calendar className="size-5" />
-              <span>Book a service</span>
-            </Link>
-            <a
-              href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I would like to schedule an AC inspection or upgrade.")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackWhatsAppClick("home_bottom_cta")}
-              className="flex items-center gap-2 rounded-2xl bg-[#25D366] px-8 py-4 text-base font-black uppercase tracking-wider text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
-            >
-              <WhatsAppIcon className="size-5 fill-current" />
-              <span>WhatsApp us</span>
-            </a>
-            <a
-              href={`tel:${EGS_CALL_NUMBER}`}
-              onClick={() => trackCallClick("home_bottom_cta")}
-              className="flex items-center gap-2 rounded-2xl border-2 border-border bg-background px-8 py-4 text-base font-black uppercase tracking-wider text-ink shadow-md transition-all hover:scale-105 hover:bg-surface"
-            >
-              <Phone className="size-5 text-brand" />
-              <span>Call now</span>
-            </a>
+
+          <div className="relative z-10 mx-auto max-w-3xl">
+            <Badge tone="white">COMFORT RESTORED</Badge>
+            <h2 className="mx-auto mt-6 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight text-ink sm:text-5xl md:text-6xl">
+              Ready to Upgrade Your Cooling System?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-base text-ink/75 sm:text-lg">
+              Get 90-minute rapid arrival, transparent pricing, and 100% genuine spare parts for your home or business.
+            </p>
+            
+            {/* 3 Prominent Home Page Action Buttons */}
+            <div className="mt-8 sm:mt-10 flex flex-wrap justify-center items-center gap-4">
+              <Link
+                to="/book"
+                className="flex items-center gap-2 rounded-2xl bg-brand px-8 py-4 text-base font-black uppercase tracking-wider text-brand-foreground shadow-2xl shadow-brand/40 transition-all hover:scale-105 hover:bg-brand/90"
+              >
+                <Calendar className="size-5" />
+                <span>Book a service</span>
+              </Link>
+              <a
+                href={`https://wa.me/${EGS_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello EGS INDIA! I would like to schedule an AC inspection or upgrade.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick("home_bottom_cta")}
+                className="flex items-center gap-2 rounded-2xl bg-[#25D366] px-8 py-4 text-base font-black uppercase tracking-wider text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
+              >
+                <WhatsAppIcon className="size-5 fill-current" />
+                <span>WhatsApp us</span>
+              </a>
+              <a
+                href={`tel:${EGS_CALL_NUMBER}`}
+                onClick={() => trackCallClick("home_bottom_cta")}
+                className="flex items-center gap-2 rounded-2xl border-2 border-border bg-background px-8 py-4 text-base font-black uppercase tracking-wider text-ink shadow-md transition-all hover:scale-105 hover:bg-surface"
+              >
+                <Phone className="size-5 text-brand" />
+                <span>Call now</span>
+              </a>
+            </div>
           </div>
         </div>
       </ScrollReveal>
