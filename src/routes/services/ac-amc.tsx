@@ -28,7 +28,7 @@ function ACAMCPage() {
       serviceTitle="Annual Maintenance Contract (AMC)"
       badgeText="Annual Savings Plan • 365 Days Peace of Mind"
       headline="Year-Round AC Protection & Maintenance Contracts"
-      subheadline="Never worry about sudden summer breakdowns or surprise repair bills again. Enjoy scheduled quarterly deep jet washes, priority 60-min breakdown visits, and free labor."
+      subheadline="Never worry about sudden summer breakdowns or surprise repair bills again. Enjoy scheduled quarterly deep jet washes, priority breakdown visits within 24 hours, and free labor."
       startingPrice="₹1,999/yr"
       packages={[
         {
@@ -42,7 +42,7 @@ function ACAMCPage() {
             "Unlimited free breakdown inspection visits",
             "Zero labor charges for any repairs during contract year",
             "10-Point pre-summer comprehensive health checkup",
-            "Priority same-day technician dispatch within 2 hours",
+            "Priority technician dispatch within 24 hours",
             "Dedicated WhatsApp relationship manager",
           ],
         },
