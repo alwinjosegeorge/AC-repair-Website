@@ -185,7 +185,6 @@ export function Footer() {
               <Link to="/services/ac-service" className="hover:text-white transition-colors">AC Service</Link>
               <Link to="/services/ac-repair" className="hover:text-white transition-colors">AC Repair</Link>
               <Link to="/service-areas" className="hover:text-white transition-colors">Service Areas</Link>
-              <Link to="/projects" className="hover:text-white transition-colors">Projects &amp; Clients</Link>
               <Link to="/about" className="hover:text-white transition-colors">About Us</Link>
               <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
               <Link to="/book" className="text-white font-bold hover:underline">Book a Service</Link>

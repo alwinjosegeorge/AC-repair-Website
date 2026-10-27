@@ -38,7 +38,6 @@ import {
   trackWhatsAppClick,
 } from "@/lib/tracking";
 import { CoolAirFlow } from "@/components/CoolAirFlow";
-import { ClientsShowcase } from "@/components/ClientsShowcase";
 import aboutTech from "@/assets/about-tech.jpg";
 import projectResidential from "@/assets/project-residential.jpg";
 import projectCommercial from "@/assets/project-commercial.jpg";
@@ -70,7 +69,6 @@ export const Route = createFileRoute("/")({
 
 const navLinks = [
   { name: "About", href: "/about" },
-  { name: "Projects", href: "/projects" },
   { name: "Services", href: "#services" },
   { name: "Contact", href: "/contact" }
 ];
@@ -630,24 +628,6 @@ function BookOnlineSection() {
   );
 }
 
-function HomeClientsSection() {
-  return (
-    <section id="clients-and-works" className="bg-background py-16 sm:py-24 px-4 sm:px-6 border-b border-border/60">
-      <div className="mx-auto max-w-7xl">
-        <ScrollReveal>
-          <ClientsShowcase
-            showBanner={true}
-            limit={8}
-            showFilters={false}
-            title="Trusted by Leading Clients & Brands"
-            subtitle="Explore our completed works and prestigious client partners across Trivandrum, Cochin, Kollam, and Thrissur."
-          />
-        </ScrollReveal>
-      </div>
-    </section>
-  );
-}
-
 const steps = [
   { n: "01", title: "Request Service", text: "Submit service request easily through our platform" },
   { n: "02", title: "Schedule Technician", text: "Choose a convenient time for our expert visit" },
@@ -1155,7 +1135,6 @@ function Index() {
       <Services />
       <BookOnlineSection />
       <Process />
-      <HomeClientsSection />
       <RegionalHubsDirectory />
       <CallToAction />
       <Footer />
