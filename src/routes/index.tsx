@@ -392,12 +392,7 @@ function Marquee() {
   );
 
   return (
-    <div className="relative my-8 sm:my-12 py-3 sm:py-5 overflow-hidden isolate select-none">
-      {/* Background stripes that fade out at the bottom */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden mask-bottom-fade">
-        <div className="absolute inset-y-0 -left-6 w-[calc(100%+120px)] h-full cool-stripes-pattern animate-cool-stripes" />
-      </div>
-
+    <div className="relative mt-4 sm:mt-6 mb-2 sm:mb-4 py-2 sm:py-3 overflow-hidden isolate select-none">
       {/* Left and Right Edge Vignette Fades for seamless entrance & exit */}
       <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10" />
@@ -413,7 +408,7 @@ function Marquee() {
 
 function About() {
   return (
-    <section id="about" className="bg-background py-16 sm:py-24">
+    <section id="about" className="bg-background pt-4 pb-16 sm:pt-6 sm:pb-24">
       <div className="mx-auto max-w-7xl px-6">
         <ScrollReveal>
           <div className="text-center">
