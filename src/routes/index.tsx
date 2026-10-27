@@ -38,6 +38,7 @@ import {
   trackWhatsAppClick,
 } from "@/lib/tracking";
 import { CoolAirFlow } from "@/components/CoolAirFlow";
+import { ClientsShowcase } from "@/components/ClientsShowcase";
 import aboutTech from "@/assets/about-tech.jpg";
 import projectResidential from "@/assets/project-residential.jpg";
 import projectCommercial from "@/assets/project-commercial.jpg";
@@ -46,9 +47,6 @@ import cta1 from "@/assets/cta-1.jpg";
 import cta2 from "@/assets/cta-2.jpg";
 import blog1 from "@/assets/blog-1.jpg";
 import blog2 from "@/assets/blog-2.jpg";
-import work1 from "@/assets/work-1.jpg";
-import work2 from "@/assets/work-2.jpg";
-import work3 from "@/assets/work-3.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -632,78 +630,19 @@ function BookOnlineSection() {
   );
 }
 
-const statProjects = [
-  {
-    img: work1,
-    title: "Expert AC Repair",
-    client: "Jenora Havard",
-    time: "2 Days",
-    price: "$50",
-  },
-  {
-    img: work2,
-    title: "Residential AC Service",
-    client: "Aria Mitchell",
-    time: "3 Days",
-    price: "$75",
-  },
-  {
-    img: work3,
-    title: "Quick AC Fix",
-    client: "Liana Carter",
-    time: "4 Days",
-    price: "$100",
-  },
-];
-
-function Statistics() {
+function HomeClientsSection() {
   return (
-    <section id="projects" className="bg-background py-24">
-      <div className="mx-auto max-w-7xl px-6 text-center md:text-left">
-        <Badge>OUR STATISTICS STATE</Badge>
-        <h2 className="mt-6 text-4xl font-extrabold md:text-6xl">Speaks Everything</h2>
-      </div>
-      <div className="mt-14 flex gap-6 overflow-x-auto px-6 pb-4 lg:mx-auto lg:max-w-7xl">
-        {statProjects.map(({ img, title, client, time, price }) => (
-          <article
-            key={title}
-            className="relative min-w-[20rem] flex-1 overflow-hidden rounded-2xl md:min-w-[24rem]"
-          >
-            <img
-              src={img}
-              alt={title}
-              width={900}
-              height={1100}
-              loading="lazy"
-              className="h-[34rem] w-full object-cover"
-            />
-            <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-background p-6 shadow-md">
-              <h3 className="text-2xl font-extrabold text-ink">{title}</h3>
-              <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4 text-sm font-medium text-ink/75">
-                <div className="flex justify-between">
-                  <span className="text-ink/50">Client:</span>
-                  <span>{client}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-ink/50">Time:</span>
-                  <span>{time}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-ink/50">Price:</span>
-                  <span className="text-brand font-bold">{price}</span>
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-      <div className="mt-12 text-center">
-        <a
-          href="/contact"
-          className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-4 text-base font-semibold text-brand-foreground shadow-sm transition-opacity hover:opacity-90"
-        >
-          More Projects <ArrowRight className="size-4" />
-        </a>
+    <section id="clients-and-works" className="bg-background py-16 sm:py-24 px-4 sm:px-6 border-b border-border/60">
+      <div className="mx-auto max-w-7xl">
+        <ScrollReveal>
+          <ClientsShowcase
+            showBanner={true}
+            limit={8}
+            showFilters={false}
+            title="Trusted by Leading Clients & Brands"
+            subtitle="Explore our completed works and prestigious client partners across Trivandrum, Cochin, Kollam, and Thrissur."
+          />
+        </ScrollReveal>
       </div>
     </section>
   );
@@ -1216,6 +1155,7 @@ function Index() {
       <Services />
       <BookOnlineSection />
       <Process />
+      <HomeClientsSection />
       <RegionalHubsDirectory />
       <CallToAction />
       <Footer />
