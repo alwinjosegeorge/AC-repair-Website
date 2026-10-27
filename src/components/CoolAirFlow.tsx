@@ -36,13 +36,23 @@ export function CoolAirFlow({ className = "" }: CoolAirFlowProps) {
               />
             </picture>
 
-            {/* Secondary Cascading Wind Shimmer */}
+            {/* Secondary Cascading Wind Shimmer 1 */}
             <picture className="absolute inset-0 block w-full opacity-60">
               <source srcSet="/ac-airflow.avif" type="image/avif" />
               <img
                 src={acAirflowPng}
                 alt="Cold breeze ripple"
                 className="w-full pointer-events-none animate-ac-flow-shimmer select-none"
+              />
+            </picture>
+
+            {/* Staggered Cascading Wind Shimmer 2 */}
+            <picture className="absolute inset-0 block w-full opacity-45">
+              <source srcSet="/ac-airflow.avif" type="image/avif" />
+              <img
+                src={acAirflowPng}
+                alt="Cold breeze continuous wave"
+                className="w-full pointer-events-none animate-ac-flow-shimmer-delay select-none"
               />
             </picture>
           </div>

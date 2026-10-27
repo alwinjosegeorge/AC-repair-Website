@@ -384,45 +384,64 @@
   transform-origin: top center;
 }
 
-/* User-provided Authentic AC Airflow Stream Movement */
+/* Real AC Auto-Swing Up & Down Airflow Motion */
 @keyframes ac-flow-stream {
-  0%, 100% {
-    transform: scaleX(0.99) scaleY(0.97) translateY(0);
-    opacity: 0.9;
-    filter: drop-shadow(0 6px 16px rgba(56, 189, 248, 0.4));
+  0% {
+    transform: translateY(-4px) scaleY(0.90) scaleX(0.97);
+    opacity: 0.85;
+    filter: drop-shadow(0 6px 14px rgba(56, 189, 248, 0.4));
+  }
+  35% {
+    transform: translateY(12px) scaleY(1.10) scaleX(1.01);
+    opacity: 0.95;
+    filter: drop-shadow(0 14px 28px rgba(56, 189, 248, 0.65));
   }
   50% {
-    transform: scaleX(1.02) scaleY(1.03) translateY(5px);
+    transform: translateY(22px) scaleY(1.22) scaleX(1.03);
     opacity: 1;
-    filter: drop-shadow(0 12px 26px rgba(56, 189, 248, 0.65));
+    filter: drop-shadow(0 20px 40px rgba(56, 189, 248, 0.85));
+  }
+  65% {
+    transform: translateY(14px) scaleY(1.12) scaleX(1.01);
+    opacity: 0.95;
+    filter: drop-shadow(0 14px 28px rgba(56, 189, 248, 0.65));
+  }
+  100% {
+    transform: translateY(-4px) scaleY(0.90) scaleX(0.97);
+    opacity: 0.85;
+    filter: drop-shadow(0 6px 14px rgba(56, 189, 248, 0.4));
   }
 }
 .animate-ac-flow {
   transform-origin: top center;
-  animation: ac-flow-stream 2.8s ease-in-out infinite;
+  animation: ac-flow-stream 3.6s ease-in-out infinite;
 }
 
-/* Secondary Flowing Wind Shimmer Cascade */
+/* Secondary Flowing Wind Shimmer Wave (Downward Gust Ripples) */
 @keyframes ac-flow-shimmer {
   0% {
-    transform: scaleX(0.98) scaleY(0.95) translateY(-2px);
+    transform: translateY(-6px) scaleY(0.85) scaleX(0.95);
     opacity: 0;
   }
-  30% {
-    opacity: 0.55;
-  }
-  70% {
+  20% {
     opacity: 0.65;
-    transform: scaleX(1.015) scaleY(1.04) translateY(6px);
+  }
+  55% {
+    transform: translateY(16px) scaleY(1.15) scaleX(1.02);
+    opacity: 0.75;
   }
   100% {
-    transform: scaleX(1.03) scaleY(1.08) translateY(14px);
+    transform: translateY(36px) scaleY(1.35) scaleX(1.05);
     opacity: 0;
   }
 }
 .animate-ac-flow-shimmer {
   transform-origin: top center;
-  animation: ac-flow-shimmer 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: ac-flow-shimmer 2.4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+.animate-ac-flow-shimmer-delay {
+  transform-origin: top center;
+  animation: ac-flow-shimmer 2.4s cubic-bezier(0.25, 1, 0.5, 1) infinite 1.2s;
 }
 
 /* Flowing Cold Breeze Ripples (Continuous Downward Cascades) */
