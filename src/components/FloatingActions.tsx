@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Phone, Calendar, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Phone, Calendar, X, Headphones } from "lucide-react";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 import { EGS_WHATSAPP_NUMBER, EGS_CALL_NUMBER } from "../lib/store";
 import { trackCallClick, trackWhatsAppClick } from "../lib/tracking";
@@ -7,6 +7,23 @@ import { BookingWizard } from "./BookingWizard";
 
 export function FloatingActions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close speed dial when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   // Don't render floating consumer actions inside admin or technician field portals
   if (
@@ -63,41 +80,82 @@ export function FloatingActions() {
         </div>
       </div>
 
-      {/* Desktop Floating Actions Widget */}
-      <div className="fixed bottom-6 right-6 z-40 hidden md:flex items-center gap-2 rounded-full border border-border/80 bg-background/95 p-1.5 shadow-2xl backdrop-blur-md">
-        {/* Call */}
-        <a
-          href={`tel:${EGS_CALL_NUMBER}`}
-          onClick={() => trackCallClick("desktop_floating_dock")}
-          title="Call Helpline: +91 98956 88833"
-          className="flex items-center gap-1.5 rounded-full bg-surface px-3 py-2 text-xs font-bold text-foreground border border-border/80 hover:border-brand/40 transition-all hover:scale-105"
-        >
-          <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-          <Phone className="size-3.5 text-brand" />
-          <span>Call</span>
-        </a>
+      {/* Desktop Floating Actions Widget - Single Button with Spring-Out Speed Dial */}
+      <div ref={menuRef} className="fixed bottom-6 right-6 z-40 hidden md:flex flex-col items-end">
+        {/* Popped Out Action Items (Spring up when open) */}
+        {isOpen && (
+          <div className="flex flex-col items-end gap-2.5 mb-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
+            {/* Book Action */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsModalOpen(true);
+                setIsOpen(false);
+              }}
+              className="flex items-center gap-2 rounded-full bg-brand px-4 py-2.5 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-xl shadow-brand/35 transition-all hover:scale-105 hover:bg-brand/90 cursor-pointer"
+            >
+              <Calendar className="size-3.5" />
+              <span>Book a Service</span>
+            </button>
 
-        {/* WhatsApp */}
-        <a
-          href={waURL}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => trackWhatsAppClick("desktop_floating_dock")}
-          title="Chat on WhatsApp"
-          className="flex items-center gap-1.5 rounded-full bg-[#25D366] px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-[#25D366]/25 transition-all hover:scale-105 hover:bg-[#20ba59]"
-        >
-          <WhatsAppIcon className="size-3.5 fill-current" />
-          <span>WhatsApp</span>
-        </a>
+            {/* WhatsApp Action */}
+            <a
+              href={waURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                trackWhatsAppClick("desktop_floating_dock");
+                setIsOpen(false);
+              }}
+              className="flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white shadow-xl shadow-[#25D366]/30 transition-all hover:scale-105 hover:bg-[#20ba59]"
+            >
+              <WhatsAppIcon className="size-3.5 fill-current" />
+              <span>WhatsApp Us</span>
+            </a>
 
-        {/* Book */}
+            {/* Call Action */}
+            <a
+              href={`tel:${EGS_CALL_NUMBER}`}
+              onClick={() => {
+                trackCallClick("desktop_floating_dock");
+                setIsOpen(false);
+              }}
+              className="flex items-center gap-2 rounded-full border border-border bg-card/95 px-4 py-2.5 text-xs font-bold text-foreground shadow-xl backdrop-blur-md hover:border-brand/40 transition-all hover:scale-105"
+            >
+              <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+              <Phone className="size-3.5 text-brand" />
+              <span>Call Helpline</span>
+            </a>
+          </div>
+        )}
+
+        {/* The Single Trigger Button */}
         <button
           type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/30 transition-all hover:scale-105 hover:bg-brand/90 cursor-pointer"
+          onClick={() => setIsOpen(!isOpen)}
+          className={`flex items-center gap-2 rounded-full border shadow-2xl backdrop-blur-md transition-all duration-300 cursor-pointer select-none ${
+            isOpen
+              ? "bg-foreground text-background border-foreground px-4 py-2.5 shadow-foreground/20"
+              : "bg-card/95 border-brand/30 text-foreground hover:border-brand hover:scale-105 px-4 py-2.5 shadow-brand/20"
+          }`}
+          aria-expanded={isOpen}
+          aria-label={isOpen ? "Close quick menu" : "Open quick contact actions"}
         >
-          <Calendar className="size-3.5" />
-          <span>Book</span>
+          {isOpen ? (
+            <>
+              <X className="size-4 text-background" />
+              <span className="text-xs font-bold">Close</span>
+            </>
+          ) : (
+            <>
+              <span className="relative flex size-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
+              </span>
+              <Headphones className="size-3.5 text-brand" />
+              <span className="text-xs font-bold text-foreground">Quick Help</span>
+            </>
+          )}
         </button>
       </div>
 
