@@ -64,7 +64,7 @@ export const SERVICES_DATA: Array<{
     title: "AC Service",
     emoji: "❄",
     badge: "Most Popular",
-    priceText: "From ₹800",
+    priceText: "From ₹799",
     icon: AirVent,
     desc: "Power jet pump wash, 10-point checkup, chemical disinfection & cooling test.",
     subServices: [
@@ -73,14 +73,14 @@ export const SERVICES_DATA: Array<{
       "Filter & Drainage Pipe Flush",
       "Pre-Summer Complete Servicing",
     ],
-    defaultAmount: 800,
+    defaultAmount: 799,
   },
   {
     id: "ac-repair",
     title: "AC Repair",
     emoji: "🔧",
     badge: "90-Min Arrival",
-    priceText: "From ₹399",
+    priceText: "From ₹649",
     icon: Wrench,
     desc: "Cooling issues, unusual noise, PCB diagnosis, water leak & electrical fixes.",
     subServices: [
@@ -89,14 +89,14 @@ export const SERVICES_DATA: Array<{
       "Compressor / Fan Motor Failure",
       "PCB Board Repair & Power Trip",
     ],
-    defaultAmount: 399,
+    defaultAmount: 649,
   },
   {
     id: "ac-cleaning",
     title: "AC Cleaning",
     emoji: "🧹",
     badge: "Eco Foam",
-    priceText: "From ₹349",
+    priceText: "From ₹799",
     icon: Sparkles,
     desc: "Indoor & outdoor coil chemical foam clean, blower wipe & drain line flush.",
     subServices: [
@@ -105,14 +105,14 @@ export const SERVICES_DATA: Array<{
       "Filter Anti-Bacterial Sanitization",
       "Blower & Air Vane Degreasing",
     ],
-    defaultAmount: 349,
+    defaultAmount: 799,
   },
   {
     id: "ac-installation",
     title: "AC Installation",
     emoji: "⚙",
     badge: "Zero Gas Loss",
-    priceText: "From ₹1,199",
+    priceText: "From ₹1,699",
     icon: Cog,
     desc: "Wall mounting, copper piping, core drilling, vacuuming & safe dismantling.",
     subServices: [
@@ -121,14 +121,14 @@ export const SERVICES_DATA: Array<{
       "AC Relocation (Dismantle + Re-fitting)",
       "Window AC Fitting & Wooden Frame Setup",
     ],
-    defaultAmount: 1199,
+    defaultAmount: 1699,
   },
   {
     id: "gas-charging",
     title: "Gas Charging",
     emoji: "💨",
     badge: "Leak Test Incl.",
-    priceText: "From ₹1,499",
+    priceText: "From ₹1,799",
     icon: Wind,
     desc: "Nitrogen pressure leak testing & pure R32 / R410A / R22 refrigerant refill.",
     subServices: [
@@ -137,7 +137,7 @@ export const SERVICES_DATA: Array<{
       "Top-up Gas Charging (Partial)",
       "Valve & Flare Nut Replacement",
     ],
-    defaultAmount: 1499,
+    defaultAmount: 1799,
   },
   {
     id: "commercial-hvac",
@@ -160,7 +160,7 @@ export const SERVICES_DATA: Array<{
     title: "AMC",
     emoji: "📋",
     badge: "Save 40%",
-    priceText: "From ₹1,999/yr",
+    priceText: "From ₹1,500/yr",
     icon: ShieldCheck,
     desc: "Annual maintenance contracts with scheduled deep services & free breakdown visits.",
     subServices: [
@@ -168,7 +168,7 @@ export const SERVICES_DATA: Array<{
       "Comprehensive Care AMC (Services + Spares + Gas)",
       "Commercial Building Annual HVAC Contract",
     ],
-    defaultAmount: 1999,
+    defaultAmount: 1500,
   },
   {
     id: "buy-new-ac",

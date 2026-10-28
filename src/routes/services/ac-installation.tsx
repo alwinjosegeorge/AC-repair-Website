@@ -29,12 +29,12 @@ function ACInstallationPage() {
       badgeText="Certified Technicians • Zero Gas Loss"
       headline="Precision AC Installation, Dismantling & Shifting"
       subheadline="Ensure maximum cooling and long compressor lifespan with vibration-free bracket mounting, vacuum pump line evacuation, and proper copper flare joints."
-      startingPrice="₹1,199"
+      startingPrice="₹1,699"
       packages={[
         {
           name: "Standard Split AC Installation",
-          price: "₹1,199",
-          originalPrice: "₹1,699",
+          price: "₹1,699",
+          originalPrice: "₹2,199",
           badge: "Most Booked",
           popular: true,
           features: [

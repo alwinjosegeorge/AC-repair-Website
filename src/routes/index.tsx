@@ -233,7 +233,7 @@ function Hero() {
         {/* Trust Badges */}
         <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs font-semibold text-ink/75">
           <span className="flex items-center gap-1 text-emerald-600">
-            <CheckCircle2 className="size-3.5" /> Flat ₹800 full body service
+            <CheckCircle2 className="size-3.5" /> Flat ₹799 full body service
           </span>
           <span className="text-muted-foreground/30">•</span>
           <span className="flex items-center gap-1 text-brand">
@@ -479,7 +479,7 @@ const services = [
     icon: AirVent,
     title: "AC Deep Service",
     href: "/services/ac-service",
-    price: "From ₹800",
+    price: "From ₹799",
     badge: "Most Popular",
     text: "High-pressure power jet pump wash, chemical foam cleaning, and deep coil sanitization.",
   },
@@ -487,7 +487,7 @@ const services = [
     icon: Wrench,
     title: "AC Repair & Fix",
     href: "/services/ac-repair",
-    price: "From ₹399",
+    price: "From ₹649",
     badge: "90-Min Arrival",
     text: "Immediate diagnostics, gas leak detection & refill, water dripping fix, and PCB repair.",
   },
@@ -495,7 +495,7 @@ const services = [
     icon: Cog,
     title: "AC Installation",
     href: "/services/ac-installation",
-    price: "From ₹1,199",
+    price: "From ₹1,699",
     badge: "Zero Gas Loss",
     text: "Wall mounting, copper piping, vacuum line evacuation, and safe unit shifting.",
   },
@@ -503,7 +503,7 @@ const services = [
     icon: ShieldCheck,
     title: "AC AMC Contract",
     href: "/services/ac-amc",
-    price: "From ₹1,999/yr",
+    price: "From ₹1,500/yr",
     badge: "Save 40%",
     text: "3 Scheduled seasonal wet jet services per year with unlimited free breakdown visits.",
   },

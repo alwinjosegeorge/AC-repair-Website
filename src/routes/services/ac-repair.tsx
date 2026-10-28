@@ -29,11 +29,11 @@ function ACRepairPage() {
       badgeText="Emergency Breakdown • 90-Min Response"
       headline="Instant AC Repair, Gas Refill & Troubleshooting"
       subheadline="Not cooling? Water dripping? Strange noise? Our certified technicians diagnose the root cause in minutes with genuine spares and transparent rates."
-      startingPrice="₹399"
+      startingPrice="₹649"
       packages={[
         {
           name: "Standard Diagnostic Check",
-          price: "₹399",
+          price: "₹649",
           originalPrice: "₹599",
           badge: "Adjusted in Bill",
           popular: true,

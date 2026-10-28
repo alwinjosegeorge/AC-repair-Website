@@ -26,14 +26,14 @@ function ACServicePage() {
     <ServiceLandingTemplate
       category="ac-service"
       serviceTitle="AC Deep Jet Service"
-      badgeText="Google & Meta Ad Special • Flat ₹800"
+      badgeText="Google & Meta Ad Special • Flat ₹799"
       headline="High-Pressure Power Jet AC Service & Sanitization"
       subheadline="Restore icy cooling, boost energy efficiency, and eliminate bacteria and dust with 2X deeper high-pressure jet pump cleaning."
-      startingPrice="₹800"
+      startingPrice="₹799"
       packages={[
         {
           name: "Full Body AC Service",
-          price: "₹800",
+          price: "₹799",
           originalPrice: "₹1,199",
           badge: "Most Popular",
           popular: true,

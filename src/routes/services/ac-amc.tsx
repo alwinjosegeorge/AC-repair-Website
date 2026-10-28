@@ -29,12 +29,12 @@ function ACAMCPage() {
       badgeText="Annual Savings Plan • 365 Days Peace of Mind"
       headline="Year-Round AC Protection & Maintenance Contracts"
       subheadline="Never worry about sudden summer breakdowns or surprise repair bills again. Enjoy scheduled quarterly deep jet washes, priority breakdown visits within 24 hours, and free labor."
-      startingPrice="₹1,999/yr"
+      startingPrice="₹1,500/yr"
       packages={[
         {
           name: "Residential Saver AMC",
-          price: "₹1,999",
-          originalPrice: "₹3,200",
+          price: "₹1,500",
+          originalPrice: "₹2,499",
           badge: "Best for Homes",
           popular: true,
           features: [
