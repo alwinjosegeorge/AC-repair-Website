@@ -294,7 +294,7 @@ function AboutPage() {
                     <div className="text-muted-foreground text-[11px] font-medium">Founded EGS INDIA</div>
                   </div>
                   <div className="p-3 rounded-xl bg-surface/70 border border-border">
-                    <div className="font-black text-brand text-base sm:text-lg">10+ Years</div>
+                    <div className="font-black text-brand text-base sm:text-lg">15+ Years</div>
                     <div className="text-muted-foreground text-[11px] font-medium">Industry Excellence</div>
                   </div>
                   <div className="col-span-2 sm:col-span-1 p-3 rounded-xl bg-surface/70 border border-border">

@@ -262,7 +262,7 @@ function Hero() {
           </span>
         }
         label="Happy Clients"
-        value="12k+"
+        value="30k+"
       />
 
       <div className="relative z-10 mx-auto mt-8 sm:mt-12 md:mt-14 max-w-5xl px-4 sm:px-6">
@@ -455,7 +455,7 @@ function About() {
             <div className="grid gap-6 h-full">
               {[
                 { icon: HardHat, value: "15+", label: "YEARS OF EXPERIENCE" },
-                { icon: ThumbsUp, value: "2638+", label: "HAPPY CUSTOMERS" },
+                { icon: ThumbsUp, value: "30000+", label: "HAPPY CUSTOMERS" },
               ].map(({ icon: Icon, value, label }) => (
                 <div key={label} className="rounded-2xl bg-surface p-9 flex flex-col justify-center">
                   <Icon className="size-9 text-brand" strokeWidth={2} />
