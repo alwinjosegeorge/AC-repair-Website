@@ -237,6 +237,233 @@ const MAJOR_CITIES = [
   "Other City",
 ];
 
+// Coordinates for regional service hubs used for nearest-hub fallback
+const CITY_COORDINATES: Record<string, { lat: number; lon: number }> = {
+  "Kollam": { lat: 8.8932, lon: 76.6141 },
+  "Thiruvananthapuram": { lat: 8.5241, lon: 76.9366 },
+  "Ernakulam / Cochin": { lat: 9.9816, lon: 76.2999 },
+  "Thrissur": { lat: 10.5276, lon: 76.2144 },
+  "Kozhikode": { lat: 11.2588, lon: 75.7804 },
+  "Kottayam": { lat: 9.5916, lon: 76.5222 },
+  "Palakkad": { lat: 10.7867, lon: 76.6548 },
+  "Alappuzha": { lat: 9.4981, lon: 76.3388 },
+  "Kannur": { lat: 11.8745, lon: 75.3704 },
+  "Bangalore": { lat: 12.9716, lon: 77.5946 },
+  "Chennai": { lat: 13.0827, lon: 80.2707 },
+};
+
+function getNearestMajorCity(lat: number, lon: number): string {
+  let bestCity = "Ernakulam / Cochin";
+  let bestDist = Infinity;
+  for (const [name, coords] of Object.entries(CITY_COORDINATES)) {
+    const d = Math.hypot(coords.lat - lat, coords.lon - lon);
+    if (d < bestDist) {
+      bestDist = d;
+      bestCity = name;
+    }
+  }
+  return bestCity;
+}
+
+function matchMajorCity(rawCity: string, lat: number, lon: number): string {
+  const norm = (rawCity || "").toLowerCase().trim();
+  if (
+    norm.includes("ernakulam") ||
+    norm.includes("cochin") ||
+    norm.includes("kochi") ||
+    norm.includes("edappally") ||
+    norm.includes("kakkanad") ||
+    norm.includes("aluva") ||
+    norm.includes("angamaly") ||
+    norm.includes("kaloor")
+  ) {
+    return "Ernakulam / Cochin";
+  }
+  if (
+    norm.includes("trivandrum") ||
+    norm.includes("thiruvananthapuram") ||
+    norm.includes("kazhakkoottam") ||
+    norm.includes("neyyattinkara")
+  ) {
+    return "Thiruvananthapuram";
+  }
+  if (norm.includes("kollam") || norm.includes("quilon") || norm.includes("karunagappally")) {
+    return "Kollam";
+  }
+  if (
+    norm.includes("thrissur") ||
+    norm.includes("trichur") ||
+    norm.includes("guruvayur") ||
+    norm.includes("chalakkudy")
+  ) {
+    return "Thrissur";
+  }
+  if (norm.includes("kozhikode") || norm.includes("calicut") || norm.includes("vadakara")) {
+    return "Kozhikode";
+  }
+  if (norm.includes("kottayam") || norm.includes("changanassery") || norm.includes("pala")) {
+    return "Kottayam";
+  }
+  if (norm.includes("palakkad") || norm.includes("palghat") || norm.includes("ottapalam")) {
+    return "Palakkad";
+  }
+  if (
+    norm.includes("alappuzha") ||
+    norm.includes("alleppey") ||
+    norm.includes("cherthala") ||
+    norm.includes("kayamkulam")
+  ) {
+    return "Alappuzha";
+  }
+  if (
+    norm.includes("kannur") ||
+    norm.includes("cannanore") ||
+    norm.includes("thalassery") ||
+    norm.includes("payyanur")
+  ) {
+    return "Kannur";
+  }
+  if (
+    norm.includes("bangalore") ||
+    norm.includes("bengaluru") ||
+    norm.includes("whitefield") ||
+    norm.includes("koramangala")
+  ) {
+    return "Bangalore";
+  }
+  if (
+    norm.includes("chennai") ||
+    norm.includes("madras") ||
+    norm.includes("tambaram") ||
+    norm.includes("velachery")
+  ) {
+    return "Chennai";
+  }
+
+  const found = MAJOR_CITIES.find(
+    (c) => c.toLowerCase().includes(norm) || (norm && norm.includes(c.toLowerCase()))
+  );
+  if (found) return found;
+
+  return getNearestMajorCity(lat, lon);
+}
+
+// Multi-provider reverse geocoding with fast fallback for mobile web
+async function fetchReverseGeocode(lat: number, lon: number): Promise<{
+  area?: string;
+  city?: string;
+  pincode?: string;
+}> {
+  // Provider 1: BigDataCloud (Client-side, free, CORS-unrestricted, ultra fast)
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4500);
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const area =
+        data.locality ||
+        data.localityInfo?.administrative?.find(
+          (a: { adminLevel?: number; name?: string }) => a.adminLevel === 4 || a.adminLevel === 6
+        )?.name ||
+        data.localityInfo?.administrative?.[2]?.name ||
+        "";
+      const city = data.city || data.principalSubdivision || "";
+      const pincode = data.postcode ? String(data.postcode).replace(/\D/g, "").slice(0, 6) : "";
+      if (area || city || pincode) {
+        return { area, city, pincode };
+      }
+    }
+  } catch {
+    // Continue to next provider
+  }
+
+  // Provider 2: OpenStreetMap Nominatim
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4500);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const addr = data.address || {};
+      const area =
+        addr.suburb ||
+        addr.neighbourhood ||
+        addr.residential ||
+        addr.road ||
+        addr.village ||
+        addr.hamlet ||
+        "";
+      const city = addr.city || addr.town || addr.county || addr.state_district || "";
+      const pincode = addr.postcode ? String(addr.postcode).replace(/\D/g, "").slice(0, 6) : "";
+      if (area || city || pincode) {
+        return { area, city, pincode };
+      }
+    }
+  } catch {
+    // Continue to next provider
+  }
+
+  // Provider 3: Photon / Komoot
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(
+      `https://photon.komoot.io/reverse?lat=${lat}&lon=${lon}`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const props = data.features?.[0]?.properties || {};
+      const area = props.district || props.locality || props.street || props.name || "";
+      const city = props.city || props.county || props.state || "";
+      const pincode = props.postcode ? String(props.postcode).replace(/\D/g, "").slice(0, 6) : "";
+      if (area || city || pincode) {
+        return { area, city, pincode };
+      }
+    }
+  } catch {
+    // Fallback
+  }
+
+  return {};
+}
+
+// Browser position with indoor network fallback
+function getBrowserPosition(): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      resolve,
+      (err) => {
+        // If GPS hardware timed out or is unavailable (common indoors on phones/laptops),
+        // fallback to standard network/wifi triangulation
+        if (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE) {
+          navigator.geolocation.getCurrentPosition(
+            resolve,
+            reject,
+            { timeout: 10000, enableHighAccuracy: false, maximumAge: 60000 }
+          );
+        } else {
+          reject(err);
+        }
+      },
+      { timeout: 8000, enableHighAccuracy: true, maximumAge: 30000 }
+    );
+  });
+}
+
 export function BookingWizard({
   initialCategory = "ac-service",
   onSuccess,
@@ -279,6 +506,7 @@ export function BookingWizard({
   } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationStatus, setLocationStatus] = useState<string>("");
+  const [locationIsError, setLocationIsError] = useState(false);
 
   // Step 5: Preferred time
   const [dateOption, setDateOption] = useState<"today" | "tomorrow" | "custom">("today");
@@ -329,76 +557,62 @@ export function BookingWizard({
     }
   };
 
-  // GPS "Use My Location" Geolocation Handler
-  const handleUseMyLocation = () => {
-    if (!navigator.geolocation) {
+  // Robust GPS "Auto GPS" Geolocation & Multi-Provider Reverse Geocode Handler
+  const handleUseMyLocation = async () => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
       setLocationStatus("Geolocation is not supported by your browser.");
+      setLocationIsError(true);
       return;
     }
 
     setIsLocating(true);
-    setLocationStatus("Detecting your GPS location...");
+    setLocationStatus("Detecting GPS coordinates...");
+    setLocationIsError(false);
+    setErrorMsg("");
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        setLocationCoordinates({ latitude, longitude });
+    try {
+      const position = await getBrowserPosition();
+      const { latitude, longitude } = position.coords;
+      setLocationCoordinates({ latitude, longitude });
 
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 4000);
+      setLocationStatus("Resolving address & locality...");
 
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-            { signal: controller.signal }
-          );
-          clearTimeout(timeoutId);
+      // Multi-provider reverse geocoding with fast fallback
+      const geo = await fetchReverseGeocode(latitude, longitude);
 
-          if (res.ok) {
-            const data = await res.json();
-            const addr = data.address || {};
-            const detectedArea =
-              addr.suburb || addr.neighbourhood || addr.road || addr.village || "";
-            const detectedCity =
-              addr.city || addr.town || addr.county || addr.state_district || "";
-            const detectedPin = addr.postcode || "";
+      const matchedCity = matchMajorCity(geo.city || "", latitude, longitude);
+      setCity(matchedCity);
 
-            if (detectedArea && !area) setArea(detectedArea);
-            if (detectedCity) {
-              const matched = MAJOR_CITIES.find((c) =>
-                c.toLowerCase().includes(detectedCity.toLowerCase())
-              );
-              if (matched) setCity(matched);
-              else setCity(detectedCity);
-            }
-            if (detectedPin && !pincode) setPincode(detectedPin);
+      const resolvedArea =
+        geo.area || `GPS Pin (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+      setArea(resolvedArea);
 
-            setLocationStatus(
-              `Live location captured: ${detectedArea ? detectedArea + ", " : ""}${detectedCity || "Coordinates saved"}`
-            );
-          } else {
-            setLocationStatus(
-              `GPS location locked (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
-            );
-          }
-        } catch {
-          setLocationStatus(
-            `GPS location locked (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
-          );
-        } finally {
-          setIsLocating(false);
-        }
-      },
-      (error) => {
-        setIsLocating(false);
-        if (error.code === error.PERMISSION_DENIED) {
-          setLocationStatus("Location access was denied. Please enter address manually.");
-        } else {
-          setLocationStatus("Could not fetch location. Please enter manually.");
-        }
-      },
-      { timeout: 8000, enableHighAccuracy: true }
-    );
+      if (geo.pincode) {
+        setPincode(geo.pincode);
+      }
+
+      const displayPin = geo.pincode ? ` - ${geo.pincode}` : "";
+      setLocationStatus(`📍 GPS locked: ${resolvedArea}, ${matchedCity}${displayPin}`);
+      setLocationIsError(false);
+      setErrorMsg("");
+    } catch (err: unknown) {
+      const error = err as GeolocationPositionError;
+      if (error?.code === 1) {
+        // PERMISSION_DENIED
+        setLocationStatus("Location access was denied. Please allow GPS permissions in your browser or type address manually.");
+      } else if (error?.code === 2) {
+        // POSITION_UNAVAILABLE
+        setLocationStatus("Location unavailable. Please ensure device GPS is enabled.");
+      } else if (error?.code === 3) {
+        // TIMEOUT
+        setLocationStatus("GPS detection timed out. Please enter your address manually.");
+      } else {
+        setLocationStatus("Could not fetch location. Please enter manually.");
+      }
+      setLocationIsError(true);
+    } finally {
+      setIsLocating(false);
+    }
   };
 
   // Step 1 -> Step 2
@@ -551,6 +765,7 @@ export function BookingWizard({
     setPincode("");
     setLocationCoordinates(null);
     setLocationStatus("");
+    setLocationIsError(false);
     setIssueDescription("");
     setSpecialTimingNotes("");
     setErrorMsg("");
@@ -1329,22 +1544,58 @@ export function BookingWizard({
                     onClick={handleUseMyLocation}
                     disabled={isLocating}
                     className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
-                      isGlass
+                      locationCoordinates && !isLocating
+                        ? isGlass
+                          ? "border border-emerald-400/60 bg-emerald-500/20 text-emerald-200"
+                          : "border border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
+                        : isGlass
                         ? "border border-white/40 bg-white/20 text-white hover:bg-white/30"
                         : "border border-brand/30 bg-brand/10 text-brand hover:bg-brand/20"
                     }`}
                   >
                     <LocateFixed className={`size-3 ${isLocating ? "animate-spin" : ""}`} />
-                    <span>{isLocating ? "Locating..." : "📍 Auto GPS"}</span>
+                    <span>
+                      {isLocating
+                        ? "Locating..."
+                        : locationCoordinates
+                        ? "✓ GPS Locked"
+                        : "📍 Auto GPS"}
+                    </span>
                   </button>
                 </div>
 
                 {locationStatus && (
-                  <div className={`rounded-lg px-2.5 py-1 text-[10px] font-medium flex items-center gap-1.5 ${
-                    isGlass ? "border border-white/30 bg-white/20 text-white" : "border border-emerald-500/20 bg-emerald-500/10 text-emerald-700"
-                  }`}>
-                    <CheckCircle2 className="size-3 shrink-0" />
-                    <span className="truncate">{locationStatus}</span>
+                  <div
+                    className={`rounded-lg px-2.5 py-1.5 text-[10px] sm:text-xs font-medium flex items-center justify-between gap-1.5 ${
+                      locationIsError
+                        ? isGlass
+                          ? "border border-rose-400/40 bg-rose-500/25 text-rose-100"
+                          : "border border-rose-500/30 bg-rose-500/10 text-rose-700"
+                        : isGlass
+                        ? "border border-white/30 bg-white/20 text-white"
+                        : "border border-emerald-500/20 bg-emerald-500/10 text-emerald-700"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {locationIsError ? (
+                        <AlertCircle className="size-3.5 shrink-0 text-rose-400" />
+                      ) : (
+                        <CheckCircle2 className="size-3.5 shrink-0 text-emerald-400" />
+                      )}
+                      <span className="truncate">{locationStatus}</span>
+                    </div>
+                    {locationCoordinates && !locationIsError && (
+                      <a
+                        href={`https://maps.google.com/?q=${locationCoordinates.latitude},${locationCoordinates.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`text-[10px] font-bold underline shrink-0 ${
+                          isGlass ? "text-white/90 hover:text-white" : "text-brand hover:underline"
+                        }`}
+                      >
+                        Map Pin ↗
+                      </a>
+                    )}
                   </div>
                 )}
 
