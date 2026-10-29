@@ -162,7 +162,15 @@ export function Footer() {
         <div className="mt-12 border-t border-white/10 pt-8 space-y-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-white/60">
             <p className="font-medium">
-              © {currentYear} EGS INDIA. Copyright and design by Codexora Studio
+              © {currentYear} EGS INDIA. Made by{" "}
+              <a
+                href="https://codexorastudio.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-white underline underline-offset-2 hover:text-sky-300 transition-colors"
+              >
+                Codexora
+              </a>
             </p>
             <div className="flex flex-wrap gap-4 text-white/60">
               <Link to="/" className="hover:text-white transition-colors">Home</Link>

@@ -55,39 +55,11 @@ Experience the official web application running live in production on [egsindia.
 
 ---
 
-## 🎨 3D Isometric Architectural Visual
-
-<p align="center">
-  <img src="./public/showcase/cute-isometric-room.png" alt="Smart Cozy Living Room Cooling" width="100%" style="max-width: 600px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.15);" /><br />
-  <sub><b>🏡 Smart Cozy Living Room Cooling (3D Isometric Concept)</b><br />Gentle fresh air waves, whisper-quiet comfort, and intelligent HVAC airflow.</sub>
-</p>
-
----
-
 ## 📖 About EGS INDIA
 
 Established in **2015 in Kollam, Kerala**, **Expert Goods & Services (EGS INDIA)** is one of South India's premier organized HVAC engineering and cooling solutions providers. Spanning Kerala, Tamil Nadu, and Karnataka, EGS INDIA operates with a dedicated fleet of **80+ certified mobile technicians**, providing **guaranteed 90-minute arrival** for emergency AC breakdowns, preventive maintenance, industrial VRV/VRF deployments, and multi-year corporate AMCs.
 
 This repository powers the entire customer-facing digital presence and the internal operational backbone for customer intake, technician dispatching, and billing.
-
-<br />
-
-<table align="center" width="100%">
-  <tr>
-    <td align="center" width="33%">
-      <img src="./public/showcase/process.jpg" alt="Certified Technician Diagnostics" style="border-radius: 12px; width: 100%; object-fit: cover;" /><br />
-      <sub><b>Certified Technician Diagnostics & Hygiene</b></sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="./public/showcase/project-residential.jpg" alt="Precision Residential Jet Cleaning" style="border-radius: 12px; width: 100%; object-fit: cover;" /><br />
-      <sub><b>Precision Residential Jet Cleaning & Service</b></sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="./public/showcase/project-commercial.jpg" alt="Commercial Cassette & VRV Units" style="border-radius: 12px; width: 100%; object-fit: cover;" /><br />
-      <sub><b>Commercial Cassette, VRF & Ceiling Systems</b></sub>
-    </td>
-  </tr>
-</table>
 
 ---
 
@@ -198,8 +170,7 @@ egs_india/
 │       └── db-keepalive.yml     # Automated scheduled database keep-alive workflow
 ├── public/
 │   ├── clients/                 # Client institutional brand logos
-│   ├── screenshots/             # Production mobile app & admin dashboard captures
-│   ├── showcase/                # 3D mascot, isometric room & service photography
+│   ├── screenshots/             # Live desktop application captures
 │   ├── commercial-ac-plant.jpg  # Central chiller & VRV plant photography
 │   ├── og-image.png             # Official OpenGraph branding social card
 │   └── logo-full.png            # Official high-resolution logo
@@ -338,5 +309,5 @@ The project is optimized for zero-config deployment on **Vercel**:
 ---
 
 <div align="center">
-  <sub>Built with ❤️ for <strong>EGS INDIA</strong> • Designed for maximum speed, reliability, and enterprise scale.</sub>
+  <sub>Built with ❤️ for <strong>EGS INDIA</strong> • Designed & Made by <a href="https://codexorastudio.vercel.app/"><strong>Codexora Studio</strong></a></sub>
 </div>
