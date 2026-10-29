@@ -1,26 +1,64 @@
-# EGS INDIA — Enterprise HVAC Solutions & Certified AC Services
+# ❄️ EGS INDIA — Enterprise HVAC Solutions & Certified AC Services 🛠️
 
 <div align="center">
 
-[![Website](https://img.shields.io/badge/Website-egsindia.in-0066cc?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.egsindia.in)
+<p align="center">
+  <img src="./public/showcase/cute-mascot.png" width="190" alt="EGS Certified Mascot" style="border-radius: 50%; box-shadow: 0 12px 35px rgba(0,102,204,0.35); border: 4px solid #0084f6;" />
+</p>
+
+### *"Fresh Air, Happy Homes & Precision Cooling Reinvented!"* ✨
+
+[![Website](https://img.shields.io/badge/Live_Site-egsindia.in-0066cc?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.egsindia.in)
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![TanStack Start](https://img.shields.io/badge/TanStack-Start-FF4154?style=for-the-badge&logo=react-router&logoColor=white)](https://tanstack.com/start)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 [![Neon Database](https://img.shields.io/badge/Neon-PostgreSQL-00E599?style=for-the-badge&logo=postgresql&logoColor=black)](https://neon.tech)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Vercel](https://img.shields.io/badge/Deployment-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
 
-**Official Web Application, Consumer Booking Engine, and Field Service Operations ERP for EGS INDIA (Expert Goods & Services).**
+**Official Web Application, 60-Second Consumer Booking Engine & Real-Time Field Service Operations ERP for EGS INDIA (Expert Goods & Services).**
 
-[Live Website](https://www.egsindia.in) • [Online Booking](https://www.egsindia.in/book) • [Services](https://www.egsindia.in/#services) • [Client Portfolio](https://www.egsindia.in/projects) • [Regional Hubs](https://www.egsindia.in/service-areas)
+[🌐 Explore Website](https://www.egsindia.in) • [⚡ Book a Service](https://www.egsindia.in/book) • [🛠️ Services](https://www.egsindia.in/#services) • [🏢 Client Portfolio](https://www.egsindia.in/projects) • [📍 Service Areas](https://www.egsindia.in/service-areas)
 
 <br />
 
 <p align="center">
-  <img src="./public/og-image.png" alt="EGS INDIA HVAC Engineering & Doorstep AC Solutions" width="100%" style="border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);" />
+  <img src="./public/og-image.png" alt="EGS INDIA HVAC Engineering & Doorstep AC Solutions" width="100%" style="border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.18);" />
 </p>
 
 </div>
+
+---
+
+## 📱 Live App Showcase & Production Screenshots
+
+Experience the live application running in production on [egsindia.in](https://www.egsindia.in):
+
+<div align="center">
+
+| 📲 5-Step Online Booking Wizard | 👨‍💻 Operations Control Hub | ❄️ Service Landing Experience | 🏆 Customer Trust & Metrics |
+| :---: | :---: | :---: | :---: |
+| <img src="./public/screenshots/booking-wizard-mobile.png" width="220" alt="5-Step Online Booking Wizard" style="border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" /> | <img src="./public/screenshots/admin-control-hub.png" width="220" alt="Executive Admin Control Hub" style="border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" /> | <img src="./public/screenshots/service-landing-mobile.png" width="220" alt="Service Landing Experience" style="border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" /> | <img src="./public/screenshots/trust-stats-mobile.png" width="220" alt="Customer Trust Metrics" style="border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" /> |
+| **Instant 60s Booking**<br /><sub>Interactive Step 1–5 flow with multi-unit pricing & WhatsApp sync</sub> | **Lead Pipeline & ERP**<br /><sub>Live booking tracker, status dispatch, customer CRM & invoices</sub> | **90-Min Rapid Dispatch**<br /><sub>Transparent pricing from ₹649 per unit with zero advance</sub> | **Verified Track Record**<br /><sub>15+ Years experience, 2,638+ Happy institutional clients</sub> |
+
+</div>
+
+---
+
+## 🎨 3D Isometric Artwork & Engineering Vision
+
+<table align="center" width="100%">
+  <tr>
+    <td align="center" width="50%">
+      <img src="./public/showcase/cute-isometric-room.png" alt="Smart Cozy Living Room Cooling" style="border-radius: 16px; width: 100%; max-width: 440px; box-shadow: 0 12px 30px rgba(0,0,0,0.15);" /><br />
+      <sub><b>🏡 Smart Cozy Living Room Cooling (3D Isometric)</b><br />Gentle fresh air waves, whisper-quiet comfort, and energy efficiency.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="./public/showcase/cute-mascot.png" alt="EGS Certified Technician Mascot" style="border-radius: 16px; width: 100%; max-width: 440px; box-shadow: 0 12px 30px rgba(0,0,0,0.15);" /><br />
+      <sub><b>👨‍🔧 Meet Sparky — Certified EGS Service Mascot</b><br />Certified mechanics, 90-min doorstep arrival, and 30-day revisit warranty.</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -158,7 +196,8 @@ egs_india/
 │       └── db-keepalive.yml     # Automated scheduled database keep-alive workflow
 ├── public/
 │   ├── clients/                 # Client institutional brand logos
-│   ├── showcase/                # Feature gallery and photography
+│   ├── screenshots/             # Production mobile app & admin dashboard captures
+│   ├── showcase/                # 3D mascot, isometric room & service photography
 │   ├── commercial-ac-plant.jpg  # Central chiller & VRV plant photography
 │   ├── og-image.png             # Official OpenGraph branding social card
 │   └── logo-full.png            # Official high-resolution logo
