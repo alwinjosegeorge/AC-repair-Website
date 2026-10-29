@@ -1469,25 +1469,6 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
             </div>
           </div>
 
-          {/* Dedicated Field Technician Mobile Interface Link */}
-          <div className="mt-4 pt-3 border-t border-border">
-            <Link
-              to="/technician"
-              className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold text-white shadow-md hover:bg-slate-850 hover:border-slate-700 transition-all group"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="flex size-7 items-center justify-center rounded-lg bg-brand text-brand-foreground font-black">
-                  <HardHat className="size-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-extrabold text-white">Technician Portal</div>
-                  <div className="text-[10px] text-slate-400">Mobile Field Interface</div>
-                </div>
-              </div>
-              <ChevronRight className="size-4 text-brand group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
           {/* Quick Hotline Card */}
           <div className="mt-4 rounded-2xl border border-border bg-surface p-3 text-xs">
             <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
@@ -1561,15 +1542,6 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                   <option value="Chennai">Chennai</option>
                 </select>
               )}
-
-              <Link
-                to="/technician"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 border border-slate-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition-colors shadow-sm"
-                title="Open Technician Field Mobile Portal"
-              >
-                <HardHat className="size-3.5 text-brand" />
-                <span>Field Tech Portal 📱</span>
-              </Link>
             </div>
           </div>
 
@@ -5470,19 +5442,12 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                 <Link
                   to="/"
                   target="_blank"
-                  className="flex items-center gap-2 p-3 rounded-xl border border-border bg-card text-foreground hover:bg-surface text-left cursor-pointer"
+                  className={`flex items-center gap-2 p-3 rounded-xl border border-border bg-card text-foreground hover:bg-surface text-left cursor-pointer ${
+                    !onLock ? "col-span-2" : ""
+                  }`}
                 >
                   <ExternalLink className="size-4 text-sky-500" />
                   <span className="text-xs font-bold">Live Website</span>
-                </Link>
-
-                {/* Field Tech Mobile Portal */}
-                <Link
-                  to="/technician"
-                  className="flex items-center gap-2 p-3 rounded-xl border border-border bg-card text-foreground hover:bg-surface text-left cursor-pointer"
-                >
-                  <HardHat className="size-4 text-amber-500" />
-                  <span className="text-xs font-bold">Tech Portal 📱</span>
                 </Link>
               </div>
             </div>

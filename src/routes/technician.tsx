@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import {
   Booking,
   Technician,
@@ -64,14 +64,16 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/technician")({
+  beforeLoad: () => {
+    throw redirect({ to: "/control-hub" });
+  },
   head: () => ({
     meta: [
-      { title: "EGS Technician Mobile Portal | HVAC Field Operations" },
+      { title: "EGS Control Hub | HVAC Operations" },
       { name: "robots", content: "noindex, nofollow" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" },
     ],
   }),
-  component: TechnicianMobilePortal,
+  component: () => null,
 });
 
 type DateFilterOption = "today" | "tomorrow" | "upcoming" | "all";
