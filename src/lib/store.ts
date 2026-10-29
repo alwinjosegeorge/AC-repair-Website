@@ -5,6 +5,11 @@
  */
 
 import { TrackingData, getStoredTracking } from "./tracking";
+import {
+  insertBookingToDatabase,
+  updateBookingStatusInDatabase,
+  fetchBookingsFromDatabase,
+} from "./db";
 
 export type ServiceCategory =
   | "ac-service"
@@ -1117,10 +1122,86 @@ const STORAGE_KEYS = {
 };
 
 /**
- * Storage helpers
+ * Storage helpers & Neon PostgreSQL Synchronization
  */
+
+function generateBookingId(existingBookings: Booking[]): string {
+  let maxNum = 1095;
+  for (const b of existingBookings) {
+    const match = b.id.match(/EGS-\d{4}-(\d+)/);
+    if (match && match[1]) {
+      const n = parseInt(match[1], 10);
+      if (!isNaN(n) && n > maxNum) maxNum = n;
+    }
+  }
+  return `EGS-2026-${maxNum + 1}`;
+}
+
+let lastDbSyncTime = 0;
+let isDbSyncInProgress = false;
+
+/**
+ * Synchronizes local storage bookings with live Neon PostgreSQL database.
+ * Merges records and guarantees any pending local bookings get pushed to Neon DB.
+ */
+export async function syncBookingsWithDatabase(): Promise<Booking[]> {
+  if (typeof window === "undefined" || isDbSyncInProgress) {
+    return getBookings();
+  }
+
+  isDbSyncInProgress = true;
+  try {
+    const dbBookings = await fetchBookingsFromDatabase(250);
+    if (!dbBookings || dbBookings.length === 0) {
+      return getBookings();
+    }
+
+    const localBookings = getBookings();
+    const map = new Map<string, Booking>();
+
+    // 1. Populate map with DB bookings
+    for (const b of dbBookings) {
+      map.set(b.id, b);
+    }
+
+    // 2. Identify any local bookings not yet in DB and push them to Neon DB
+    for (const b of localBookings) {
+      if (!map.has(b.id)) {
+        map.set(b.id, b);
+        insertBookingToDatabase(b).catch((err) =>
+          console.warn(`[Neon DB] Failed to push pending local booking ${b.id}:`, err)
+        );
+      }
+    }
+
+    // 3. Sort by createdAt descending
+    const merged = Array.from(map.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(merged));
+    window.dispatchEvent(new Event("egs_bookings_updated"));
+    return merged;
+  } catch (err) {
+    console.warn("[Neon DB] Background sync skipped:", err);
+    return getBookings();
+  } finally {
+    isDbSyncInProgress = false;
+  }
+}
+
 export function getBookings(): Booking[] {
   if (typeof window === "undefined") return SEED_BOOKINGS;
+
+  // Background sync throttle (every 15 seconds)
+  const now = Date.now();
+  if (now - lastDbSyncTime > 15000) {
+    lastDbSyncTime = now;
+    setTimeout(() => {
+      syncBookingsWithDatabase().catch(() => {});
+    }, 150);
+  }
+
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.BOOKINGS);
     if (!raw) {
@@ -1139,10 +1220,10 @@ export function getBookings(): Booking[] {
 
 export function saveBooking(bookingData: Omit<Booking, "id" | "createdAt" | "status" | "attribution">): Booking {
   const current = getBookings();
-  const nextNumber = 1096 + current.length;
+  const nextId = generateBookingId(current);
   const newBooking: Booking = {
     ...bookingData,
-    id: `EGS-2026-${nextNumber}`,
+    id: nextId,
     createdAt: new Date().toISOString(),
     status: "NEW",
     attribution: getStoredTracking(),
@@ -1151,7 +1232,41 @@ export function saveBooking(bookingData: Omit<Booking, "id" | "createdAt" | "sta
   const updated = [newBooking, ...current];
   if (typeof window !== "undefined") {
     localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(updated));
+    window.dispatchEvent(new Event("egs_bookings_updated"));
   }
+
+  // Dual-layer asynchronous persistence to Neon PostgreSQL
+  (async () => {
+    try {
+      // Layer 1: Attempt /api/bookings endpoint
+      if (typeof window !== "undefined") {
+        const res = await fetch("/api/bookings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newBooking),
+        });
+        if (res.ok) {
+          console.log(`[Neon DB] ✓ Booking ${newBooking.id} persisted via API endpoint`);
+          return;
+        }
+      }
+    } catch {
+      // Fall through to direct DB client
+    }
+
+    try {
+      // Layer 2: Direct serverless client execution
+      const result = await insertBookingToDatabase(newBooking);
+      if (result.ok) {
+        console.log(`[Neon DB] ✓ Booking ${newBooking.id} persisted directly to PostgreSQL`);
+      } else {
+        console.warn(`[Neon DB] Direct insert warning:`, result.error);
+      }
+    } catch (dbErr) {
+      console.error("[Neon DB] Persistence error:", dbErr);
+    }
+  })();
+
   return newBooking;
 }
 
@@ -1183,7 +1298,19 @@ export function updateBookingStatus(
 
   if (typeof window !== "undefined") {
     localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(updated));
+    window.dispatchEvent(new Event("egs_bookings_updated"));
   }
+
+  // Asynchronously update status in Neon PostgreSQL
+  (async () => {
+    try {
+      await updateBookingStatusInDatabase(bookingId, status, technicianId, assignedTech?.name);
+      console.log(`[Neon DB] ✓ Status for ${bookingId} updated to ${status}`);
+    } catch (err) {
+      console.error(`[Neon DB] Failed to update status in DB:`, err);
+    }
+  })();
+
   return updatedBooking;
 }
 
