@@ -19,6 +19,7 @@ import {
   DEFAULT_TRACKING_CONFIG,
   pushDataLayer,
 } from "../lib/tracking";
+import { pingDatabaseKeepAlive } from "../lib/db";
 
 function NotFoundComponent() {
   return (
@@ -222,6 +223,20 @@ function RootComponent() {
 
   useEffect(() => {
     captureTrackingParams();
+  }, []);
+
+  // Pre-warm Neon serverless database in the background when visitor arrives
+  // Eliminates cold-start latency so booking submissions and queries are instantaneous
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const warmDb = () => {
+      pingDatabaseKeepAlive().catch(() => {});
+    };
+    if ("requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(warmDb, { timeout: 3500 });
+    } else {
+      setTimeout(warmDb, 1500);
+    }
   }, []);
 
   useEffect(() => {

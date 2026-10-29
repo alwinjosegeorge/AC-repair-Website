@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "db:setup": "node scripts/setup-db.mjs",
-    "db:health": "node -e \"import('./src/lib/db.ts').then(m => m.checkDatabaseHealth().then(console.log))\""
+    "db:health": "node -e \"import('./src/lib/db.ts').then(m => m.checkDatabaseHealth().then(console.log))\"",
+    "db:keepalive": "node scripts/keepalive.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1",

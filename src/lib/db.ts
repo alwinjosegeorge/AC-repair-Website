@@ -43,6 +43,20 @@ export async function checkDatabaseHealth(): Promise<{
 }
 
 /**
+ * Lightweight keep-alive ping for Neon serverless PostgreSQL.
+ * Executes a fast `SELECT 1;` query to keep the compute endpoint warm and active.
+ */
+export async function pingDatabaseKeepAlive(): Promise<boolean> {
+  try {
+    const res = await sql`SELECT 1 as keepalive;`;
+    return Boolean(res && res.length > 0);
+  } catch (err) {
+    console.warn("[Neon KeepAlive] Heartbeat ping notice:", err);
+    return false;
+  }
+}
+
+/**
  * Persist a new or existing booking into Neon PostgreSQL
  * Also upserts customer profile and records an audit log.
  */

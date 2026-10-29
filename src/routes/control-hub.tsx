@@ -38,7 +38,9 @@ import {
   generateAMCRenewalConfirmationWhatsAppURL,
   EGS_CALL_NUMBER,
   EGS_WHATSAPP_NUMBER,
+  syncBookingsWithDatabase,
 } from "@/lib/store";
+import { pingDatabaseKeepAlive } from "@/lib/db";
 import {
   LayoutDashboard,
   CalendarCheck,
@@ -660,6 +662,17 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
   useEffect(() => {
     loadData();
 
+    // Auto-sync with Neon database upon opening Control Hub
+    syncBookingsWithDatabase().then(loadData).catch(() => {});
+
+    // Active Keep-Alive & Auto-Sync every 3.5 minutes while admin tab is visible
+    const keepAliveTimer = setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        pingDatabaseKeepAlive().catch(() => {});
+        syncBookingsWithDatabase().then(loadData).catch(() => {});
+      }
+    }, 3.5 * 60 * 1000);
+
     const handleUpdate = () => loadData();
     window.addEventListener("egs_bookings_updated", handleUpdate);
     window.addEventListener("egs_customers_updated", handleUpdate);
@@ -667,6 +680,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
     window.addEventListener("egs_transactions_updated", handleUpdate);
     window.addEventListener("egs_invoices_updated", handleUpdate);
     return () => {
+      clearInterval(keepAliveTimer);
       window.removeEventListener("egs_bookings_updated", handleUpdate);
       window.removeEventListener("egs_customers_updated", handleUpdate);
       window.removeEventListener("egs_amc_updated", handleUpdate);

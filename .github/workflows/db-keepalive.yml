@@ -1,0 +1,29 @@
+name: Neon Database Keep-Alive
+
+on:
+  schedule:
+    # Runs every 10 minutes between 02:30 UTC and 16:30 UTC (8:00 AM to 10:00 PM IST).
+    # Keeps database warm during business hours, and sleeps at night to save free CU-hours.
+    - cron: '*/10 2-16 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub anytime
+
+jobs:
+  ping:
+    name: Keep Neon Database Warm
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Neon Keep-Alive Ping
+        run: |
+          npm install @neondatabase/serverless
+          node scripts/keepalive.mjs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
