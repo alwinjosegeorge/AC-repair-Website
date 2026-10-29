@@ -1299,19 +1299,19 @@ export function BookingWizard({
           )}
 
           {/* Pricing Highlight */}
-          <div className={`rounded-xl border p-2.5 sm:p-3 flex items-center justify-between ${
+          <div className={`rounded-xl border p-2.5 sm:p-3 flex items-center justify-between gap-3 ${
             isGlass ? "border-white/20 bg-white/15 text-white" : "border-brand/20 bg-brand/5"
           }`}>
-            <div>
-              <span className={`font-bold text-xs sm:text-sm block ${isGlass ? "text-white" : "text-foreground"}`}>
+            <div className="flex-1 min-w-0">
+              <span className={`font-bold text-xs sm:text-sm block truncate ${isGlass ? "text-white" : "text-foreground"}`}>
                 {currentServiceObj.emoji} {currentServiceObj.title} ({effectiveUnits}{" "}
                 {effectiveUnits === 1 ? "Unit" : "Units"})
               </span>
-              <span className={`text-[10px] ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
+              <span className={`text-[10px] block truncate ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
                 {effectiveUnits >= 2 ? "Multi-unit discount included • Pay after service" : "Upfront standard rate • Pay after service"}
               </span>
             </div>
-            <div className="text-right">
+            <div className="text-right shrink-0">
               <span className={`text-base sm:text-lg font-black ${isGlass ? "text-white" : "text-brand"}`}>
                 {estimatedTotal > 0
                   ? `₹${estimatedTotal.toLocaleString("en-IN")}`
@@ -1878,13 +1878,13 @@ export function BookingWizard({
               ? "border-white/20 bg-white/15 text-white"
               : "border-2 border-brand/25 bg-brand/5 text-foreground shadow-xs"
           }`}>
-            <div className={`flex items-center justify-between pb-1.5 border-b ${
+            <div className={`flex items-center justify-between gap-3 pb-1.5 border-b ${
               isGlass ? "border-white/15" : "border-brand/15"
             }`}>
-              <span className={`font-black ${isGlass ? "text-white" : "text-foreground"}`}>
+              <span className={`font-black flex-1 min-w-0 ${isGlass ? "text-white" : "text-foreground"}`}>
                 {currentServiceObj.emoji} {currentServiceObj.title} • {acType} ({effectiveUnits} {effectiveUnits === 1 ? "Unit" : "Units"})
               </span>
-              <span className={`font-black text-sm ${isGlass ? "text-white" : "text-brand"}`}>
+              <span className={`font-black text-sm shrink-0 ${isGlass ? "text-white" : "text-brand"}`}>
                 {estimatedTotal > 0 ? `₹${estimatedTotal.toLocaleString("en-IN")}` : currentServiceObj.priceText}
               </span>
             </div>
@@ -1958,46 +1958,107 @@ export function BookingWizard({
           </div>
 
           {/* Full Breakdown Summary Card */}
-          <div className={`rounded-2xl border p-5 text-left max-w-lg mx-auto text-sm space-y-2.5 ${
-            isGlass ? "border-white/20 bg-[#0060b8]/80 text-white" : "border-border bg-surface/50 text-foreground"
+          <div className={`rounded-2xl border p-4 sm:p-5 text-left max-w-lg mx-auto text-xs sm:text-sm space-y-3 ${
+            isGlass ? "border-white/20 bg-[#0060b8]/80 text-white shadow-xl" : "border-border bg-surface/50 text-foreground shadow-sm"
           }`}>
-            <div className={`flex justify-between border-b pb-2 ${isGlass ? "border-white/15" : "border-border/80"}`}>
-              <span className={isGlass ? "text-white/70" : "text-muted-foreground"}>Service:</span>
-              <span className={`font-bold ${isGlass ? "text-white" : "text-foreground"}`}>{createdBooking.serviceName}</span>
+            {/* Service */}
+            <div className={`flex items-start justify-between gap-3 sm:gap-4 border-b pb-2.5 ${isGlass ? "border-white/15" : "border-border/80"}`}>
+              <span className={`w-28 sm:w-36 shrink-0 text-xs sm:text-sm font-medium ${isGlass ? "text-white/75" : "text-muted-foreground"}`}>
+                Service:
+              </span>
+              <span className={`flex-1 text-right text-xs sm:text-sm font-bold break-words ${isGlass ? "text-white" : "text-foreground"}`}>
+                {createdBooking.serviceName}
+              </span>
             </div>
-            <div className={`flex justify-between border-b pb-2 ${isGlass ? "border-white/15" : "border-border/80"}`}>
-              <span className={isGlass ? "text-white/70" : "text-muted-foreground"}>AC Type &amp; Units:</span>
-              <span className={`font-medium ${isGlass ? "text-white" : "text-foreground"}`}>
+
+            {/* AC Type & Units */}
+            <div className={`flex items-start justify-between gap-3 sm:gap-4 border-b pb-2.5 ${isGlass ? "border-white/15" : "border-border/80"}`}>
+              <span className={`w-28 sm:w-36 shrink-0 text-xs sm:text-sm font-medium ${isGlass ? "text-white/75" : "text-muted-foreground"}`}>
+                AC Type &amp; Units:
+              </span>
+              <span className={`flex-1 text-right text-xs sm:text-sm font-semibold break-words ${isGlass ? "text-white" : "text-foreground"}`}>
                 {createdBooking.acType} ({createdBooking.unitCount}{" "}
                 {createdBooking.unitCount === "1" ? "Unit" : "Units"})
               </span>
             </div>
-            <div className={`flex justify-between border-b pb-2 ${isGlass ? "border-white/15" : "border-border/80"}`}>
-              <span className={isGlass ? "text-white/70" : "text-muted-foreground"}>Preferred Time:</span>
-              <span className={`font-medium ${isGlass ? "text-white" : "text-foreground"}`}>
-                {createdBooking.preferredDate} ({createdBooking.preferredSlot})
+
+            {/* Preferred Time (Clean 2-line layout with zero overlap) */}
+            <div className={`flex items-start justify-between gap-3 sm:gap-4 border-b pb-2.5 ${isGlass ? "border-white/15" : "border-border/80"}`}>
+              <span className={`w-28 sm:w-36 shrink-0 text-xs sm:text-sm font-medium ${isGlass ? "text-white/75" : "text-muted-foreground"}`}>
+                Preferred Time:
               </span>
+              <div className="flex-1 text-right min-w-0">
+                <div className={`text-xs sm:text-sm font-bold ${isGlass ? "text-white" : "text-foreground"}`}>
+                  {createdBooking.preferredDate || "Scheduled Date"}
+                </div>
+                {createdBooking.preferredSlot && (
+                  <div className={`text-[11px] sm:text-xs mt-0.5 font-medium ${isGlass ? "text-amber-200" : "text-amber-700"}`}>
+                    {createdBooking.preferredSlot}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className={`flex justify-between border-b pb-2 ${isGlass ? "border-white/15" : "border-border/80"}`}>
-              <span className={isGlass ? "text-white/70" : "text-muted-foreground"}>Contact &amp; WhatsApp:</span>
-              <span className={`font-medium ${isGlass ? "text-white" : "text-foreground"}`}>
-                {createdBooking.phone} / {createdBooking.whatsappNumber || createdBooking.phone}
+
+            {/* Contact & Phone */}
+            <div className={`flex items-start justify-between gap-3 sm:gap-4 border-b pb-2.5 ${isGlass ? "border-white/15" : "border-border/80"}`}>
+              <span className={`w-28 sm:w-36 shrink-0 text-xs sm:text-sm font-medium ${isGlass ? "text-white/75" : "text-muted-foreground"}`}>
+                Contact Number:
               </span>
+              <div className="flex-1 text-right min-w-0">
+                <div className={`text-xs sm:text-sm font-bold ${isGlass ? "text-white" : "text-foreground"}`}>
+                  {createdBooking.phone}
+                </div>
+                {createdBooking.whatsappNumber && createdBooking.whatsappNumber !== createdBooking.phone ? (
+                  <div className={`text-[11px] sm:text-xs mt-0.5 ${isGlass ? "text-emerald-300" : "text-emerald-600"}`}>
+                    WA: {createdBooking.whatsappNumber}
+                  </div>
+                ) : (
+                  <div className={`text-[11px] sm:text-xs mt-0.5 font-medium ${isGlass ? "text-emerald-300" : "text-emerald-600"}`}>
+                    ✓ Primary &amp; WhatsApp
+                  </div>
+                )}
+              </div>
             </div>
-            <div className={`flex justify-between border-b pb-2 ${isGlass ? "border-white/15" : "border-border/80"}`}>
-              <span className={isGlass ? "text-white/70" : "text-muted-foreground"}>Location:</span>
-              <span className={`font-medium text-right max-w-xs ${isGlass ? "text-white" : "text-foreground"}`}>
-                {createdBooking.address}, {createdBooking.city} - {createdBooking.pincode}
-                {createdBooking.landmark ? ` (Landmark: ${createdBooking.landmark})` : ""}
+
+            {/* Location */}
+            <div className={`flex items-start justify-between gap-3 sm:gap-4 border-b pb-2.5 ${isGlass ? "border-white/15" : "border-border/80"}`}>
+              <span className={`w-28 sm:w-36 shrink-0 text-xs sm:text-sm font-medium ${isGlass ? "text-white/75" : "text-muted-foreground"}`}>
+                Location:
               </span>
+              <div className="flex-1 text-right min-w-0">
+                <div className={`text-xs sm:text-sm font-semibold leading-snug break-words ${isGlass ? "text-white" : "text-foreground"}`}>
+                  {createdBooking.address}
+                </div>
+                <div className={`text-[11px] sm:text-xs mt-0.5 ${isGlass ? "text-white/80" : "text-muted-foreground"}`}>
+                  {createdBooking.city} {createdBooking.pincode ? `• PIN: ${createdBooking.pincode}` : ""}
+                </div>
+                {createdBooking.landmark && (
+                  <div className={`text-[10px] sm:text-[11px] italic mt-0.5 ${isGlass ? "text-white/70" : "text-muted-foreground"}`}>
+                    Landmark: {createdBooking.landmark}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex justify-between pt-1">
-              <span className={`font-bold ${isGlass ? "text-white" : "text-foreground"}`}>Estimated Total:</span>
-              <span className={`font-black text-base ${isGlass ? "text-white text-lg" : "text-brand"}`}>
-                {createdBooking.estimatedAmount > 0
-                  ? `₹${createdBooking.estimatedAmount.toLocaleString("en-IN")}`
-                  : "Pay After Inspection"}
-              </span>
+
+            {/* Estimated Total */}
+            <div className="flex items-center justify-between gap-3 sm:gap-4 pt-1">
+              <div>
+                <span className={`block text-xs sm:text-sm font-bold ${isGlass ? "text-white" : "text-foreground"}`}>
+                  Estimated Total:
+                </span>
+                <span className={`text-[10px] sm:text-xs block ${isGlass ? "text-white/70" : "text-muted-foreground"}`}>
+                  Pay after service
+                </span>
+              </div>
+              <div className="text-right">
+                <span className={`font-black text-lg sm:text-xl tracking-tight ${
+                  isGlass ? "text-amber-300" : "text-brand"
+                }`}>
+                  {createdBooking.estimatedAmount > 0
+                    ? `₹${createdBooking.estimatedAmount.toLocaleString("en-IN")}`
+                    : "Pay After Inspection"}
+                </span>
+              </div>
             </div>
           </div>
 
