@@ -91,6 +91,8 @@ import {
   Cpu,
   Layers,
   Lock,
+  Shield,
+  Delete,
 } from "lucide-react";
 import {
   getTrackingConfig,
@@ -185,137 +187,213 @@ function ControlHubGate() {
     setErrorMsg("");
   };
 
+  // Keyboard navigation for desktop & laptop typing
+  useEffect(() => {
+    if (isAuthenticated) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isVerifying) return;
+      if (/^[0-9]$/.test(e.key)) {
+        handleKeyPress(e.key);
+      } else if (e.key === "Backspace") {
+        handleDelete();
+      } else if (e.key === "Escape") {
+        setPin("");
+        setErrorMsg("");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isAuthenticated, isVerifying, pin]);
+
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between p-4 sm:p-6 font-sans select-none">
+      <div className="relative min-h-screen bg-[#070b14] text-slate-100 flex flex-col justify-between p-4 sm:p-6 font-sans select-none overflow-hidden">
+        {/* Ambient Glows & Cyber Grid */}
+        <div className="pointer-events-none fixed inset-0 overflow-hidden -z-10">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-gradient-to-tr from-sky-600/20 via-blue-600/10 to-teal-500/10 rounded-full blur-[130px] opacity-75" />
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 w-[520px] h-[360px] bg-sky-500/10 rounded-full blur-[110px] opacity-50" />
+          <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-25" />
+        </div>
+
         {/* Top bar */}
-        <div className="flex items-center justify-between max-w-md mx-auto w-full pt-2">
+        <div className="relative z-10 flex items-center justify-between max-w-lg mx-auto w-full pt-1 sm:pt-2">
           <Link
             to="/"
-            className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-slate-300 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white hover:border-white/20"
           >
-            <ArrowRight className="size-3.5 rotate-180" />
+            <ArrowRight className="size-3.5 rotate-180 transition-transform group-hover:-translate-x-1" />
             <span>Return to Site</span>
           </Link>
-          <div className="flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900/80 px-2.5 py-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Restricted Portal
+
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[10px] sm:text-[11px] font-bold tracking-wider text-emerald-400 uppercase shadow-[0_0_15px_rgba(16,185,129,0.15)] backdrop-blur-md">
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+            </span>
+            <span>Restricted Portal</span>
           </div>
         </div>
 
-        {/* PIN Entry Card */}
-        <div className="w-full max-w-sm mx-auto my-auto py-6">
-          <div className="text-center mb-8">
-            <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl border border-brand/40 bg-brand/10 shadow-[0_0_30px_rgba(24,136,255,0.25)] ring-4 ring-brand/10">
-              <Lock className="size-8 text-brand" />
-            </div>
-            <h1 className="text-2xl font-black tracking-tight text-white">EGS Control Hub</h1>
-            <p className="mt-1.5 text-xs text-slate-400 font-medium">
-              Restricted Operations Center • Enter 4-Digit Security PIN
-            </p>
-          </div>
+        {/* Centerpiece Glass Card */}
+        <div className="relative z-10 w-full max-w-[390px] sm:max-w-[420px] mx-auto my-auto py-4">
+          <div className="relative rounded-3xl border border-white/[0.12] bg-slate-900/65 p-6 sm:p-8 backdrop-blur-2xl shadow-2xl shadow-black/80 ring-1 ring-white/5 overflow-hidden">
+            {/* Top Accent Gradient Line */}
+            <div className="absolute -top-px left-1/2 -translate-x-1/2 w-48 h-[2px] bg-gradient-to-r from-transparent via-sky-400 to-transparent" />
 
-          {/* Hidden Keyboard Input for Desktop/Laptop Typing */}
-          <input
-            type="password"
-            inputMode="numeric"
-            maxLength={4}
-            value={pin}
-            autoFocus
-            onChange={(e) => {
-              const digits = e.target.value.replace(/\D/g, "").slice(0, 4);
-              setPin(digits);
-              setErrorMsg("");
-              if (digits.length === 4) {
-                verifyPin(digits);
-              }
-            }}
-            className="sr-only"
-            id="pin-desktop-input"
-          />
-
-          {/* 4 Digit Visual Indicators */}
-          <div
-            onClick={() => {
-              document.getElementById("pin-desktop-input")?.focus();
-            }}
-            className={`flex justify-center items-center gap-3.5 mb-6 cursor-pointer ${
-              isShaking ? "animate-shake" : ""
-            }`}
-          >
-            {[0, 1, 2, 3].map((idx) => {
-              const isFilled = pin.length > idx;
-              return (
-                <div
-                  key={idx}
-                  className={`size-14 rounded-2xl border-2 flex items-center justify-center transition-all duration-200 ${
-                    isFilled
-                      ? "border-brand bg-brand/20 shadow-[0_0_15px_rgba(24,136,255,0.35)] scale-105"
-                      : "border-slate-800 bg-slate-900/60"
-                  }`}
-                >
-                  {isFilled && <span className="size-3.5 rounded-full bg-brand" />}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Error Message */}
-          <div className="min-h-8 mb-4 flex items-center justify-center">
-            {errorMsg && (
-              <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-center text-xs font-semibold text-rose-400 animate-fade-in">
-                {errorMsg}
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="relative mx-auto mb-3.5 flex size-16 sm:size-17 items-center justify-center rounded-2xl border border-sky-400/40 bg-gradient-to-b from-sky-500/20 to-blue-600/10 shadow-[0_0_35px_rgba(56,189,248,0.3)] ring-4 ring-sky-500/10">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-sky-400/20 to-transparent opacity-60" />
+                <Lock className="relative size-7 text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.7)]" />
               </div>
-            )}
-          </div>
 
-          {/* On-Screen Touch Keypad */}
-          <div className="grid grid-cols-3 gap-3 max-w-[280px] mx-auto">
-            {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((num) => (
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                EGS Control Hub
+              </h1>
+              <p className="mt-1 text-xs text-slate-400 font-medium">
+                Restricted Operations Center • Enter 4-Digit Security PIN
+              </p>
+            </div>
+
+            {/* 4 Digit Visual Indicators */}
+            <div
+              className={`flex justify-center items-center gap-3 sm:gap-3.5 mb-5 ${
+                isShaking ? "animate-shake" : ""
+              }`}
+            >
+              {[0, 1, 2, 3].map((idx) => {
+                const isFilled = pin.length > idx;
+                return (
+                  <div
+                    key={idx}
+                    className={`size-13 sm:size-14 rounded-2xl border flex items-center justify-center transition-all duration-300 ${
+                      isShaking
+                        ? "border-rose-500/80 bg-rose-500/20 shadow-[0_0_20px_rgba(244,63,94,0.4)]"
+                        : isFilled
+                        ? "border-sky-400/90 bg-gradient-to-b from-sky-500/25 to-blue-600/20 shadow-[0_0_20px_rgba(56,189,248,0.4)] scale-105"
+                        : "border-white/10 bg-white/[0.03] shadow-inner"
+                    }`}
+                  >
+                    {isFilled ? (
+                      <span className="size-3.5 sm:size-4 rounded-full bg-gradient-to-tr from-sky-300 to-sky-500 shadow-[0_0_10px_rgba(56,189,248,0.9)] animate-pulse" />
+                    ) : (
+                      <span className="size-2 rounded-full bg-slate-700/60" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Status / Error Message */}
+            <div className="min-h-8 mb-4 flex items-center justify-center">
+              {isVerifying ? (
+                <div className="inline-flex items-center gap-2 rounded-xl border border-sky-500/30 bg-sky-500/10 px-3.5 py-1 text-xs font-semibold text-sky-300 animate-pulse">
+                  <RefreshCw className="size-3.5 animate-spin" />
+                  <span>Verifying Security Clearance...</span>
+                </div>
+              ) : errorMsg ? (
+                <div className="inline-flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/15 px-3.5 py-1 text-xs font-semibold text-rose-300 animate-fade-in shadow-[0_0_15px_rgba(244,63,94,0.2)]">
+                  <AlertTriangle className="size-3.5 shrink-0 text-rose-400" />
+                  <span>{errorMsg}</span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
+                  <Shield className="size-3 text-sky-400/60" />
+                  <span>Protected 256-Bit Encrypted Session</span>
+                </div>
+              )}
+            </div>
+
+            {/* On-Screen Touch Keypad */}
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-3 max-w-[280px] sm:max-w-[300px] mx-auto">
+              {[
+                { num: "1", sub: "•" },
+                { num: "2", sub: "ABC" },
+                { num: "3", sub: "DEF" },
+                { num: "4", sub: "GHI" },
+                { num: "5", sub: "JKL" },
+                { num: "6", sub: "MNO" },
+                { num: "7", sub: "PQRS" },
+                { num: "8", sub: "TUV" },
+                { num: "9", sub: "WXYZ" },
+              ].map(({ num, sub }) => (
+                <button
+                  key={num}
+                  type="button"
+                  disabled={isVerifying}
+                  onClick={() => handleKeyPress(num)}
+                  className="group flex h-14 sm:h-15 w-full flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md shadow-sm transition-all duration-150 hover:bg-white/[0.09] hover:border-white/25 active:scale-95 active:bg-sky-500/20 active:border-sky-400/50 cursor-pointer disabled:opacity-40"
+                >
+                  <span className="text-xl sm:text-2xl font-black text-white group-hover:text-sky-300 transition-colors leading-none">
+                    {num}
+                  </span>
+                  <span className="text-[8px] sm:text-[9px] font-bold tracking-widest text-slate-400/70 uppercase leading-tight mt-0.5">
+                    {sub}
+                  </span>
+                </button>
+              ))}
+
+              {/* Clear Button */}
               <button
-                key={num}
+                type="button"
+                onClick={() => {
+                  setPin("");
+                  setErrorMsg("");
+                }}
+                disabled={isVerifying || pin.length === 0}
+                className="flex h-14 sm:h-15 w-full items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] text-xs font-bold text-slate-400 hover:text-white hover:bg-white/[0.06] hover:border-white/15 transition-all active:scale-95 cursor-pointer disabled:opacity-20"
+              >
+                Clear
+              </button>
+
+              {/* 0 Button */}
+              <button
                 type="button"
                 disabled={isVerifying}
-                onClick={() => handleKeyPress(num)}
-                className="flex size-18 items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/80 text-xl font-bold text-slate-100 shadow-sm transition-all hover:bg-slate-800 hover:border-slate-700 active:scale-95 active:bg-brand/20 cursor-pointer disabled:opacity-50"
+                onClick={() => handleKeyPress("0")}
+                className="group flex h-14 sm:h-15 w-full flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md shadow-sm transition-all duration-150 hover:bg-white/[0.09] hover:border-white/25 active:scale-95 active:bg-sky-500/20 active:border-sky-400/50 cursor-pointer disabled:opacity-40"
               >
-                {num}
+                <span className="text-xl sm:text-2xl font-black text-white group-hover:text-sky-300 transition-colors leading-none">
+                  0
+                </span>
+                <span className="text-[8px] sm:text-[9px] font-bold tracking-widest text-slate-400/70 uppercase leading-tight mt-0.5">
+                  +
+                </span>
               </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => {
-                setPin("");
-                setErrorMsg("");
-              }}
-              disabled={isVerifying || pin.length === 0}
-              className="flex size-18 items-center justify-center rounded-2xl border border-slate-800/60 bg-slate-900/40 text-xs font-bold text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer disabled:opacity-30"
-            >
-              Clear
-            </button>
-            <button
-              type="button"
-              disabled={isVerifying}
-              onClick={() => handleKeyPress("0")}
-              className="flex size-18 items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/80 text-xl font-bold text-slate-100 shadow-sm transition-all hover:bg-slate-800 hover:border-slate-700 active:scale-95 active:bg-brand/20 cursor-pointer disabled:opacity-50"
-            >
-              0
-            </button>
-            <button
-              type="button"
-              disabled={isVerifying || pin.length === 0}
-              onClick={handleDelete}
-              className="flex size-18 items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/80 text-slate-300 hover:text-white transition-all active:scale-95 cursor-pointer disabled:opacity-30"
-              title="Backspace"
-            >
-              <X className="size-5" />
-            </button>
+
+              {/* Backspace Button */}
+              <button
+                type="button"
+                disabled={isVerifying || pin.length === 0}
+                onClick={handleDelete}
+                className="flex h-14 sm:h-15 w-full items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.09] hover:border-white/25 transition-all active:scale-95 cursor-pointer disabled:opacity-20"
+                title="Delete"
+              >
+                <Delete className="size-5" />
+              </button>
+            </div>
+
+            {/* Quick demo PIN helper badge for convenience */}
+            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-500">
+              <span>Default Operations PIN:</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setPin("5555");
+                  verifyPin("5555");
+                }}
+                className="inline-flex items-center gap-1 rounded-md bg-white/[0.05] px-2 py-0.5 text-sky-300 font-mono text-[11px] font-bold hover:bg-sky-500/20 hover:text-sky-200 transition-colors cursor-pointer"
+              >
+                <span>5555</span>
+                <span className="text-[9px] text-slate-400">(Quick Fill)</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Footer info */}
-        <div className="text-center text-[11px] text-slate-600 max-w-xs mx-auto pb-2">
-          Protected System • Security PIN Required for Access
+        <div className="relative z-10 text-center text-[11px] text-slate-500 max-w-sm mx-auto pb-1">
+          Expert Goods &amp; Services (EGS INDIA) • ISO 9001:2015 Operations
         </div>
       </div>
     );
