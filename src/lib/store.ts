@@ -919,7 +919,7 @@ const SEED_BOOKINGS: Booking[] = [
     status: "CONTACTED",
     serviceCategory: "ac-amc",
     serviceName: "📋 AMC",
-    subService: "Residential Saver Plan (3 Free Wet Services + 1 Free Breakdown)",
+    subService: "Residential Saver Plan (4 Free Wet Services + 1 Free Breakdown)",
     acType: "Split AC",
     acBrand: "Blue Star",
     unitCount: 3,

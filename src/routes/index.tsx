@@ -40,7 +40,7 @@ import {
   trackWhatsAppClick,
 } from "@/lib/tracking";
 import { CoolAirFlow } from "@/components/CoolAirFlow";
-import aboutTech from "@/assets/about-tech.jpg";
+import commercialAcPlant from "@/assets/commercial-ac-plant.jpg";
 import projectResidential from "@/assets/project-residential.jpg";
 import projectCommercial from "@/assets/project-commercial.jpg";
 import processImg from "@/assets/process.jpg";
@@ -442,8 +442,8 @@ function About() {
 
           <ScrollReveal delayMs={80} className="h-full">
             <img
-              src={aboutTech}
-              alt="Technician in a yellow hard hat servicing AC wiring"
+              src={commercialAcPlant}
+              alt="Commercial AC plant and industrial rooftop chiller units"
               width={800}
               height={1000}
               loading="lazy"

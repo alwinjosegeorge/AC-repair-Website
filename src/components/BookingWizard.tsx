@@ -164,7 +164,7 @@ export const SERVICES_DATA: Array<{
     icon: ShieldCheck,
     desc: "Annual maintenance contracts with scheduled deep services & free breakdown visits.",
     subServices: [
-      "Residential Saver Plan (3 Wet Services + Free Visits)",
+      "Residential Saver Plan (4 Wet Services + Free Visits)",
       "Comprehensive Care AMC (Services + Spares + Gas)",
       "Commercial Building Annual HVAC Contract",
     ],

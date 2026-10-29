@@ -8,7 +8,7 @@ export const Route = createFileRoute("/services/ac-amc")({
       {
         name: "description",
         content:
-          "Save up to 40% on AC repair & electricity bills with EGS Annual Maintenance Contracts (AMC). Unlimited breakdown calls, 3 wet jet services, and priority technician dispatch.",
+          "Save up to 40% on AC repair & electricity bills with EGS Annual Maintenance Contracts (AMC). Unlimited breakdown calls, 4 wet jet services, and priority technician dispatch.",
       },
       { property: "og:title", content: "AC AMC Annual Maintenance Contracts | EGS INDIA" },
       {
@@ -38,7 +38,7 @@ function ACAMCPage() {
           badge: "Best for Homes",
           popular: true,
           features: [
-            "3 Deep Power Jet wet services per year (every 4 months)",
+            "4 Deep Power Jet wet services per year (every 3 months / quarterly)",
             "Unlimited free breakdown inspection visits",
             "Zero labor charges for any repairs during contract year",
             "10-Point pre-summer comprehensive health checkup",
@@ -108,14 +108,14 @@ function ACAMCPage() {
       ]}
       faqs={[
         {
-          question: "How do I schedule my 3 routine wet services?",
+          question: "How do I schedule my 4 routine wet services?",
           answer:
-            "Our automated CRM tracks your contract start date and sends you WhatsApp reminders every 4 months. You can simply pick any date and time slot that suits your schedule.",
+            "Our automated CRM tracks your contract start date and sends you WhatsApp reminders every 3 months. You can simply pick any date and time slot that suits your schedule.",
         },
         {
           question: "What is the difference between Saver and Comprehensive AMC?",
           answer:
-            "The Saver AMC covers 3 wet jet wash services plus unlimited free breakdown visits and labor (spare parts charged at actuals). The Comprehensive AMC also includes refrigerant gas top-ups, capacitors, and common spare parts free of cost.",
+            "The Saver AMC covers 4 wet jet wash services plus unlimited free breakdown visits and labor (spare parts charged at actuals). The Comprehensive AMC also includes refrigerant gas top-ups, capacitors, and common spare parts free of cost.",
         },
         {
           question: "Can I transfer my AMC if I move to a new house in the same city?",

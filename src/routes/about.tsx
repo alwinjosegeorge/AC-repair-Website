@@ -20,7 +20,7 @@ import {
   Layers,
   ChevronRight,
 } from "lucide-react";
-import aboutTech from "@/assets/about-tech.jpg";
+import commercialAcPlant from "@/assets/commercial-ac-plant.jpg";
 import amalBhPhoto from "@/assets/amal-bh.jpg";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -117,8 +117,8 @@ function AboutPage() {
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl bg-card">
               <img
-                src={aboutTech}
-                alt="Expert Goods and Services AC Technicians"
+                src={commercialAcPlant}
+                alt="Expert Goods and Services Commercial AC Plant & Chillers"
                 className="w-full h-[380px] sm:h-[460px] object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />

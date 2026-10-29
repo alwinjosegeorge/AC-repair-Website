@@ -2,6 +2,18 @@ import { Link } from "@tanstack/react-router";
 import { Phone, Mail, MapPin, ShieldCheck, Clock, Award } from "lucide-react";
 import { EGS_CALL_NUMBER, EGS_WHATSAPP_NUMBER } from "../lib/store";
 
+const REGIONAL_HUBS = [
+  { name: "Kollam", isHQ: true },
+  { name: "Trivandrum" },
+  { name: "Ernakulam" },
+  { name: "Thrissur" },
+  { name: "Alappuzha" },
+  { name: "Kottayam" },
+  { name: "Kozhikode" },
+  { name: "Bangalore" },
+  { name: "Chennai" },
+];
+
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -79,69 +91,41 @@ export function Footer() {
 
           {/* Service Locations */}
           <div>
-            <h3 className="text-xs font-black uppercase tracking-wider text-background/90">
-              Regional Service Hubs
-            </h3>
-            <ul className="mt-4 space-y-2 text-xs text-background/75">
-              <li>
-                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span className="text-sky-400">📍</span>
-                  <span>Kollam (HQ)</span>
+            <div className="flex items-center gap-2">
+              <MapPin className="size-3.5 text-sky-400" />
+              <h3 className="text-xs font-black uppercase tracking-wider text-background/90">
+                Regional Service Hubs
+              </h3>
+            </div>
+            
+            <div className="mt-4 grid grid-cols-2 gap-1.5">
+              {REGIONAL_HUBS.map((hub) => (
+                <Link
+                  key={hub.name}
+                  to="/service-areas"
+                  className="group flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.03] px-2.5 py-1.5 text-xs text-background/75 transition-all duration-200 hover:border-sky-400/30 hover:bg-sky-500/10 hover:text-white"
+                >
+                  <span className="truncate group-hover:translate-x-0.5 transition-transform duration-200">
+                    {hub.name}
+                  </span>
+                  {hub.isHQ ? (
+                    <span className="ml-1 rounded bg-sky-400/20 px-1 py-0.5 text-[9px] font-black tracking-wider text-sky-300 ring-1 ring-sky-400/30">
+                      HQ
+                    </span>
+                  ) : (
+                    <span className="size-1 rounded-full bg-sky-400/40 group-hover:bg-sky-400 transition-colors" />
+                  )}
                 </Link>
-              </li>
-              <li>
-                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span className="text-sky-400">📍</span>
-                  <span>Trivandrum</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span className="text-sky-400">📍</span>
-                  <span>Ernakulam</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span className="text-sky-400">📍</span>
-                  <span>Thrissur</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span className="text-sky-400">📍</span>
-                  <span>Alappuzha</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span className="text-sky-400">📍</span>
-                  <span>Kottayam</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span className="text-sky-400">📍</span>
-                  <span>Kozhikode</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span className="text-sky-400">📍</span>
-                  <span>Bangalore</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/service-areas" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span className="text-sky-400">📍</span>
-                  <span>Chennai</span>
-                </Link>
-              </li>
-            </ul>
+              ))}
+            </div>
 
-            <div className="mt-4">
-              <Link to="/service-areas" className="text-xs font-semibold text-sky-300 hover:underline">
-                Explore All Service Areas & Hubs →
+            <div className="mt-4 pt-2">
+              <Link
+                to="/service-areas"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-300 transition-colors hover:text-white group"
+              >
+                <span>Explore All Service Areas & Hubs</span>
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
               </Link>
             </div>
           </div>
