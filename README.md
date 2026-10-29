@@ -2,10 +2,6 @@
 
 <div align="center">
 
-<p align="center">
-  <img src="./public/showcase/cute-mascot.png" width="190" alt="EGS Certified Mascot" style="border-radius: 50%; box-shadow: 0 12px 35px rgba(0,102,204,0.35); border: 4px solid #0084f6;" />
-</p>
-
 ### *"Fresh Air, Happy Homes & Precision Cooling Reinvented!"* ✨
 
 [![Website](https://img.shields.io/badge/Live_Site-egsindia.in-0066cc?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.egsindia.in)
@@ -59,20 +55,12 @@ Experience the official web application running live in production on [egsindia.
 
 ---
 
-## 🎨 3D Isometric Artwork & Engineering Vision
+## 🎨 3D Isometric Architectural Visual
 
-<table align="center" width="100%">
-  <tr>
-    <td align="center" width="50%">
-      <img src="./public/showcase/cute-isometric-room.png" alt="Smart Cozy Living Room Cooling" style="border-radius: 16px; width: 100%; max-width: 440px; box-shadow: 0 12px 30px rgba(0,0,0,0.15);" /><br />
-      <sub><b>🏡 Smart Cozy Living Room Cooling (3D Isometric)</b><br />Gentle fresh air waves, whisper-quiet comfort, and energy efficiency.</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="./public/showcase/cute-mascot.png" alt="EGS Certified Technician Mascot" style="border-radius: 16px; width: 100%; max-width: 440px; box-shadow: 0 12px 30px rgba(0,0,0,0.15);" /><br />
-      <sub><b>👨‍🔧 Meet Sparky — Certified EGS Service Mascot</b><br />Certified mechanics, 90-min doorstep arrival, and 30-day revisit warranty.</sub>
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <img src="./public/showcase/cute-isometric-room.png" alt="Smart Cozy Living Room Cooling" width="100%" style="max-width: 600px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.15);" /><br />
+  <sub><b>🏡 Smart Cozy Living Room Cooling (3D Isometric Concept)</b><br />Gentle fresh air waves, whisper-quiet comfort, and intelligent HVAC airflow.</sub>
+</p>
 
 ---
 
