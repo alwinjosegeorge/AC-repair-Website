@@ -14,6 +14,12 @@
 
 [Live Website](https://www.egsindia.in) • [Online Booking](https://www.egsindia.in/book) • [Services](https://www.egsindia.in/#services) • [Client Portfolio](https://www.egsindia.in/projects) • [Regional Hubs](https://www.egsindia.in/service-areas)
 
+<br />
+
+<p align="center">
+  <img src="./public/og-image.png" alt="EGS INDIA HVAC Engineering & Doorstep AC Solutions" width="100%" style="border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);" />
+</p>
+
 </div>
 
 ---
@@ -23,6 +29,25 @@
 Established in **2015 in Kollam, Kerala**, **Expert Goods & Services (EGS INDIA)** is one of South India's premier organized HVAC engineering and cooling solutions providers. Spanning Kerala, Tamil Nadu, and Karnataka, EGS INDIA operates with a dedicated fleet of **80+ certified mobile technicians**, providing **guaranteed 90-minute arrival** for emergency AC breakdowns, preventive maintenance, industrial VRV/VRF deployments, and multi-year corporate AMCs.
 
 This repository powers the entire customer-facing digital presence and the internal operational backbone for customer intake, technician dispatching, and billing.
+
+<br />
+
+<table align="center" width="100%">
+  <tr>
+    <td align="center" width="33%">
+      <img src="./public/showcase/process.jpg" alt="Certified Technician Diagnostics" style="border-radius: 12px; width: 100%; object-fit: cover;" /><br />
+      <sub><b>Certified Technician Diagnostics & Hygiene</b></sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="./public/showcase/project-residential.jpg" alt="Precision Residential Jet Cleaning" style="border-radius: 12px; width: 100%; object-fit: cover;" /><br />
+      <sub><b>Precision Residential Jet Cleaning & Service</b></sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="./public/showcase/project-commercial.jpg" alt="Commercial Cassette & VRV Units" style="border-radius: 12px; width: 100%; object-fit: cover;" /><br />
+      <sub><b>Commercial Cassette, VRF & Ceiling Systems</b></sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -44,16 +69,41 @@ This repository powers the entire customer-facing digital presence and the inter
 - **Billing & Invoicing Engine**: Generates professional branded tax invoices and UPI QR payment links directly for field technicians.
 - **Mobile Admin Bottom Navigation Dock**: 5-tab quick switcher dock (Bookings, AMC, Customers, Billing, Operations Drawer) designed for smartphone usage.
 
-### 3. ❄️ Dedicated Service Landing Pages
+### 3. ❄️ Commercial HVAC & Central Cooling Deployments
+EGS INDIA specializes in the design, engineering, supply, erection, and commissioning of large-scale central air conditioning plants, chillers, and VRV/VRF systems across South India.
+
+<br />
+
+<p align="center">
+  <img src="./public/commercial-ac-plant.jpg" alt="Commercial HVAC Central Chiller Plant" width="100%" style="border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" /><br />
+  <sub><em>Central Air Conditioning & Rooftop Chiller Plant deployed by EGS INDIA Engineering Division</em></sub>
+</p>
+
+<br />
+
 - **[AC Service & Deep Cleaning](https://www.egsindia.in/services/ac-service)**: Anti-bacterial foam jet cleaning, indoor blower wash, and outdoor condenser hygiene.
 - **[AC Repair & Diagnostics](https://www.egsindia.in/services/ac-repair)**: Gas leak detection, compressor diagnostics, capacitor swaps, and PCB repairs.
 - **[AC Installation & Uninstallation](https://www.egsindia.in/services/ac-installation)**: Professional copper piping, bracket mounting, vacuum testing, and office shifting.
 - **[Annual Maintenance Contracts (AMC)](https://www.egsindia.in/services/ac-amc)**: Basic & Comprehensive packages for residential villas and enterprise offices.
 - **[Commercial HVAC Solutions](https://www.egsindia.in/services/commercial-hvac)**: Central chillers, VRF/VRV engineering, cassette ACs, and ductable units.
 
-### 4. 📍 Regional Hubs & Institutional Showcase
-- **[Service Areas Directory](https://www.egsindia.in/service-areas)**: Covers Kollam (HQ), Thiruvananthapuram, Kochi / Ernakulam, Thrissur, Alappuzha, Kottayam, Kozhikode, Bangalore, and Chennai.
-- **[Projects & Client Portfolio](https://www.egsindia.in/projects)**: Verified showcase of 19 leading institutional partners including international airports, hospital chains, banking branches, and resorts.
+---
+
+## 🏛️ Trusted by Leading Institutions
+
+EGS INDIA manages mission-critical HVAC operations, precision cooling, and preventive AMC for prominent corporate, government, healthcare, and hospitality institutions across South India:
+
+<div align="center">
+
+| <img src="./public/clients/state-bank-of-india.png" width="140" alt="State Bank of India" /> | <img src="./public/clients/trivandrum-airport.png" width="140" alt="Trivandrum International Airport" /> | <img src="./public/clients/kerala-police-academy.png" width="140" alt="Kerala Police Academy" /> | <img src="./public/clients/sut-hospital.png" width="140" alt="SUT Hospital" /> |
+| :---: | :---: | :---: | :---: |
+| **State Bank of India** | **Trivandrum Intl Airport** | **Kerala Police Academy** | **SUT Hospital** |
+
+| <img src="./public/clients/jayalakshmi-silks.png" width="140" alt="Jayalakshmi Silks" /> | <img src="./public/clients/tuv-rheinland.png" width="140" alt="TÜV Rheinland" /> | <img src="./public/clients/ahalya-eye-foundation.png" width="140" alt="Ahalya Eye Foundation" /> | <img src="./public/clients/hotel-all-season.png" width="140" alt="Hotel All Season" /> |
+| :---: | :---: | :---: | :---: |
+| **Jayalakshmi Silks** | **TÜV Rheinland** | **Ahalya Eye Foundation** | **Hotel All Season (5-Star)** |
+
+</div>
 
 ---
 
@@ -65,8 +115,8 @@ This repository powers the entire customer-facing digital presence and the inter
 | **Meta-Framework** | [TanStack Start](https://tanstack.com/start) | SSR & Type-safe file-based routing |
 | **Routing** | [TanStack Router v1](https://tanstack.com/router) | 100% type-safe client-side navigation |
 | **Data Fetching** | [TanStack Query v5](https://tanstack.com/query) | Async state caching and cache invalidation |
-| **Styling** | [Tailwind CSS v4](https://tailwindcss.com) | Modern, atomic design system with OKLCH color palettes |
-| **Iconography** | [Lucide React](https://lucide.dev) | Crisp, modern vector icons |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com) | Modern atomic design system with OKLCH palettes |
+| **Iconography** | [Lucide React](https://lucide.dev) | Crisp vector icons |
 | **Database** | [Neon PostgreSQL](https://neon.tech) | Cloud serverless database with connection pooling |
 | **Database Driver** | `@neondatabase/serverless` | Sub-50ms HTTP SQL querying compatible with Edge & Node |
 | **Build System** | [Vite](https://vite.dev) & [Nitro](https://nitro.unjs.io) | Lightning-fast HMR and universal production bundle |
@@ -106,12 +156,17 @@ egs_india/
 ├── .github/
 │   └── workflows/
 │       └── db-keepalive.yml     # Automated scheduled database keep-alive workflow
-├── public/                      # Static assets, logos, favicon, PWA icons, sitemap
+├── public/
+│   ├── clients/                 # Client institutional brand logos
+│   ├── showcase/                # Feature gallery and photography
+│   ├── commercial-ac-plant.jpg  # Central chiller & VRV plant photography
+│   ├── og-image.png             # Official OpenGraph branding social card
+│   └── logo-full.png            # Official high-resolution logo
 ├── scripts/
 │   ├── setup-db.mjs             # Database schema migration & initialization script
 │   └── keepalive.mjs            # Standalone Neon database keep-alive ping script
 ├── src/
-│   ├── assets/                  # High-resolution plant, equipment & team photography
+│   ├── assets/                  # Photography and visual assets
 │   ├── components/
 │   │   ├── ui/                  # Accessible UI primitives (dialogs, sheet, accordions)
 │   │   ├── BookingWizard.tsx    # 5-step interactive service booking wizard
