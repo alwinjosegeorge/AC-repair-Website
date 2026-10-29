@@ -95,18 +95,21 @@ export function ServiceLandingTemplate({
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       <Navbar />
 
-      {/* Trust Ticker Bar */}
-      <div className="mt-3 bg-brand/10 border-y border-brand/20 py-2 px-4 text-center text-xs font-bold text-brand">
+      {/* Trust Ticker Bar - spaced cleanly below floating island Navbar */}
+      <div className="mt-8 sm:mt-10 bg-brand-soft/80 border-y border-brand/20 py-2.5 px-4 text-center text-xs font-bold text-brand">
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-6 flex-wrap">
-          <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-emerald-500 animate-ping" />
-            90-Minute Express Slots Available Today
+          <span className="flex items-center gap-2">
+            <span className="relative flex size-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
+            </span>
+            <span>90-Minute Express Slots Available Today</span>
           </span>
-          <span className="hidden sm:inline">•</span>
+          <span className="hidden sm:inline text-brand/40">•</span>
           <span className="hidden sm:flex items-center gap-1.5">
             ⭐ 4.9/5 Rating (2,850+ Customer Reviews)
           </span>
-          <span className="hidden md:inline">•</span>
+          <span className="hidden md:inline text-brand/40">•</span>
           <span className="hidden md:flex items-center gap-1.5">
             🛡️ 30-Day Post-Service Guarantee
           </span>
