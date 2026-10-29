@@ -67,6 +67,7 @@ import {
   X,
   AlertTriangle,
   ChevronRight,
+  ChevronUp,
   DollarSign,
   Send,
   Truck,
@@ -481,6 +482,19 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileOperationsSheetOpen, setMobileOperationsSheetOpen] = useState(false);
+
+  const isBookingSection = useMemo(
+    () =>
+      [
+        "new-bookings",
+        "todays-bookings",
+        "upcoming-bookings",
+        "completed",
+        "cancelled",
+      ].includes(activeSection),
+    [activeSection]
+  );
 
   // AMC Renewal System State
   const [amcSectionTab, setAmcSectionTab] = useState<"all" | "expiring_soon" | "active" | "expired" | "renewed">("all");
@@ -1495,7 +1509,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
         {/* ============================================================ */}
         {/* MAIN CONTENT AREA */}
         {/* ============================================================ */}
-        <main className="flex-1 p-4 md:p-6 space-y-6 overflow-x-hidden">
+        <main className="flex-1 p-4 md:p-6 space-y-6 overflow-x-hidden pb-36 lg:pb-8">
           {/* Header Title & Filter Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -4993,6 +5007,485 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 1. BOOKING SUB-FILTER CHIP BAR (Mobile only, shown when in Bookings) */}
+      {/* ============================================================ */}
+      {isBookingSection && !mobileOperationsSheetOpen && (
+        <div className="lg:hidden fixed bottom-[68px] left-2.5 right-2.5 z-40 bg-card/95 backdrop-blur-2xl border border-border/80 rounded-2xl shadow-xl p-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar animate-in slide-in-from-bottom-2 duration-200">
+          {/* New Leads */}
+          <button
+            type="button"
+            onClick={() => setActiveSection("new-bookings")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSection === "new-bookings"
+                ? "bg-rose-500 text-white shadow-sm shadow-rose-500/40"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface/80"
+            }`}
+          >
+            <span className="relative flex size-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+              <span className="relative inline-flex rounded-full size-2 bg-rose-500" />
+            </span>
+            <span>New Leads</span>
+            {counts.newBookings > 0 && (
+              <span className="bg-white/25 text-white px-1.5 py-0.2 rounded-full text-[10px] font-black leading-none">
+                {counts.newBookings}
+              </span>
+            )}
+          </button>
+
+          {/* Today's Bookings */}
+          <button
+            type="button"
+            onClick={() => setActiveSection("todays-bookings")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSection === "todays-bookings"
+                ? "bg-amber-500 text-white shadow-sm shadow-amber-500/40"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface/80"
+            }`}
+          >
+            <Clock className="size-3" />
+            <span>Today ({counts.todays})</span>
+          </button>
+
+          {/* Upcoming Bookings */}
+          <button
+            type="button"
+            onClick={() => setActiveSection("upcoming-bookings")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSection === "upcoming-bookings"
+                ? "bg-brand text-brand-foreground shadow-sm shadow-brand/40"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface/80"
+            }`}
+          >
+            <Calendar className="size-3" />
+            <span>Upcoming ({counts.upcoming})</span>
+          </button>
+
+          {/* Completed */}
+          <button
+            type="button"
+            onClick={() => setActiveSection("completed")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSection === "completed"
+                ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/40"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface/80"
+            }`}
+          >
+            <CheckCircle2 className="size-3" />
+            <span>Completed ({counts.completed})</span>
+          </button>
+
+          {/* Cancelled */}
+          <button
+            type="button"
+            onClick={() => setActiveSection("cancelled")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSection === "cancelled"
+                ? "bg-slate-700 text-white shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface/80"
+            }`}
+          >
+            <XCircle className="size-3" />
+            <span>Cancelled ({counts.cancelled})</span>
+          </button>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 2. ADMIN MOBILE BOTTOM NAVIGATION DOCK (lg:hidden) */}
+      {/* ============================================================ */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 block lg:hidden border-t border-border/80 bg-background/95 backdrop-blur-2xl shadow-[0_-10px_35px_rgba(0,0,0,0.18)] pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2 px-2">
+        <div className="grid grid-cols-5 items-center gap-1 max-w-lg mx-auto">
+          {/* TAB 1: BOOKINGS */}
+          <button
+            type="button"
+            onClick={() => {
+              setMobileOperationsSheetOpen(false);
+              if (!isBookingSection) {
+                setActiveSection("new-bookings");
+              } else if (activeSection === "new-bookings") {
+                setActiveSection("todays-bookings");
+              } else {
+                setActiveSection("new-bookings");
+              }
+            }}
+            className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all active:scale-95 cursor-pointer ${
+              isBookingSection
+                ? "text-brand font-black"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <div className="relative">
+              <CalendarCheck className={`size-5 transition-transform ${isBookingSection ? "scale-110" : ""}`} />
+              {counts.newBookings > 0 && (
+                <span className="absolute -top-1.5 -right-2 flex items-center justify-center min-w-[17px] h-[17px] px-1 rounded-full bg-rose-500 text-[10px] font-black text-white ring-2 ring-background animate-pulse">
+                  {counts.newBookings}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] font-bold tracking-tight mt-1 leading-none">
+              Bookings
+            </span>
+            {isBookingSection && (
+              <span className="absolute -bottom-1 size-1 rounded-full bg-brand" />
+            )}
+          </button>
+
+          {/* TAB 2: AMC */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("amc-leads");
+              setMobileOperationsSheetOpen(false);
+            }}
+            className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all active:scale-95 cursor-pointer ${
+              activeSection === "amc-leads"
+                ? "text-brand font-black"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <div className="relative">
+              <ShieldCheck className={`size-5 transition-transform ${activeSection === "amc-leads" ? "scale-110" : ""}`} />
+              {counts.amcExpiring > 0 && (
+                <span className="absolute -top-1.5 -right-2 flex items-center justify-center min-w-[17px] h-[17px] px-1 rounded-full bg-amber-500 text-[10px] font-black text-white ring-2 ring-background">
+                  {counts.amcExpiring}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] font-bold tracking-tight mt-1 leading-none">
+              AMC
+            </span>
+            {activeSection === "amc-leads" && (
+              <span className="absolute -bottom-1 size-1 rounded-full bg-brand" />
+            )}
+          </button>
+
+          {/* TAB 3: CUSTOMERS CRM */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("customers");
+              setMobileOperationsSheetOpen(false);
+            }}
+            className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all active:scale-95 cursor-pointer ${
+              activeSection === "customers"
+                ? "text-brand font-black"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <div className="relative">
+              <Users className={`size-5 transition-transform ${activeSection === "customers" ? "scale-110" : ""}`} />
+              {customers.length > 0 && (
+                <span className="absolute -top-1.5 -right-2 flex items-center justify-center min-w-[16px] h-[16px] px-1 rounded-full bg-surface border border-border text-[9px] font-black text-foreground">
+                  {customers.length}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] font-bold tracking-tight mt-1 leading-none">
+              Customers
+            </span>
+            {activeSection === "customers" && (
+              <span className="absolute -bottom-1 size-1 rounded-full bg-brand" />
+            )}
+          </button>
+
+          {/* TAB 4: PAYMENTS & INVOICES */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("payments");
+              setMobileOperationsSheetOpen(false);
+            }}
+            className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all active:scale-95 cursor-pointer ${
+              activeSection === "payments"
+                ? "text-brand font-black"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <div className="relative">
+              <Receipt className={`size-5 transition-transform ${activeSection === "payments" ? "scale-110" : ""}`} />
+            </div>
+            <span className="text-[10px] font-bold tracking-tight mt-1 leading-none">
+              Billing
+            </span>
+            {activeSection === "payments" && (
+              <span className="absolute -bottom-1 size-1 rounded-full bg-brand" />
+            )}
+          </button>
+
+          {/* TAB 5: OPERATIONS & QUICK ACTIONS */}
+          <button
+            type="button"
+            onClick={() => setMobileOperationsSheetOpen(!mobileOperationsSheetOpen)}
+            className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all active:scale-95 cursor-pointer ${
+              mobileOperationsSheetOpen ||
+              ["technicians", "service-areas", "reports", "quotation-requests", "tracking-diagnostics"].includes(activeSection)
+                ? "text-brand font-black"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <div className="relative">
+              <Sliders className="size-5" />
+            </div>
+            <span className="text-[10px] font-bold tracking-tight mt-1 leading-none">
+              Operations
+            </span>
+            {(mobileOperationsSheetOpen ||
+              ["technicians", "service-areas", "reports", "quotation-requests", "tracking-diagnostics"].includes(activeSection)) && (
+              <span className="absolute -bottom-1 size-1 rounded-full bg-brand" />
+            )}
+          </button>
+        </div>
+      </nav>
+
+      {/* ============================================================ */}
+      {/* 3. OPERATIONS MOBILE BOTTOM SHEET DRAWER */}
+      {/* ============================================================ */}
+      {mobileOperationsSheetOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          {/* Backdrop */}
+          <div
+            onClick={() => setMobileOperationsSheetOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+          />
+
+          {/* Bottom Sheet Card */}
+          <div className="relative z-10 w-full rounded-t-3xl border-t border-border bg-card p-5 shadow-2xl max-h-[85vh] overflow-y-auto space-y-5 animate-in slide-in-from-bottom duration-300 pb-[max(2rem,env(safe-area-inset-bottom))]">
+            {/* Sheet Handle */}
+            <div className="flex justify-center -mt-1">
+              <div className="w-12 h-1.5 rounded-full bg-muted-foreground/30" />
+            </div>
+
+            {/* Header */}
+            <div className="flex items-center justify-between pb-2 border-b border-border">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-9 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                  <Sliders className="size-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-foreground">Hub Operations</h3>
+                  <p className="text-[11px] text-muted-foreground">Logistics, Techs, Analytics &amp; Controls</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileOperationsSheetOpen(false)}
+                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-surface cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Field Operations Grid */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block px-1">
+                Field Operations &amp; Logistics
+              </span>
+              <div className="grid grid-cols-1 gap-2">
+                {/* Field Technicians */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("technicians");
+                    setMobileOperationsSheetOpen(false);
+                  }}
+                  className={`flex items-center justify-between p-3 rounded-2xl border transition-all text-left cursor-pointer ${
+                    activeSection === "technicians"
+                      ? "border-brand bg-brand/10 text-brand font-bold"
+                      : "border-border bg-surface/50 text-foreground hover:bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+                      <HardHat className="size-5" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-black block">Field Technicians Roster</span>
+                      <span className="text-[11px] text-muted-foreground block">
+                        {technicians.length} Technicians • Live job assignments
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight className="size-4 text-muted-foreground" />
+                </button>
+
+                {/* Regional Hubs & Service Areas */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("service-areas");
+                    setMobileOperationsSheetOpen(false);
+                  }}
+                  className={`flex items-center justify-between p-3 rounded-2xl border transition-all text-left cursor-pointer ${
+                    activeSection === "service-areas"
+                      ? "border-brand bg-brand/10 text-brand font-bold"
+                      : "border-border bg-surface/50 text-foreground hover:bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-sky-500/10 text-sky-500">
+                      <Building2 className="size-5" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-black block">Regional Hubs &amp; Cities</span>
+                      <span className="text-[11px] text-muted-foreground block">
+                        Kochi, TVM, Kozhikode, Kollam, Thrissur, Chennai
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight className="size-4 text-muted-foreground" />
+                </button>
+
+                {/* Quotation Requests */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("quotation-requests");
+                    setMobileOperationsSheetOpen(false);
+                  }}
+                  className={`flex items-center justify-between p-3 rounded-2xl border transition-all text-left cursor-pointer ${
+                    activeSection === "quotation-requests"
+                      ? "border-brand bg-brand/10 text-brand font-bold"
+                      : "border-border bg-surface/50 text-foreground hover:bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-purple-500/10 text-purple-500">
+                      <ShoppingBag className="size-5" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-black block">Quotation Requests</span>
+                      <span className="text-[11px] text-muted-foreground block">
+                        Commercial VRF/VRV &amp; Bulk AC Purchases ({counts.quotation})
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight className="size-4 text-muted-foreground" />
+                </button>
+              </div>
+            </div>
+
+            {/* Analytics & Marketing Diagnostics */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block px-1">
+                Analytics &amp; Marketing Intelligence
+              </span>
+              <div className="grid grid-cols-1 gap-2">
+                {/* Reports & ROI */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("reports");
+                    setMobileOperationsSheetOpen(false);
+                  }}
+                  className={`flex items-center justify-between p-3 rounded-2xl border transition-all text-left cursor-pointer ${
+                    activeSection === "reports"
+                      ? "border-brand bg-brand/10 text-brand font-bold"
+                      : "border-border bg-surface/50 text-foreground hover:bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
+                      <TrendingUp className="size-5" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-black block">Revenue &amp; Ads ROI Reports</span>
+                      <span className="text-[11px] text-muted-foreground block">
+                        Google Ads vs Meta Ads conversion breakdown
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight className="size-4 text-muted-foreground" />
+                </button>
+
+                {/* GTM & Tracking Diagnostics */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("tracking-diagnostics");
+                    setMobileOperationsSheetOpen(false);
+                  }}
+                  className={`flex items-center justify-between p-3 rounded-2xl border transition-all text-left cursor-pointer ${
+                    activeSection === "tracking-diagnostics"
+                      ? "border-brand bg-brand/10 text-brand font-bold"
+                      : "border-border bg-surface/50 text-foreground hover:bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
+                      <Activity className="size-5" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-black block">GTM &amp; Tracking Diagnostics</span>
+                      <span className="text-[11px] text-muted-foreground block">
+                        GA4, Meta CAPI, Google Ads Enhanced Conversions
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight className="size-4 text-muted-foreground" />
+                </button>
+              </div>
+            </div>
+
+            {/* Quick System Actions */}
+            <div className="space-y-2 pt-2 border-t border-border">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block px-1">
+                Terminal &amp; Quick Links
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {/* Refresh Neon DB */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    loadData();
+                    setMobileOperationsSheetOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 rounded-xl border border-border bg-card text-foreground hover:bg-surface text-left cursor-pointer"
+                >
+                  <RefreshCw className="size-4 text-brand" />
+                  <span className="text-xs font-bold">Refresh DB</span>
+                </button>
+
+                {/* Lock Portal */}
+                {onLock && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileOperationsSheetOpen(false);
+                      onLock();
+                    }}
+                    className="flex items-center gap-2 p-3 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 text-left cursor-pointer"
+                  >
+                    <Lock className="size-4" />
+                    <span className="text-xs font-bold">Lock Hub</span>
+                  </button>
+                )}
+
+                {/* Live Customer Website */}
+                <Link
+                  to="/"
+                  target="_blank"
+                  className="flex items-center gap-2 p-3 rounded-xl border border-border bg-card text-foreground hover:bg-surface text-left cursor-pointer"
+                >
+                  <ExternalLink className="size-4 text-sky-500" />
+                  <span className="text-xs font-bold">Live Website</span>
+                </Link>
+
+                {/* Field Tech Mobile Portal */}
+                <Link
+                  to="/technician"
+                  className="flex items-center gap-2 p-3 rounded-xl border border-border bg-card text-foreground hover:bg-surface text-left cursor-pointer"
+                >
+                  <HardHat className="size-4 text-amber-500" />
+                  <span className="text-xs font-bold">Tech Portal 📱</span>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       )}

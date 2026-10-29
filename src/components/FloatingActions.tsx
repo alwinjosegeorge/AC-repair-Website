@@ -49,12 +49,17 @@ export function FloatingActions() {
   }, [isOpen]);
 
   // Don't render floating consumer actions inside admin or technician field portals
-  if (
-    typeof window !== "undefined" &&
-    (window.location.pathname.startsWith("/control-hub") ||
-      window.location.pathname.startsWith("/admin") ||
-      window.location.pathname.startsWith("/technician"))
-  ) {
+  const currentPath = (location?.pathname || "").toLowerCase();
+  const isPortalRoute =
+    currentPath.startsWith("/control-hub") ||
+    currentPath.startsWith("/admin") ||
+    currentPath.startsWith("/technician") ||
+    (typeof window !== "undefined" &&
+      (window.location.pathname.startsWith("/control-hub") ||
+        window.location.pathname.startsWith("/admin") ||
+        window.location.pathname.startsWith("/technician")));
+
+  if (isPortalRoute) {
     return null;
   }
 
