@@ -76,7 +76,7 @@ function AboutPage() {
       <Navbar />
 
       {/* Hero / About Us Story Section */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-16">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-16">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           <div className="lg:col-span-7 space-y-6">
             <span className="inline-block rounded-full bg-brand-soft px-3.5 py-1 text-xs font-black tracking-wider uppercase text-brand">

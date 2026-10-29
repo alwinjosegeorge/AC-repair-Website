@@ -72,7 +72,7 @@ function ContactPage() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="mx-auto max-w-7xl px-6 pt-20 pb-16 text-center">
+      <section className="mx-auto max-w-7xl px-6 pt-6 sm:pt-10 pb-12 sm:pb-16 text-center">
         <span className="inline-block rounded-md bg-[#1888ff]/10 px-3 py-1.5 text-xs font-bold tracking-[0.08em] uppercase text-[#1888ff]">
           REACH OUT TODAY
         </span>

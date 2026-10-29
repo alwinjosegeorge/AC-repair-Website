@@ -17,7 +17,7 @@ function ProjectsPage() {
       <Navbar />
 
       {/* Modern Hero Section */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-16 sm:pt-20 pb-10 text-center">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-6 sm:pt-10 pb-8 sm:pb-10 text-center">
         <span className="inline-block rounded-full bg-[#1888ff]/10 px-3.5 py-1.5 text-xs font-bold tracking-[0.08em] uppercase text-[#1888ff]">
           OUR PROJECTS &amp; CLIENT PORTFOLIO
         </span>

@@ -27,13 +27,13 @@ function BookingPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-1 relative overflow-hidden pt-28 sm:pt-32 pb-20">
+      <main className="flex-1 relative overflow-hidden pt-5 sm:pt-8 pb-16 sm:pb-20">
         {/* Background stripes matching website hero */}
         <div className="absolute inset-0 cool-stripes mask-bottom-fade -z-10" />
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Header Title with website badges */}
-          <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 space-y-3">
+          <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8 space-y-2.5 sm:space-y-3">
             <span className="inline-block rounded-full bg-brand-soft px-3.5 py-1 text-xs font-black uppercase tracking-wider text-brand">
               ONLINE SERVICE BOOKING
             </span>

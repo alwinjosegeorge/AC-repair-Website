@@ -96,7 +96,7 @@ export function ServiceLandingTemplate({
       <Navbar />
 
       {/* Trust Ticker Bar - spaced cleanly below floating island Navbar */}
-      <div className="mt-8 sm:mt-10 bg-brand-soft/80 border-y border-brand/20 py-2.5 px-4 text-center text-xs font-bold text-brand">
+      <div className="mt-4 sm:mt-6 bg-brand-soft/80 border-y border-brand/20 py-2.5 px-4 text-center text-xs font-bold text-brand">
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-6 flex-wrap">
           <span className="flex items-center gap-2">
             <span className="relative flex size-2">

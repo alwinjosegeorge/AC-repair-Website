@@ -245,7 +245,7 @@ function ServiceAreasPage() {
 
       <main className="flex-1">
         {/* Header Hero */}
-        <section className="bg-surface/50 border-b border-border px-4 py-16 md:py-20 md:px-8 text-center">
+        <section className="bg-surface/50 border-b border-border px-4 pt-6 sm:pt-10 pb-12 md:pb-16 md:px-8 text-center">
           <div className="mx-auto max-w-4xl space-y-4">
             <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand-soft px-3.5 py-1 text-xs font-black uppercase tracking-wider text-brand">
               <Navigation className="size-3.5" />
