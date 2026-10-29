@@ -208,25 +208,25 @@ function ControlHubGate() {
 
   if (!isAuthenticated) {
     return (
-      <div className="relative min-h-screen bg-[#070b14] text-slate-100 flex flex-col justify-between p-4 sm:p-6 font-sans select-none overflow-hidden">
-        {/* Ambient Glows & Cyber Grid */}
+      <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-sky-50/40 to-blue-50/30 text-slate-900 flex flex-col justify-between p-4 sm:p-6 font-sans select-none overflow-hidden">
+        {/* Ambient Glows & Light Mesh */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden -z-10">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-gradient-to-tr from-sky-600/20 via-blue-600/10 to-teal-500/10 rounded-full blur-[130px] opacity-75" />
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 w-[520px] h-[360px] bg-sky-500/10 rounded-full blur-[110px] opacity-50" />
-          <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-25" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-gradient-to-tr from-sky-200/60 via-blue-200/30 to-teal-100/40 rounded-full blur-[130px] opacity-75" />
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 w-[520px] h-[360px] bg-sky-200/40 rounded-full blur-[110px] opacity-60" />
+          <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
         </div>
 
         {/* Top bar */}
         <div className="relative z-10 flex items-center justify-between max-w-lg mx-auto w-full pt-1 sm:pt-2">
           <Link
             to="/"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-slate-300 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white hover:border-white/20"
+            className="group inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-brand hover:border-brand/40 hover:shadow"
           >
             <ArrowRight className="size-3.5 rotate-180 transition-transform group-hover:-translate-x-1" />
             <span>Return to Site</span>
           </Link>
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[10px] sm:text-[11px] font-bold tracking-wider text-emerald-400 uppercase shadow-[0_0_15px_rgba(16,185,129,0.15)] backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-50 px-3 py-1 text-[10px] sm:text-[11px] font-bold tracking-wider text-emerald-700 uppercase shadow-sm backdrop-blur-md">
             <span className="relative flex size-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
@@ -235,23 +235,23 @@ function ControlHubGate() {
           </div>
         </div>
 
-        {/* Centerpiece Glass Card */}
+        {/* Centerpiece Light Glass Card */}
         <div className="relative z-10 w-full max-w-[390px] sm:max-w-[420px] mx-auto my-auto py-4">
-          <div className="relative rounded-3xl border border-white/[0.12] bg-slate-900/65 p-6 sm:p-8 backdrop-blur-2xl shadow-2xl shadow-black/80 ring-1 ring-white/5 overflow-hidden">
+          <div className="relative rounded-3xl border border-slate-200/90 bg-white/95 p-6 sm:p-8 backdrop-blur-2xl shadow-2xl shadow-sky-950/10 ring-1 ring-slate-100 overflow-hidden">
             {/* Top Accent Gradient Line */}
-            <div className="absolute -top-px left-1/2 -translate-x-1/2 w-48 h-[2px] bg-gradient-to-r from-transparent via-sky-400 to-transparent" />
+            <div className="absolute -top-px left-1/2 -translate-x-1/2 w-48 h-[3px] bg-gradient-to-r from-transparent via-[#0084f6] to-transparent" />
 
             {/* Header */}
             <div className="text-center mb-6">
-              <div className="relative mx-auto mb-3.5 flex size-16 sm:size-17 items-center justify-center rounded-2xl border border-sky-400/40 bg-gradient-to-b from-sky-500/20 to-blue-600/10 shadow-[0_0_35px_rgba(56,189,248,0.3)] ring-4 ring-sky-500/10">
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-sky-400/20 to-transparent opacity-60" />
-                <Lock className="relative size-7 text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.7)]" />
+              <div className="relative mx-auto mb-3.5 flex size-16 sm:size-17 items-center justify-center rounded-2xl border border-sky-200 bg-gradient-to-b from-sky-50 to-blue-100/60 shadow-md shadow-sky-500/10 ring-4 ring-sky-50">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-sky-400/15 to-transparent opacity-80" />
+                <Lock className="relative size-7 text-[#0084f6] drop-shadow-[0_2px_4px_rgba(0,132,246,0.3)]" />
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
                 EGS Control Hub
               </h1>
-              <p className="mt-1 text-xs text-slate-400 font-medium">
+              <p className="mt-1 text-xs text-slate-500 font-medium">
                 Restricted Operations Center • Enter 4-Digit Security PIN
               </p>
             </div>
@@ -269,16 +269,16 @@ function ControlHubGate() {
                     key={idx}
                     className={`size-13 sm:size-14 rounded-2xl border flex items-center justify-center transition-all duration-300 ${
                       isShaking
-                        ? "border-rose-500/80 bg-rose-500/20 shadow-[0_0_20px_rgba(244,63,94,0.4)]"
+                        ? "border-rose-400 bg-rose-50 shadow-[0_0_15px_rgba(244,63,94,0.3)]"
                         : isFilled
-                        ? "border-sky-400/90 bg-gradient-to-b from-sky-500/25 to-blue-600/20 shadow-[0_0_20px_rgba(56,189,248,0.4)] scale-105"
-                        : "border-white/10 bg-white/[0.03] shadow-inner"
+                        ? "border-[#0084f6] bg-gradient-to-b from-sky-50 to-blue-100/70 shadow-md shadow-sky-500/20 scale-105"
+                        : "border-slate-200 bg-slate-50 shadow-inner"
                     }`}
                   >
                     {isFilled ? (
-                      <span className="size-3.5 sm:size-4 rounded-full bg-gradient-to-tr from-sky-300 to-sky-500 shadow-[0_0_10px_rgba(56,189,248,0.9)] animate-pulse" />
+                      <span className="size-3.5 sm:size-4 rounded-full bg-gradient-to-tr from-sky-400 to-[#0084f6] shadow-[0_0_8px_rgba(0,132,246,0.7)] animate-pulse" />
                     ) : (
-                      <span className="size-2 rounded-full bg-slate-700/60" />
+                      <span className="size-2 rounded-full bg-slate-300" />
                     )}
                   </div>
                 );
@@ -288,18 +288,18 @@ function ControlHubGate() {
             {/* Status / Error Message */}
             <div className="min-h-8 mb-4 flex items-center justify-center">
               {isVerifying ? (
-                <div className="inline-flex items-center gap-2 rounded-xl border border-sky-500/30 bg-sky-500/10 px-3.5 py-1 text-xs font-semibold text-sky-300 animate-pulse">
-                  <RefreshCw className="size-3.5 animate-spin" />
+                <div className="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-3.5 py-1 text-xs font-semibold text-sky-700 animate-pulse">
+                  <RefreshCw className="size-3.5 animate-spin text-[#0084f6]" />
                   <span>Verifying Security Clearance...</span>
                 </div>
               ) : errorMsg ? (
-                <div className="inline-flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/15 px-3.5 py-1 text-xs font-semibold text-rose-300 animate-fade-in shadow-[0_0_15px_rgba(244,63,94,0.2)]">
-                  <AlertTriangle className="size-3.5 shrink-0 text-rose-400" />
+                <div className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-1 text-xs font-semibold text-rose-700 animate-fade-in shadow-sm">
+                  <AlertTriangle className="size-3.5 shrink-0 text-rose-500" />
                   <span>{errorMsg}</span>
                 </div>
               ) : (
                 <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
-                  <Shield className="size-3 text-sky-400/60" />
+                  <Shield className="size-3 text-[#0084f6]" />
                   <span>Protected 256-Bit Encrypted Session</span>
                 </div>
               )}
@@ -323,12 +323,12 @@ function ControlHubGate() {
                   type="button"
                   disabled={isVerifying}
                   onClick={() => handleKeyPress(num)}
-                  className="group flex h-14 sm:h-15 w-full flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md shadow-sm transition-all duration-150 hover:bg-white/[0.09] hover:border-white/25 active:scale-95 active:bg-sky-500/20 active:border-sky-400/50 cursor-pointer disabled:opacity-40"
+                  className="group flex h-14 sm:h-15 w-full flex-col items-center justify-center rounded-2xl border border-slate-200/90 bg-white shadow-sm transition-all duration-150 hover:bg-slate-50 hover:border-sky-300 hover:shadow-md active:scale-95 active:bg-sky-50 active:border-[#0084f6] cursor-pointer disabled:opacity-40"
                 >
-                  <span className="text-xl sm:text-2xl font-black text-white group-hover:text-sky-300 transition-colors leading-none">
+                  <span className="text-xl sm:text-2xl font-black text-slate-800 group-hover:text-[#0084f6] transition-colors leading-none">
                     {num}
                   </span>
-                  <span className="text-[8px] sm:text-[9px] font-bold tracking-widest text-slate-400/70 uppercase leading-tight mt-0.5">
+                  <span className="text-[8px] sm:text-[9px] font-bold tracking-widest text-slate-400 uppercase leading-tight mt-0.5">
                     {sub}
                   </span>
                 </button>
@@ -342,7 +342,7 @@ function ControlHubGate() {
                   setErrorMsg("");
                 }}
                 disabled={isVerifying || pin.length === 0}
-                className="flex h-14 sm:h-15 w-full items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] text-xs font-bold text-slate-400 hover:text-white hover:bg-white/[0.06] hover:border-white/15 transition-all active:scale-95 cursor-pointer disabled:opacity-20"
+                className="flex h-14 sm:h-15 w-full items-center justify-center rounded-2xl border border-slate-200 bg-slate-100/80 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 hover:border-slate-300 transition-all active:scale-95 cursor-pointer disabled:opacity-30"
               >
                 Clear
               </button>
@@ -352,12 +352,12 @@ function ControlHubGate() {
                 type="button"
                 disabled={isVerifying}
                 onClick={() => handleKeyPress("0")}
-                className="group flex h-14 sm:h-15 w-full flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md shadow-sm transition-all duration-150 hover:bg-white/[0.09] hover:border-white/25 active:scale-95 active:bg-sky-500/20 active:border-sky-400/50 cursor-pointer disabled:opacity-40"
+                className="group flex h-14 sm:h-15 w-full flex-col items-center justify-center rounded-2xl border border-slate-200/90 bg-white shadow-sm transition-all duration-150 hover:bg-slate-50 hover:border-sky-300 hover:shadow-md active:scale-95 active:bg-sky-50 active:border-[#0084f6] cursor-pointer disabled:opacity-40"
               >
-                <span className="text-xl sm:text-2xl font-black text-white group-hover:text-sky-300 transition-colors leading-none">
+                <span className="text-xl sm:text-2xl font-black text-slate-800 group-hover:text-[#0084f6] transition-colors leading-none">
                   0
                 </span>
-                <span className="text-[8px] sm:text-[9px] font-bold tracking-widest text-slate-400/70 uppercase leading-tight mt-0.5">
+                <span className="text-[8px] sm:text-[9px] font-bold tracking-widest text-slate-400 uppercase leading-tight mt-0.5">
                   +
                 </span>
               </button>
@@ -367,7 +367,7 @@ function ControlHubGate() {
                 type="button"
                 disabled={isVerifying || pin.length === 0}
                 onClick={handleDelete}
-                className="flex h-14 sm:h-15 w-full items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.09] hover:border-white/25 transition-all active:scale-95 cursor-pointer disabled:opacity-20"
+                className="flex h-14 sm:h-15 w-full items-center justify-center rounded-2xl border border-slate-200 bg-slate-100/80 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 hover:border-slate-300 transition-all active:scale-95 cursor-pointer disabled:opacity-30"
                 title="Delete"
               >
                 <Delete className="size-5" />
@@ -375,7 +375,7 @@ function ControlHubGate() {
             </div>
 
             {/* Quick demo PIN helper badge for convenience */}
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-500">
+            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
               <span>Default Operations PIN:</span>
               <button
                 type="button"
@@ -383,10 +383,10 @@ function ControlHubGate() {
                   setPin("5555");
                   verifyPin("5555");
                 }}
-                className="inline-flex items-center gap-1 rounded-md bg-white/[0.05] px-2 py-0.5 text-sky-300 font-mono text-[11px] font-bold hover:bg-sky-500/20 hover:text-sky-200 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 rounded-md bg-sky-50 border border-sky-200 px-2 py-0.5 text-[#0084f6] font-mono text-[11px] font-bold hover:bg-sky-100 hover:border-sky-300 transition-colors cursor-pointer shadow-xs"
               >
                 <span>5555</span>
-                <span className="text-[9px] text-slate-400">(Quick Fill)</span>
+                <span className="text-[9px] text-slate-500">(Quick Fill)</span>
               </button>
             </div>
           </div>
