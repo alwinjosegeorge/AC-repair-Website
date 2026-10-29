@@ -30,18 +30,32 @@
 
 ---
 
-## 📱 Live App Showcase & Production Screenshots
+## 🖥️ Live Application Showcase & Desktop Experience
 
-Experience the live application running in production on [egsindia.in](https://www.egsindia.in):
+Experience the official web application running live in production on [egsindia.in](https://www.egsindia.in):
 
-<div align="center">
-
-| 📲 5-Step Online Booking Wizard | 👨‍💻 Operations Control Hub | ❄️ Service Landing Experience | 🏆 Customer Trust & Metrics |
-| :---: | :---: | :---: | :---: |
-| <img src="./public/screenshots/booking-wizard-mobile.png" width="220" alt="5-Step Online Booking Wizard" style="border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" /> | <img src="./public/screenshots/admin-control-hub.png" width="220" alt="Executive Admin Control Hub" style="border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" /> | <img src="./public/screenshots/service-landing-mobile.png" width="220" alt="Service Landing Experience" style="border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" /> | <img src="./public/screenshots/trust-stats-mobile.png" width="220" alt="Customer Trust Metrics" style="border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" /> |
-| **Instant 60s Booking**<br /><sub>Interactive Step 1–5 flow with multi-unit pricing & WhatsApp sync</sub> | **Lead Pipeline & ERP**<br /><sub>Live booking tracker, status dispatch, customer CRM & invoices</sub> | **90-Min Rapid Dispatch**<br /><sub>Transparent pricing from ₹649 per unit with zero advance</sub> | **Verified Track Record**<br /><sub>15+ Years experience, 2,638+ Happy institutional clients</sub> |
-
-</div>
+<table align="center" width="100%">
+  <tr>
+    <td align="center" width="50%">
+      <img src="./public/screenshots/hero-desktop.png" alt="Homepage Hero Experience" style="border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.12);" /><br />
+      <sub><b>🌟 Modern Homepage & Hero Experience</b><br />Floating glassmorphism navigation, dynamic counters, and instant service speed-dials.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="./public/screenshots/booking-wizard-desktop.png" alt="5-Step Online Booking Wizard" style="border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.12);" /><br />
+      <sub><b>⚡ 5-Step Certified AC Booking Engine</b><br />Instant service selection, multi-unit discounts, and rapid technician dispatch.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./public/screenshots/trust-partner-desktop.png" alt="Trust Metrics & Commercial Experience" style="border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.12);" /><br />
+      <sub><b>🏢 South India's Most Trusted AC Partner</b><br />15+ years engineering heritage, 30,000+ happy customers, and central plant expertise.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="./public/screenshots/cta-section-desktop.png" alt="High-Conversion Call to Action" style="border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.12);" /><br />
+      <sub><b>📞 Seamless 1-Click WhatsApp & Call Assistance</b><br />Direct connect to regional dispatch desks across Kerala and South India.</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
