@@ -30,6 +30,18 @@
 
 Experience the official web application running live in production on [egsindia.in](https://www.egsindia.in):
 
+<p align="center">
+  <a href="https://www.egsindia.in" target="_blank" rel="noopener noreferrer">
+    <img src="./public/screenshots/fullpage-preview.png" alt="Complete EGS INDIA Production Web Application" width="100%" style="border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08);" />
+  </a>
+  <br />
+  <sub><b>🌐 Complete Production Landing Page Walkthrough</b> • Built with high-speed SSR on <a href="https://www.egsindia.in">egsindia.in</a></sub>
+</p>
+
+<br />
+
+### 🔍 Key Experience Highlights
+
 <table align="center" width="100%">
   <tr>
     <td align="center" width="50%">
@@ -170,7 +182,7 @@ egs_india/
 │       └── db-keepalive.yml     # Automated scheduled database keep-alive workflow
 ├── public/
 │   ├── clients/                 # Client institutional brand logos
-│   ├── screenshots/             # Live desktop application captures
+│   ├── screenshots/             # Live desktop application captures & full-page preview
 │   ├── commercial-ac-plant.jpg  # Central chiller & VRV plant photography
 │   ├── og-image.png             # Official OpenGraph branding social card
 │   └── logo-full.png            # Official high-resolution logo
