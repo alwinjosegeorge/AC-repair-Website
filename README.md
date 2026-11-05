@@ -321,5 +321,5 @@ The project is optimized for zero-config deployment on **Vercel**:
 ---
 
 <div align="center">
-  <sub>Built with ❤️ for <strong>EGS INDIA</strong> • Designed & Made by <a href="https://codexorastudio.vercel.app/"><strong>Codexora Studio</strong></a></sub>
+  <sub>Built with ❤️ for <strong>EGS INDIA</strong> • Designed & Engineered by <a href="https://codexorastudio.vercel.app/"><strong>Codexora Studio</strong></a></sub>
 </div>
