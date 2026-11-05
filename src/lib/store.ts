@@ -2102,6 +2102,58 @@ Support Helpline: +91 98956 88833.`;
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
 
+export function generateAMCContractWhatsAppURL(contract: AMCContract): string {
+  const cleanPhone = (contract.whatsapp || contract.phone).replace(/[^0-9]/g, "");
+  const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+  const text = `*OFFICIAL HVAC AMC CONTRACT - EGS INDIA* ❄️🛠️
+━━━━━━━━━━━━━━━━━━
+Dear *${contract.customerName}*,
+
+Here is your official Annual Maintenance Contract (AMC) Agreement with EGS INDIA:
+
+📋 *Contract Agreement No:* ${contract.contractNo}
+📅 *Validity Period:* ${contract.amcStartDate} to ${contract.amcEndDate} (365 Days)
+❄️ *Equipment Covered:* ${contract.numberOfUnits} AC Unit(s) (${contract.planName})
+⚙️ *Service Frequency:* ${contract.serviceFrequency}
+💰 *Total Contract Value:* ₹${contract.amount.toLocaleString("en-IN")} (Inclusive of 18% GST)
+
+✨ *Contract Inclusions & SLA:*
+• Scheduled seasonal deep jet power cleaning visits
+• 100% Free breakdown visits & zero labor charges
+• 90-minute priority emergency dispatch
+• 365-day cooling & workmanship assurance certificate
+
+Your official signed contract document is ready. For 24/7 HVAC support, reach us at +91 98956 88833 or service@egsindia.com.`;
+
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+
+export function generateAMCQuotationWhatsAppURL(contract: AMCContract): string {
+  const cleanPhone = (contract.whatsapp || contract.phone).replace(/[^0-9]/g, "");
+  const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+  const text = `*OFFICIAL HVAC AMC QUOTATION & PROPOSAL - EGS INDIA* ❄️📄
+━━━━━━━━━━━━━━━━━━
+Dear *${contract.customerName}*,
+
+Thank you for your enquiry regarding HVAC Annual Maintenance Services. Here is our official AMC proposal:
+
+📄 *Quotation Ref:* QUOT-${contract.contractNo}
+❄️ *AC Units Covered:* ${contract.numberOfUnits} AC Unit(s)
+🛠️ *Proposed Plan:* ${contract.planName}
+⚙️ *Maintenance Frequency:* ${contract.serviceFrequency}
+💵 *Proposed Annual Fee:* ₹${contract.amount.toLocaleString("en-IN")} (Inclusive of 18% GST)
+
+🌟 *Scope of Services:*
+✓ Multi-point wet & jet chemical condenser cleaning
+✓ Complete electrical safety & gas pressure diagnostics
+✓ Unlimited free emergency breakdown attendance
+✓ Priority response within 90 minutes across Kerala & Chennai
+
+This quotation is valid for 30 days. To approve and activate your AMC, simply reply *CONFIRM* to this message or call +91 98956 88833.`;
+
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+
 /**
  * ============================================================
  * PAYMENT & INVOICING HELPERS

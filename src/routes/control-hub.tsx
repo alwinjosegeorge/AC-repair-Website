@@ -36,6 +36,8 @@ import {
   generateAdminToCustomerWhatsAppURL,
   generateAMCRenewalWhatsAppURL,
   generateAMCRenewalConfirmationWhatsAppURL,
+  generateAMCContractWhatsAppURL,
+  generateAMCQuotationWhatsAppURL,
   EGS_CALL_NUMBER,
   EGS_WHATSAPP_NUMBER,
   syncBookingsWithDatabase,
@@ -508,6 +510,10 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
   const [renewModalContract, setRenewModalContract] = useState<AMCContract | null>(null);
   const [scheduleServiceContract, setScheduleServiceContract] = useState<AMCContract | null>(null);
   const [showNewAMCModal, setShowNewAMCModal] = useState(false);
+  const [selectedAMCModalContract, setSelectedAMCModalContract] = useState<{
+    contract: AMCContract;
+    type: "contract" | "quotation";
+  } | null>(null);
   const [amcActionToast, setAmcActionToast] = useState<string | null>(null);
 
   // Payments & Invoicing State
@@ -1808,6 +1814,44 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                               </button>
                             )}
 
+                            {/* Official Quotation / Contract button if quotation request or AMC */}
+                            {(activeSection === "quotation-requests" || b.serviceCategory === "ac-amc") && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const matchingContract = amcContracts.find(
+                                    (c) => c.phone === b.phone || c.customerName === b.customerName
+                                  );
+                                  const contractToView: AMCContract = matchingContract || {
+                                    id: `amc-quot-${b.id}`,
+                                    contractNo: `AMC-2026-${b.id.replace(/\D/g, "") || "901"}`,
+                                    amcStartDate: new Date().toISOString().split("T")[0],
+                                    amcEndDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+                                    customerName: b.customerName,
+                                    phone: b.phone,
+                                    whatsapp: b.whatsappNumber || b.phone,
+                                    email: b.email,
+                                    city: b.city,
+                                    address: b.address || b.area,
+                                    numberOfUnits: typeof b.unitCount === "number" ? b.unitCount : parseInt(String(b.unitCount)) || 2,
+                                    serviceFrequency: "3 Services / Year (Once in 4 Months)",
+                                    servicesIncluded: 3,
+                                    servicesCompleted: 0,
+                                    planName: "Comprehensive Annual HVAC Protection",
+                                    amount: b.estimatedAmount > 0 ? b.estimatedAmount : 4999,
+                                    status: "active",
+                                    notes: b.issueDescription,
+                                  };
+                                  setSelectedAMCModalContract({ contract: contractToView, type: "quotation" });
+                                }}
+                                className="inline-flex items-center gap-1 rounded-lg bg-blue-500/15 border border-blue-500/30 px-2 py-1 text-[11px] font-bold text-blue-600 hover:bg-blue-500/25 cursor-pointer"
+                                title="Generate & Send Official AMC Quotation"
+                              >
+                                <FileText className="size-3" />
+                                <span>Quote</span>
+                              </button>
+                            )}
+
                             {/* 1-Tap WhatsApp */}
                             <a
                               href={generateAdminToCustomerWhatsAppURL(b, b.status)}
@@ -1859,6 +1903,21 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {amcContracts.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedAMCModalContract({
+                          contract: amcContracts[0],
+                          type: "contract",
+                        })
+                      }
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-brand/30 bg-brand-soft px-3.5 py-2 text-xs font-black text-brand hover:bg-brand/20 transition-all cursor-pointer shadow-xs active:scale-95"
+                    >
+                      <FileText className="size-3.5" />
+                      <span>Official Contract &amp; Quote PDF</span>
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => setShowNewAMCModal(true)}
@@ -2105,6 +2164,18 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
 
                               {/* Actions Column */}
                               <td className="px-4 py-3.5 text-right space-x-1.5 whitespace-nowrap">
+                                {/* Official Contract & Quotation PDF / Send */}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setSelectedAMCModalContract({ contract: c, type: "contract" })
+                                  }
+                                  className="inline-flex size-7 items-center justify-center rounded-lg border border-brand/30 bg-brand-soft text-brand hover:bg-brand/20 transition-colors cursor-pointer"
+                                  title="View / Print Official AMC Contract & Quotation PDF"
+                                >
+                                  <FileText className="size-3.5" />
+                                </button>
+
                                 {/* 1-Click WhatsApp Renewal Alert */}
                                 <a
                                   href={generateAMCRenewalWhatsAppURL(c)}
@@ -4621,6 +4692,395 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                     Verified by EGS Quality Assurance Desk • Kollam &amp; Kochi Hub
                   </div>
                   <div className="font-mono text-muted-foreground text-[10px]">
+                    Authorized Digital Stamp • EGS INDIA
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL: OFFICIAL AMC CONTRACT & QUOTATION DOCUMENT (PRINT / PDF / WHATSAPP) */}
+      {/* ============================================================ */}
+      {selectedAMCModalContract && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm print:p-0 print:bg-white">
+          <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl border border-border bg-card p-6 md:p-8 shadow-2xl space-y-6 print:border-none print:shadow-none print:p-0 print:max-h-none print:max-w-none">
+            {/* Top Toolbar (Hidden on print) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4 print:hidden">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-mono font-black text-brand text-lg">
+                  {selectedAMCModalContract.type === "contract"
+                    ? selectedAMCModalContract.contract.contractNo
+                    : `QUOT-${selectedAMCModalContract.contract.contractNo}`}
+                </span>
+
+                {/* Mode Switcher Tabs */}
+                <div className="inline-flex rounded-xl border border-border bg-surface p-0.5 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedAMCModalContract({
+                        ...selectedAMCModalContract,
+                        type: "contract",
+                      })
+                    }
+                    className={`rounded-lg px-2.5 py-1 transition-all cursor-pointer ${
+                      selectedAMCModalContract.type === "contract"
+                        ? "bg-brand text-brand-foreground shadow-xs font-black"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    📋 AMC Contract
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedAMCModalContract({
+                        ...selectedAMCModalContract,
+                        type: "quotation",
+                      })
+                    }
+                    className={`rounded-lg px-2.5 py-1 transition-all cursor-pointer ${
+                      selectedAMCModalContract.type === "quotation"
+                        ? "bg-brand text-brand-foreground shadow-xs font-black"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    💼 AMC Quotation
+                  </button>
+                </div>
+
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase ${
+                    selectedAMCModalContract.type === "contract"
+                      ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-600"
+                      : "bg-blue-500/15 border border-blue-500/30 text-blue-600"
+                  }`}
+                >
+                  {selectedAMCModalContract.type === "contract"
+                    ? "Official Agreement"
+                    : "Official Proposal"}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Print / Save as PDF */}
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-foreground hover:bg-surface/80 cursor-pointer shadow-xs active:scale-95"
+                  title="Print or Save as PDF"
+                >
+                  <Printer className="size-3.5 text-brand" />
+                  <span>Print / PDF</span>
+                </button>
+
+                {/* Send on WhatsApp with pre-filled contract/quote message */}
+                <a
+                  href={
+                    selectedAMCModalContract.type === "contract"
+                      ? generateAMCContractWhatsAppURL(selectedAMCModalContract.contract)
+                      : generateAMCQuotationWhatsAppURL(selectedAMCModalContract.contract)
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#25D366] px-3 py-1.5 text-xs font-black text-white hover:bg-[#20ba59] transition-transform active:scale-95 shadow-xs"
+                  title="Send via WhatsApp to Customer"
+                >
+                  <MessageSquare className="size-3.5 fill-current" />
+                  <span>
+                    Send {selectedAMCModalContract.type === "contract" ? "Contract" : "Quotation"}
+                  </span>
+                </a>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedAMCModalContract(null)}
+                  className="rounded-xl p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* PRINTABLE CONTRACT / QUOTATION BODY */}
+            <div className="space-y-6 text-foreground print:space-y-4">
+              {/* Company Header */}
+              <div className="flex flex-col sm:flex-row justify-between gap-4 border-b border-border pb-6">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-lg bg-brand flex items-center justify-center text-brand-foreground font-black text-sm">
+                      EGS
+                    </div>
+                    <div>
+                      <h1 className="text-lg font-black tracking-tight text-foreground">
+                        {EGS_COMPANY_DETAILS.name}
+                      </h1>
+                      <div className="text-[11px] font-bold text-muted-foreground">
+                        {EGS_COMPANY_DETAILS.legalName}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground space-y-0.5">
+                    <div>{EGS_COMPANY_DETAILS.registeredOffice}</div>
+                    <div>Branches: Kollam • Kochi • Thiruvananthapuram • Thrissur • Chennai</div>
+                    <div>
+                      GSTIN: <strong className="text-foreground font-mono">{EGS_COMPANY_DETAILS.gstin}</strong> | PAN:{" "}
+                      <strong className="text-foreground font-mono">{EGS_COMPANY_DETAILS.pan}</strong>
+                    </div>
+                    <div>
+                      Helpline: {EGS_COMPANY_DETAILS.phone} | {EGS_COMPANY_DETAILS.email}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-left sm:text-right space-y-1 text-xs">
+                  <div className="text-[11px] font-black uppercase tracking-wider text-brand">
+                    {selectedAMCModalContract.type === "contract"
+                      ? "ANNUAL MAINTENANCE CONTRACT (AMC)"
+                      : "OFFICIAL AMC QUOTATION & PROPOSAL"}
+                  </div>
+                  <div className="text-base font-black font-mono text-foreground">
+                    {selectedAMCModalContract.type === "contract"
+                      ? selectedAMCModalContract.contract.contractNo
+                      : `QUOT-${selectedAMCModalContract.contract.contractNo}`}
+                  </div>
+                  <div>
+                    Date:{" "}
+                    <strong className="text-foreground">
+                      {selectedAMCModalContract.contract.amcStartDate || new Date().toISOString().split("T")[0]}
+                    </strong>
+                  </div>
+                  <div>
+                    Coverage:{" "}
+                    <strong className="text-foreground">
+                      {selectedAMCModalContract.contract.amcStartDate} to {selectedAMCModalContract.contract.amcEndDate}
+                    </strong>
+                  </div>
+                  <div>
+                    Frequency:{" "}
+                    <strong className="text-foreground">
+                      {selectedAMCModalContract.contract.serviceFrequency}
+                    </strong>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground font-mono">
+                    Emergency SLA: <strong className="text-foreground">90-Min Response</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Billed To Customer & Asset Details */}
+              <div className="grid grid-cols-2 gap-4 text-xs bg-surface/50 p-4 rounded-2xl border border-border">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1">
+                    Billed To (Customer):
+                  </span>
+                  <div className="font-extrabold text-foreground text-sm">
+                    {selectedAMCModalContract.contract.customerName}
+                  </div>
+                  <div className="text-muted-foreground mt-0.5">
+                    {selectedAMCModalContract.contract.address || `${selectedAMCModalContract.contract.city} Facility`}
+                  </div>
+                  <div className="text-muted-foreground">{selectedAMCModalContract.contract.city}</div>
+                  <div className="text-foreground font-medium mt-1">
+                    Phone: {selectedAMCModalContract.contract.phone}
+                  </div>
+                  {selectedAMCModalContract.contract.email && (
+                    <div className="text-muted-foreground">{selectedAMCModalContract.contract.email}</div>
+                  )}
+                </div>
+
+                <div className="text-right">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1">
+                    HVAC System &amp; Scope:
+                  </span>
+                  <div className="font-bold text-foreground">
+                    {selectedAMCModalContract.contract.planName}
+                  </div>
+                  <div className="text-muted-foreground">
+                    Units Covered: <strong className="text-foreground">{selectedAMCModalContract.contract.numberOfUnits} Unit(s) AC</strong>
+                  </div>
+                  <div className="text-muted-foreground">
+                    Assigned Desk: {selectedAMCModalContract.contract.lastServiceTechnician || "EGS HVAC Engineering Operations"}
+                  </div>
+                  <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-600 border border-emerald-500/20">
+                    <CheckCircle2 className="size-3" />
+                    <span>
+                      {selectedAMCModalContract.type === "contract"
+                        ? "Active AMC Coverage"
+                        : "Quotation Valid for 30 Days"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Itemized Deliverables Table */}
+              <div className="overflow-hidden rounded-2xl border border-border">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-surface text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b border-border">
+                    <tr>
+                      <th className="px-4 py-2.5">#</th>
+                      <th className="px-4 py-2.5">Description of HVAC Services &amp; Deliverables</th>
+                      <th className="px-4 py-2.5">HSN/SAC</th>
+                      <th className="px-4 py-2.5 text-center">Qty</th>
+                      <th className="px-4 py-2.5 text-right">Annual Rate (₹)</th>
+                      <th className="px-4 py-2.5 text-right">Taxable Amount (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {(() => {
+                      const grandTotal = selectedAMCModalContract.contract.amount || 4999;
+                      const subtotal = Math.round((grandTotal / 1.18) * 100) / 100;
+                      const item1Amount = Math.round(subtotal * 0.75 * 100) / 100;
+                      const item2Amount = Math.round(subtotal * 0.15 * 100) / 100;
+                      const item3Amount = Math.round((subtotal - item1Amount - item2Amount) * 100) / 100;
+
+                      return (
+                        <>
+                          <tr>
+                            <td className="px-4 py-3 text-muted-foreground">1</td>
+                            <td className="px-4 py-3 font-semibold text-foreground">
+                              <div>
+                                Scheduled Preventative HVAC Maintenance ({selectedAMCModalContract.contract.serviceFrequency})
+                              </div>
+                              <div className="text-[11px] text-muted-foreground font-normal">
+                                Deep wet &amp; jet pump coil wash, blower cleaning, drain flush &amp; filter sterilization
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 font-mono text-muted-foreground">{EGS_COMPANY_DETAILS.sacCode}</td>
+                            <td className="px-4 py-3 text-center text-foreground font-bold">
+                              {selectedAMCModalContract.contract.numberOfUnits}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono">
+                              ₹{(Math.round((item1Amount / selectedAMCModalContract.contract.numberOfUnits) * 100) / 100).toFixed(2)}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono font-bold">₹{item1Amount.toFixed(2)}</td>
+                          </tr>
+                          <tr>
+                            <td className="px-4 py-3 text-muted-foreground">2</td>
+                            <td className="px-4 py-3 font-semibold text-foreground">
+                              <div>24/7 Unlimited Priority Emergency Breakdown Attendance</div>
+                              <div className="text-[11px] text-muted-foreground font-normal">
+                                Zero visit &amp; labor charges with 90-minute rapid response guarantee
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 font-mono text-muted-foreground">{EGS_COMPANY_DETAILS.sacCode}</td>
+                            <td className="px-4 py-3 text-center text-foreground font-bold">1</td>
+                            <td className="px-4 py-3 text-right font-mono">₹{item2Amount.toFixed(2)}</td>
+                            <td className="px-4 py-3 text-right font-mono font-bold">₹{item2Amount.toFixed(2)}</td>
+                          </tr>
+                          <tr>
+                            <td className="px-4 py-3 text-muted-foreground">3</td>
+                            <td className="px-4 py-3 font-semibold text-foreground">
+                              <div>Refrigerant Pressure Audit &amp; Electrical Contactor Inspection</div>
+                              <div className="text-[11px] text-muted-foreground font-normal">
+                                Multi-point sensor testing, ampere load checks &amp; anti-corrosive coating audit
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 font-mono text-muted-foreground">{EGS_COMPANY_DETAILS.sacCode}</td>
+                            <td className="px-4 py-3 text-center text-foreground font-bold">1</td>
+                            <td className="px-4 py-3 text-right font-mono">₹{item3Amount.toFixed(2)}</td>
+                            <td className="px-4 py-3 text-right font-mono font-bold">₹{item3Amount.toFixed(2)}</td>
+                          </tr>
+                        </>
+                      );
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Tax & Grand Total Breakdown */}
+              {(() => {
+                const grandTotal = selectedAMCModalContract.contract.amount || 4999;
+                const subtotal = Math.round((grandTotal / 1.18) * 100) / 100;
+                const taxAmount = Math.round((grandTotal - subtotal) * 100) / 100;
+                const halfTax = Math.round((taxAmount / 2) * 100) / 100;
+
+                return (
+                  <div className="flex flex-col sm:flex-row justify-between gap-4 pt-2">
+                    <div className="flex-1 space-y-2 text-xs">
+                      <div className="rounded-xl border border-border bg-surface/40 p-3 text-muted-foreground">
+                        <span className="font-bold text-foreground block mb-0.5">
+                          Contract Terms &amp; Conditions:
+                        </span>
+                        <ol className="list-decimal list-inside space-y-0.5 text-[11px]">
+                          <li>All charges are inclusive of 18% GST (CGST 9% + SGST 9%).</li>
+                          <li>
+                            {selectedAMCModalContract.type === "contract"
+                              ? "AMC Agreement is active for 365 calendar days. Scheduled routine visits and unlimited breakdown services are fully covered."
+                              : "Quotation is valid for 30 calendar days from the date of issue. To approve, reply via WhatsApp or phone call."}
+                          </li>
+                          <li>
+                            EGS INDIA 24/7 Breakdown Dispatch Helpline: +91 98956 88833.
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
+
+                    <div className="w-full sm:w-72 space-y-2 text-xs bg-surface/50 p-4 rounded-2xl border border-border font-mono">
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Taxable Subtotal:</span>
+                        <span>₹{subtotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>CGST (9.0%):</span>
+                        <span>₹{halfTax.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>SGST (9.0%):</span>
+                        <span>₹{halfTax.toFixed(2)}</span>
+                      </div>
+                      <div className="border-t border-border pt-2 flex justify-between text-sm font-black text-foreground">
+                        <span>Annual Grand Total:</span>
+                        <span className="text-brand">₹{grandTotal.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* OFFICIAL STAMPED 365-DAY AMC PROTECTION CERTIFICATE */}
+              <div className="rounded-2xl border-2 border-emerald-500/50 bg-emerald-500/10 p-5 space-y-3 relative overflow-hidden">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-black uppercase text-white tracking-wider shadow-sm">
+                      <ShieldCheck className="size-4" />
+                      <span>
+                        {selectedAMCModalContract.type === "contract"
+                          ? "365-Day Annual HVAC Protection & Workmanship Certificate"
+                          : "Official EGS Service Level Agreement & Performance Guarantee"}
+                      </span>
+                    </div>
+                    <div className="text-sm font-black text-foreground">
+                      Certified Cooling Assurance &amp; Operational Reliability Protection
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      This installation is backed by EGS INDIA comprehensive cooling assurance. All maintenance procedures follow certified energy efficiency protocols with zero revisit charges.
+                    </p>
+                  </div>
+
+                  <div className="text-right shrink-0 bg-card p-3 rounded-xl border border-emerald-500/30 font-mono">
+                    <div className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                      Contract Validity
+                    </div>
+                    <div className="text-sm font-black text-emerald-600">
+                      {selectedAMCModalContract.contract.amcEndDate}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5">
+                      365 Days Protection
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stamped Authorized Seal */}
+                <div className="flex items-center justify-between pt-2 border-t border-emerald-500/20 text-[11px]">
+                  <div className="font-bold text-emerald-700 dark:text-emerald-400">
+                    Verified by EGS Quality Assurance Desk • Kollam &amp; Kochi Hub
+                  </div>
+                  <div className="font-mono text-muted-foreground font-black">
                     Authorized Digital Stamp • EGS INDIA
                   </div>
                 </div>

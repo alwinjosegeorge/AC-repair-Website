@@ -373,3 +373,4 @@ export function exportBookingsToPDF(
   printWindow.document.write(html);
   printWindow.document.close();
 }
+
