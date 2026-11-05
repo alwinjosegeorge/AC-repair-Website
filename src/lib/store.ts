@@ -2097,7 +2097,7 @@ This is *Expert Goods & Services (EGS INDIA)*.
 We have received your service request *${booking.id}* for *${booking.serviceName}*.
 
 Our service manager is checking technician availability in ${booking.city}. We will confirm your exact slot shortly.
-Questions? Call us at +91 98956 88833.`;
+Questions? Call us at +91 98956 88833 or visit www.egsindia.in.`;
       break;
 
     case "CONFIRMED":
@@ -2110,13 +2110,14 @@ Your HVAC service booking *${booking.id}* has been confirmed by *Expert Goods & 
 • Scheduled Date & Time: ${formatDisplayDate(booking.preferredDate, booking.createdAt)} (${booking.preferredSlot || "Morning Slot"})
 • Address: ${booking.address}, ${booking.city}
 
-Our certified technician will arrive on time. For emergency assistance call +91 98956 88833.`;
+Our certified technician will arrive on time. For emergency assistance call +91 98956 88833 or visit www.egsindia.in.`;
       break;
 
     case "ASSIGNED":
       text = `Hello ${booking.customerName}! 🔧
 Certified HVAC technician *${booking.assignedTechnicianName || "Arun Kumar"}* has been assigned to your booking *${booking.id}* (${booking.serviceName}).
-The technician will call you shortly prior to dispatch.`;
+The technician will call you shortly prior to dispatch.
+Official Website: www.egsindia.in`;
       break;
 
     case "TECHNICIAN ON THE WAY":
@@ -2126,13 +2127,14 @@ Our certified HVAC technician *${booking.assignedTechnicianName || "Arun Kumar"}
 
 • Service: ${booking.serviceName}
 • Estimated Arrival: within 30-45 mins
-• Support Helpline: +91 98956 88833`;
+• Support Helpline: +91 98956 88833 | www.egsindia.in`;
       break;
 
     case "SERVICE STARTED":
       text = `Hello ${booking.customerName}! ⚙️
 Technician *${booking.assignedTechnicianName || "Arun Kumar"}* has arrived and started the service on your ${booking.acType} unit for booking *${booking.id}*.
-We perform complete safety & diagnostic checks before and after service.`;
+We perform complete safety & diagnostic checks before and after service.
+Helpline: +91 98956 88833 | www.egsindia.in`;
       break;
 
     case "COMPLETED":
@@ -2141,24 +2143,26 @@ We perform complete safety & diagnostic checks before and after service.`;
 Your service *${booking.id}* (${booking.serviceName}) has been marked *COMPLETED*.
 
 🛡️ *30-Day Post-Service Guarantee:* Free re-visit warranty covers your serviced unit.
-Est. Amount: ₹${booking.estimatedAmount}. Please verify performance with the technician.`;
+Est. Amount: ₹${booking.estimatedAmount}. Please verify performance with the technician.
+Portal: www.egsindia.in | Helpline: +91 98956 88833`;
       break;
 
     case "PAYMENT RECEIVED":
       text = `Payment Confirmation - *EGS INDIA* ✅
 Thank you ${booking.customerName}! We have received payment of *₹${booking.estimatedAmount}* for booking *${booking.id}*.
 
-Your digital invoice & 30-day warranty card have been generated. Thank you for choosing EGS INDIA!`;
+Your digital invoice & 30-day warranty card have been generated.
+Portal: www.egsindia.in | Helpline: +91 98956 88833`;
       break;
 
     case "CANCELLED":
       text = `Booking Update - *EGS INDIA*
 Your booking *${booking.id}* has been marked CANCELLED as requested.
-If you need to reschedule in the future, please call our 24/7 helpline at +91 98956 88833.`;
+If you need to reschedule in the future, please call our 24/7 helpline at +91 98956 88833 or visit www.egsindia.in.`;
       break;
 
     default:
-      text = `Hello ${booking.customerName}! Status update for your EGS INDIA booking *${booking.id}*: Current Status: *${booking.status}*. Helpline: +91 98956 88833.`;
+      text = `Hello ${booking.customerName}! Status update for your EGS INDIA booking *${booking.id}*: Current Status: *${booking.status}*. Helpline: +91 98956 88833 | www.egsindia.in`;
   }
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
@@ -2178,7 +2182,8 @@ I am on the way to your location for booking *${booking.id}* (*${booking.service
 📍 *Destination:* ${booking.address}, ${booking.city}
 ⏱️ *ETA:* Approximately ${etaMinutes} minutes.
 
-Please let me know if you need any directions or special instructions. See you shortly!`;
+Please let me know if you need any directions or special instructions. See you shortly!
+Official Portal: www.egsindia.in`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
@@ -2196,7 +2201,7 @@ Your AC service for booking *${booking.id}* (*${booking.serviceName}*) has been 
 🛡️ 30-Day Post-Service Warranty active.
 Total Amount: ₹${booking.estimatedAmount}.
 
-Thank you for choosing EGS INDIA!`;
+Visit www.egsindia.in | Thank you for choosing EGS INDIA!`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
@@ -2222,7 +2227,7 @@ Your Annual Maintenance Contract (*${contract.contractNo}*) for *${contract.numb
 ✅ 90-Min Priority Emergency Dispatch
 ✅ Pre-Scheduled Seasonal Deep Jet Power Cleanings
 
-Please reply *RENEW* to confirm your continuous coverage or call us directly at +91 98956 88833. Thank you!`;
+Please reply *RENEW* to confirm your continuous coverage, call us directly at +91 98956 88833 or visit www.egsindia.in. Thank you!`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
@@ -2243,7 +2248,7 @@ Your HVAC AMC Contract (*${contract.contractNo}*) has been *RENEWED* successfull
 • Amount Paid: ₹${contract.amount.toLocaleString("en-IN")}
 
 Your digital AMC Warranty Certificate & Invoicing have been archived.
-Support Helpline: +91 98956 88833.`;
+Support Helpline: +91 98956 88833 | www.egsindia.in`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
@@ -2269,7 +2274,7 @@ Here is your official Annual Maintenance Contract (AMC) Agreement with EGS INDIA
 • 90-minute priority emergency dispatch
 • 365-day cooling & workmanship assurance certificate
 
-Your official signed contract document is ready. For 24/7 HVAC support, reach us at +91 98956 88833 or service@egsindia.in.`;
+Your official signed contract document is ready. For 24/7 HVAC support, reach us at +91 98956 88833, service@egsindia.in or visit www.egsindia.in.`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
@@ -2295,7 +2300,7 @@ Thank you for your enquiry regarding HVAC Annual Maintenance Services. Here is o
 ✓ Unlimited free emergency breakdown attendance
 ✓ Priority response within 90 minutes across Kerala & Chennai
 
-This quotation is valid for 30 days. To approve and activate your AMC, simply reply *CONFIRM* to this message or call +91 98956 88833.`;
+This quotation is valid for 30 days. To approve and activate your AMC, reply *CONFIRM* to this message, call +91 98956 88833 or visit www.egsindia.in.`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
@@ -2583,8 +2588,8 @@ Thank you for your payment to *Expert Goods & Services (EGS INDIA)*!
 🛡️ *30-Day Post-Service Guarantee:*
 Your serviced AC is covered under our 30-Day Free Revisit & Performance Guarantee.
 
-To view or print your GST tax invoice, visit our portal or contact our 24/7 support.
-Helpline: +91 98956 88833 (24/7 HVAC Breakdown Support)`;
+To view or print your GST tax invoice, visit www.egsindia.in or contact our 24/7 support.
+Helpline: +91 98956 88833 | www.egsindia.in`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
@@ -2621,7 +2626,7 @@ Here are the details for your official GST Tax Invoice and 30-Day Workmanship Wa
 
 GSTIN: ${EGS_COMPANY_DETAILS.gstin} | PAN: ${EGS_COMPANY_DETAILS.pan}
 Helpline: ${EGS_COMPANY_DETAILS.phone} | service@egsindia.in
-Official HVAC Support: Expert Goods & Services India (EGS INDIA)
+Official Website: www.egsindia.in
 
 _Thank you for choosing EGS INDIA!_`;
 
@@ -2649,7 +2654,7 @@ ${upiUrl}
 • IFSC: ICIC0000042
 
 Cash can also be paid directly to our field technician upon service completion.
-Support Helpline: +91 98956 88833.`;
+Support Helpline: +91 98956 88833 | www.egsindia.in`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
