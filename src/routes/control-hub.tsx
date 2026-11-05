@@ -41,6 +41,8 @@ import {
   EGS_CALL_NUMBER,
   EGS_WHATSAPP_NUMBER,
   syncBookingsWithDatabase,
+  formatDisplayDate,
+  formatDateTime,
 } from "@/lib/store";
 import { pingDatabaseKeepAlive } from "@/lib/db";
 import {
@@ -99,6 +101,7 @@ import {
   Shield,
   Delete,
   FileSpreadsheet,
+  Globe,
 } from "lucide-react";
 import { exportBookingsToCSV, exportBookingsToPDF } from "@/lib/export";
 import {
@@ -715,15 +718,23 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
   const counts = useMemo(() => {
     const allBookings = bookings.length;
     const newBookings = bookings.filter((b) => b.status === "NEW").length;
+    const todayStr = new Date().toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
     const todays = bookings.filter(
       (b) =>
-        (b.preferredDate?.toLowerCase().includes("today") || false) &&
+        (formatDisplayDate(b.preferredDate, b.createdAt) === todayStr ||
+          b.preferredDate?.toLowerCase().includes("today") ||
+          false) &&
         b.status !== "COMPLETED" &&
         b.status !== "PAYMENT RECEIVED" &&
         b.status !== "CANCELLED"
     ).length;
     const upcoming = bookings.filter(
       (b) =>
+        formatDisplayDate(b.preferredDate, b.createdAt) !== todayStr &&
         !b.preferredDate?.toLowerCase().includes("today") &&
         b.status !== "COMPLETED" &&
         b.status !== "PAYMENT RECEIVED" &&
@@ -864,20 +875,35 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
       case "new-bookings":
         list = bookings.filter((b) => b.status === "NEW");
         break;
-      case "todays-bookings":
-        list = bookings.filter((b) =>
-          b.preferredDate?.toLowerCase().includes("today")
-        );
-        break;
-      case "upcoming-bookings":
+      case "todays-bookings": {
+        const todayStr = new Date().toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
         list = bookings.filter(
           (b) =>
+            formatDisplayDate(b.preferredDate, b.createdAt) === todayStr ||
+            b.preferredDate?.toLowerCase().includes("today")
+        );
+        break;
+      }
+      case "upcoming-bookings": {
+        const todayStr = new Date().toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+        list = bookings.filter(
+          (b) =>
+            formatDisplayDate(b.preferredDate, b.createdAt) !== todayStr &&
             !b.preferredDate?.toLowerCase().includes("today") &&
             b.status !== "COMPLETED" &&
             b.status !== "PAYMENT RECEIVED" &&
             b.status !== "CANCELLED"
         );
         break;
+      }
       case "completed":
         list = bookings.filter(
           (b) => b.status === "COMPLETED" || b.status === "PAYMENT RECEIVED"
@@ -1752,9 +1778,10 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                   <thead className="border-b border-border bg-surface text-[11px] font-black uppercase tracking-wider text-muted-foreground">
                     <tr>
                       <th className="px-4 py-3">Booking ID</th>
+                      <th className="px-4 py-3">Booked At (Web)</th>
                       <th className="px-4 py-3">Customer</th>
                       <th className="px-4 py-3">Service &amp; AC Type</th>
-                      <th className="px-4 py-3">Slot / Date</th>
+                      <th className="px-4 py-3">Scheduled Date &amp; Time</th>
                       <th className="px-4 py-3">City &amp; Area</th>
                       <th className="px-4 py-3">Status</th>
                       <th className="px-4 py-3">Amount</th>
@@ -1764,7 +1791,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                   <tbody className="divide-y divide-border/60">
                     {currentSectionBookings.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
+                        <td colSpan={9} className="px-4 py-12 text-center text-muted-foreground">
                           No bookings found in {activeSection.replace("-", " ")}.
                         </td>
                       </tr>
@@ -1775,7 +1802,19 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                           className="hover:bg-surface/50 transition-colors cursor-pointer"
                           onClick={() => setSelectedBooking(b)}
                         >
-                          <td className="px-4 py-3.5 font-black text-brand">{b.id}</td>
+                          <td className="px-4 py-3.5 font-black text-brand whitespace-nowrap">{b.id}</td>
+
+                          {/* Website Booking Submission Timestamp */}
+                          <td className="px-4 py-3.5 whitespace-nowrap">
+                            <div className="font-bold text-foreground flex items-center gap-1.5">
+                              <Globe className="size-3.5 text-brand" />
+                              <span>{formatDateTime(b.createdAt).date}</span>
+                            </div>
+                            <div className="text-[11px] font-mono text-muted-foreground mt-0.5">
+                              🕒 {formatDateTime(b.createdAt).time}
+                            </div>
+                          </td>
+
                           <td className="px-4 py-3.5">
                             <div className="font-bold text-foreground">{b.customerName}</div>
                             <div className="text-[11px] text-muted-foreground">{b.phone}</div>
@@ -1786,10 +1825,19 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                               {b.acType} ({b.unitCount} {b.unitCount === "1" ? "Unit" : "Units"})
                             </div>
                           </td>
-                          <td className="px-4 py-3.5">
-                            <div className="font-medium text-foreground">{b.preferredDate}</div>
-                            <div className="text-[11px] text-muted-foreground">{b.preferredSlot}</div>
+
+                          {/* Exact Service Date & Time Slot (No Tomorrow / Upcoming Monday) */}
+                          <td className="px-4 py-3.5 whitespace-nowrap">
+                            <div className="font-extrabold text-foreground flex items-center gap-1.5">
+                              <Calendar className="size-3.5 text-emerald-600" />
+                              <span>{formatDisplayDate(b.preferredDate, b.createdAt)}</span>
+                            </div>
+                            <div className="text-[11px] font-semibold text-muted-foreground mt-0.5 flex items-center gap-1">
+                              <Clock className="size-3 text-amber-500" />
+                              <span>{b.preferredSlot || "Morning Slot"}</span>
+                            </div>
                           </td>
+
                           <td className="px-4 py-3.5">
                             <div className="font-medium text-foreground">{b.city}</div>
                             <div className="text-[11px] text-muted-foreground truncate max-w-[120px]">
@@ -3692,6 +3740,33 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                     <CheckCircle2 className="size-4" /> Assigned
                   </span>
                 )}
+              </div>
+            </div>
+
+            {/* Service Schedule & Website Booking Submission Card */}
+            <div className="grid gap-3 sm:grid-cols-2 text-xs">
+              <div className="rounded-xl border border-brand/20 bg-brand/5 p-3.5 space-y-1.5">
+                <span className="font-bold uppercase tracking-wider text-brand block text-[10px] flex items-center gap-1">
+                  <Globe className="size-3" /> Website Booking Received
+                </span>
+                <div className="font-extrabold text-foreground text-sm">
+                  {formatDateTime(selectedBooking.createdAt).date}
+                </div>
+                <div className="text-muted-foreground font-mono text-[11px]">
+                  🕒 Time: <strong className="text-foreground">{formatDateTime(selectedBooking.createdAt).time}</strong>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3.5 space-y-1.5">
+                <span className="font-bold uppercase tracking-wider text-emerald-600 block text-[10px] flex items-center gap-1">
+                  <Calendar className="size-3" /> Scheduled Service Date &amp; Time
+                </span>
+                <div className="font-extrabold text-foreground text-sm flex items-center gap-1.5">
+                  <span>{formatDisplayDate(selectedBooking.preferredDate, selectedBooking.createdAt)}</span>
+                </div>
+                <div className="text-muted-foreground text-[11px] flex items-center gap-1">
+                  <Clock className="size-3 text-amber-500" /> Slot: <strong className="text-foreground">{selectedBooking.preferredSlot || "Morning Slot"}</strong>
+                </div>
               </div>
             </div>
 

@@ -704,12 +704,18 @@ export function BookingWizard({
 
     const fullAddress = [houseBuilding.trim(), area.trim(), city.trim()].filter(Boolean).join(", ");
 
-    const preferredDateString =
-      dateOption === "today"
-        ? "Today (Express 90-Min Slot)"
-        : dateOption === "tomorrow"
-        ? "Tomorrow"
-        : customDate || "Earliest Available";
+    const now = new Date();
+    let serviceDateObj = new Date();
+    if (dateOption === "tomorrow") {
+      serviceDateObj.setDate(now.getDate() + 1);
+    } else if (dateOption === "custom" && customDate) {
+      serviceDateObj = new Date(customDate);
+    }
+    const preferredDateString = serviceDateObj.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
 
     const booking = saveBooking({
       serviceCategory: selectedCategory,

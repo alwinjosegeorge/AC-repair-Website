@@ -3,7 +3,7 @@ import type { Booking, Customer, Technician, BookingStatus } from "./store";
 
 // Pooler connection string for Neon Serverless PostgreSQL
 export const DEFAULT_NEON_URL =
-  "postgresql://neondb_owner:npg_jxL51pNhIfZr@ep-fragrant-hill-a138a91s-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require";
+  "postgresql://neondb_owner:npg_jxL51pNhIfZr@ep-fragrant-hill-a138a91s-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
 
 export const DATABASE_URL =
   (typeof process !== "undefined" && process.env?.DATABASE_URL) ||

@@ -1,4 +1,4 @@
-import { Booking } from "./store";
+import { Booking, formatDisplayDate, formatDateTime } from "./store";
 
 /**
  * Exports an array of bookings to CSV (compatible with Excel via UTF-8 BOM)
@@ -11,7 +11,8 @@ export function exportBookingsToCSV(
 
   const headers = [
     "Booking ID",
-    "Date Created",
+    "Booked On (Website Date)",
+    "Booked At (Website Time)",
     "Status",
     "Customer Name",
     "Phone Number",
@@ -26,8 +27,8 @@ export function exportBookingsToCSV(
     "AC Type",
     "AC Brand",
     "Unit Count",
-    "Preferred Date",
-    "Preferred Slot",
+    "Scheduled Date",
+    "Scheduled Slot",
     "Issue / Description",
     "Estimated Amount (INR)",
     "Assigned Technician",
@@ -43,7 +44,8 @@ export function exportBookingsToCSV(
 
   const rows = bookings.map((b) => [
     escapeCSV(b.id),
-    escapeCSV(b.createdAt || ""),
+    escapeCSV(formatDateTime(b.createdAt).date),
+    escapeCSV(formatDateTime(b.createdAt).time),
     escapeCSV(b.status),
     escapeCSV(b.customerName),
     escapeCSV(b.phone),
@@ -58,8 +60,8 @@ export function exportBookingsToCSV(
     escapeCSV(b.acType || ""),
     escapeCSV(b.acBrand || ""),
     escapeCSV(b.unitCount || 1),
-    escapeCSV(b.preferredDate || ""),
-    escapeCSV(b.preferredSlot || ""),
+    escapeCSV(formatDisplayDate(b.preferredDate, b.createdAt)),
+    escapeCSV(b.preferredSlot || "Morning Slot"),
     escapeCSV(b.issueDescription || ""),
     escapeCSV(b.estimatedAmount || 0),
     escapeCSV(b.assignedTechnicianName || "Unassigned"),
@@ -131,6 +133,10 @@ export function exportBookingsToPDF(
       <td style="padding: 7px 8px; font-weight: 700; font-family: monospace; color: #0284c7; font-size: 11px;">
         ${b.id}
       </td>
+      <td style="padding: 7px 8px; font-size: 10px;">
+        <div style="font-weight: 700; color: #0f172a;">${formatDateTime(b.createdAt).date}</div>
+        <div style="font-size: 9.5px; color: #64748b;">🕒 ${formatDateTime(b.createdAt).time}</div>
+      </td>
       <td style="padding: 7px 8px;">
         <div style="font-weight: 700; color: #0f172a;">${b.customerName}</div>
         <div style="font-size: 10px; color: #64748b;">${b.phone}</div>
@@ -140,8 +146,8 @@ export function exportBookingsToPDF(
         <div style="font-size: 10px; color: #64748b;">${b.acType} (${b.unitCount} Unit${Number(b.unitCount) > 1 ? "s" : ""})</div>
       </td>
       <td style="padding: 7px 8px; font-size: 11px;">
-        <div>${b.preferredDate || "Immediate"}</div>
-        <div style="font-size: 10px; color: #64748b;">${b.preferredSlot || ""}</div>
+        <div style="font-weight: 700; color: #0f172a;">${formatDisplayDate(b.preferredDate, b.createdAt)}</div>
+        <div style="font-size: 10px; color: #64748b;">${b.preferredSlot || "Morning Slot"}</div>
       </td>
       <td style="padding: 7px 8px; font-size: 11px;">
         <div style="font-weight: 600; color: #0f172a;">${b.city}</div>
@@ -340,9 +346,10 @@ export function exportBookingsToPDF(
           <thead>
             <tr>
               <th>Booking ID</th>
+              <th>Booked At (Web)</th>
               <th>Customer</th>
               <th>Service &amp; AC</th>
-              <th>Preferred Slot</th>
+              <th>Scheduled Date &amp; Time</th>
               <th>City &amp; Area</th>
               <th>Status</th>
               <th class="right">Amount</th>

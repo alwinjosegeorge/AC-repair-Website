@@ -108,6 +108,152 @@ export interface Booking {
   attribution: TrackingData;
 }
 
+/**
+ * Converts relative date descriptions ("Tomorrow", "Today", "Upcoming Monday") into
+ * exact, clean Indian calendar dates (e.g. "06 Nov 2026").
+ */
+export function formatDisplayDate(dateStr?: string, createdAt?: string): string {
+  if (!dateStr) return "Immediate Schedule";
+  const now = createdAt ? new Date(createdAt) : new Date();
+  const lower = dateStr.toLowerCase().trim();
+
+  if (lower.includes("today")) {
+    return now.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (lower.includes("tomorrow")) {
+    const tmrw = new Date(now);
+    tmrw.setDate(tmrw.getDate() + 1);
+    return tmrw.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (lower.includes("yesterday")) {
+    const yest = new Date(now);
+    yest.setDate(yest.getDate() - 1);
+    return yest.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (lower.includes("monday")) {
+    const d = new Date(now);
+    const day = d.getDay();
+    const diff = (8 - day) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (lower.includes("tuesday")) {
+    const d = new Date(now);
+    const day = d.getDay();
+    const diff = (9 - day) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (lower.includes("wednesday")) {
+    const d = new Date(now);
+    const day = d.getDay();
+    const diff = (10 - day) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (lower.includes("thursday")) {
+    const d = new Date(now);
+    const day = d.getDay();
+    const diff = (11 - day) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (lower.includes("friday")) {
+    const d = new Date(now);
+    const day = d.getDay();
+    const diff = (12 - day) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (lower.includes("saturday")) {
+    const d = new Date(now);
+    const day = d.getDay();
+    const diff = (13 - day) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (lower.includes("sunday")) {
+    const d = new Date(now);
+    const day = d.getDay();
+    const diff = (14 - day) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  // Parse if standard date string
+  const parsed = new Date(dateStr);
+  if (!isNaN(parsed.getTime())) {
+    return parsed.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  return dateStr;
+}
+
+/**
+ * Formats a timestamp into separate exact Date and Time parts
+ */
+export function formatDateTime(dateStr?: string): { date: string; time: string } {
+  if (!dateStr) return { date: "—", time: "" };
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return { date: dateStr, time: "" };
+  return {
+    date: d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }),
+    time: d.toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }),
+  };
+}
+
 export interface Technician {
   id: string;
   name: string;
@@ -1828,7 +1974,7 @@ export function getCustomers(): Customer[] {
       serviceCategory: b.serviceCategory,
       serviceName: b.serviceName,
       subService: b.subService,
-      date: b.preferredDate || new Date(b.createdAt).toLocaleDateString("en-IN"),
+      date: formatDisplayDate(b.preferredDate, b.createdAt),
       slot: b.preferredSlot,
       amount: b.estimatedAmount,
       status: b.status,
@@ -1961,7 +2107,7 @@ Your HVAC service booking *${booking.id}* has been confirmed by *Expert Goods & 
 
 📋 *Booking Details:*
 • Service: ${booking.serviceName}
-• Slot: ${booking.preferredDate} (${booking.preferredSlot})
+• Scheduled Date & Time: ${formatDisplayDate(booking.preferredDate, booking.createdAt)} (${booking.preferredSlot || "Morning Slot"})
 • Address: ${booking.address}, ${booking.city}
 
 Our certified technician will arrive on time. For emergency assistance call +91 98956 88833.`;

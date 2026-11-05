@@ -19,6 +19,8 @@ import {
   generatePaymentReceiptWhatsAppURL,
   generateTechnicianEtaWhatsAppURL,
   generateTechnicianCompletedWhatsAppURL,
+  formatDisplayDate,
+  formatDateTime,
   EGS_CALL_NUMBER,
   EGS_WHATSAPP_NUMBER,
   EGS_COMPANY_DETAILS,
@@ -579,7 +581,7 @@ export function TechnicianMobilePortal() {
                     <div className="mt-2 rounded-xl bg-slate-950/70 p-2 border border-slate-800/80 flex items-center justify-between text-[11px]">
                       <div className="flex items-center gap-1.5 text-slate-300 font-semibold">
                         <Calendar className="size-3.5 text-brand" />
-                        <span>{b.preferredDate || "Immediate"}</span>
+                        <span>{formatDisplayDate(b.preferredDate, b.createdAt)}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-amber-400 font-bold">
                         <Clock className="size-3.5" />
