@@ -96,7 +96,9 @@ import {
   Lock,
   Shield,
   Delete,
+  FileSpreadsheet,
 } from "lucide-react";
+import { exportBookingsToCSV, exportBookingsToPDF } from "@/lib/export";
 import {
   getTrackingConfig,
   saveTrackingConfig,
@@ -407,6 +409,7 @@ function ControlHubGate() {
 
 // Admin Navigation Items matching the exact brief:
 export type AdminSection =
+  | "all-bookings"
   | "new-bookings"
   | "todays-bookings"
   | "upcoming-bookings"
@@ -479,6 +482,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
   // Filters & Selected State
   const [searchQuery, setSearchQuery] = useState("");
   const [cityFilter, setCityFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [amcStatusFilter, setAmcStatusFilter] = useState("all");
   const [acTypeFilter, setAcTypeFilter] = useState("all");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -489,6 +493,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
   const isBookingSection = useMemo(
     () =>
       [
+        "all-bookings",
         "new-bookings",
         "todays-bookings",
         "upcoming-bookings",
@@ -702,6 +707,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
 
   // Status counts for badge indicators
   const counts = useMemo(() => {
+    const allBookings = bookings.length;
     const newBookings = bookings.filter((b) => b.status === "NEW").length;
     const todays = bookings.filter(
       (b) =>
@@ -750,6 +756,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
       .reduce((acc, b) => acc + (b.estimatedAmount || 0), 0);
 
     return {
+      allBookings,
       newBookings,
       todays,
       upcoming,
@@ -842,6 +849,12 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
     let list: Booking[] = [];
 
     switch (activeSection) {
+      case "all-bookings":
+        list =
+          statusFilter === "all"
+            ? bookings
+            : bookings.filter((b) => b.status === statusFilter);
+        break;
       case "new-bookings":
         list = bookings.filter((b) => b.status === "NEW");
         break;
@@ -894,7 +907,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
       const matchCity = cityFilter === "all" || b.city === cityFilter;
       return matchSearch && matchCity;
     });
-  }, [bookings, activeSection, searchQuery, cityFilter]);
+  }, [bookings, activeSection, statusFilter, searchQuery, cityFilter]);
 
   // Filtered Customers CRM list
   const customersList = useMemo(() => {
@@ -1109,6 +1122,34 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                 Bookings Flow
               </div>
               <div className="mt-2 space-y-1">
+                {/* 0. All Enquiries & Bookings */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("all-bookings");
+                    setMobileSidebarOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    activeSection === "all-bookings"
+                      ? "bg-brand text-brand-foreground shadow-md"
+                      : "text-foreground hover:bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Layers className="size-4" />
+                    <span>All Enquiries &amp; Bookings</span>
+                  </div>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                      activeSection === "all-bookings"
+                        ? "bg-white text-brand"
+                        : "bg-surface text-muted-foreground border border-border"
+                    }`}
+                  >
+                    {counts.allBookings}
+                  </span>
+                </button>
+
                 {/* 1. New Bookings */}
                 <button
                   type="button"
@@ -1509,9 +1550,10 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-xl md:text-2xl font-black text-foreground capitalize flex items-center gap-2">
-                {activeSection.replace("-", " ")}
+                {activeSection === "all-bookings" ? "All Enquiries & Bookings" : activeSection.replace("-", " ")}
               </h1>
               <p className="text-xs text-muted-foreground mt-0.5">
+                {activeSection === "all-bookings" && "Comprehensive ledger of all customer enquiries, service requests, and bookings across all statuses."}
                 {activeSection === "new-bookings" && "Fresh leads requiring immediate contact & confirmation."}
                 {activeSection === "todays-bookings" && "Live operations scheduled for execution today."}
                 {activeSection === "upcoming-bookings" && "Advance scheduled visits for tomorrow and upcoming dates."}
@@ -1527,8 +1569,43 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
               </p>
             </div>
 
-            {/* Search & City Filter (for booking/customer views) */}
+            {/* Search, Status, City Filter & Export Actions */}
             <div className="flex flex-wrap items-center gap-2">
+              {/* Quick Export Actions (Excel & PDF) for booking sections */}
+              {(isBookingSection || activeSection === "quotation-requests") && (
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      exportBookingsToCSV(
+                        currentSectionBookings,
+                        `EGS-${activeSection === "all-bookings" ? "All-Bookings" : activeSection}`
+                      )
+                    }
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1.5 text-xs font-bold text-emerald-600 transition-all cursor-pointer shadow-xs active:scale-95"
+                    title="Export bookings to Excel compatible CSV sheet"
+                  >
+                    <FileSpreadsheet className="size-3.5" />
+                    <span>Excel</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      exportBookingsToPDF(
+                        currentSectionBookings,
+                        `EGS INDIA — ${activeSection === "all-bookings" ? "All Bookings & Enquiries" : activeSection.replace("-", " ")} Report`
+                      )
+                    }
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card hover:bg-surface px-3 py-1.5 text-xs font-bold text-foreground transition-all cursor-pointer shadow-xs active:scale-95"
+                    title="Download / Print PDF report"
+                  >
+                    <Printer className="size-3.5 text-brand" />
+                    <span>PDF</span>
+                  </button>
+                </div>
+              )}
+
               {activeSection !== "tracking-diagnostics" && (
                 <div className="relative">
                   <Search className="absolute left-3 top-2.5 size-3.5 text-muted-foreground" />
@@ -1540,6 +1617,26 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                     className="rounded-xl border border-border bg-card py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:border-brand focus:outline-none"
                   />
                 </div>
+              )}
+
+              {/* Status Filter for All Bookings View */}
+              {activeSection === "all-bookings" && (
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="rounded-xl border border-border bg-card py-1.5 px-3 text-xs text-foreground focus:border-brand focus:outline-none"
+                >
+                  <option value="all">All Statuses ({bookings.length})</option>
+                  <option value="NEW">New Leads ({counts.newBookings})</option>
+                  <option value="CONTACTED">Contacted</option>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="ASSIGNED">Assigned</option>
+                  <option value="TECHNICIAN ON THE WAY">Technician En Route</option>
+                  <option value="SERVICE STARTED">In Progress</option>
+                  <option value="COMPLETED">Completed ({counts.completed})</option>
+                  <option value="PAYMENT RECEIVED">Payment Received</option>
+                  <option value="CANCELLED">Cancelled ({counts.cancelled})</option>
+                </select>
               )}
 
               {activeSection !== "reports" && activeSection !== "service-areas" && activeSection !== "tracking-diagnostics" && (
@@ -1563,8 +1660,81 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
           {/* SECTION VIEWS */}
           {/* ============================================================ */}
 
-          {/* VIEW: BOOKINGS TABLES (New, Today, Upcoming, Completed, Cancelled, Quotes) */}
-          {(activeSection === "new-bookings" ||
+          {/* All Bookings Quick Stats & Bulk Export Panel */}
+          {activeSection === "all-bookings" && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Total Bookings &amp; Enquiries
+                </div>
+                <div className="text-2xl font-black text-brand mt-1">
+                  {counts.allBookings}
+                </div>
+                <div className="text-[11px] text-muted-foreground font-semibold mt-0.5">
+                  Across all service categories
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-blue-500/30 bg-blue-500/5 p-4 shadow-sm">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-blue-600">
+                  New Unconfirmed Leads
+                </div>
+                <div className="text-2xl font-black text-blue-600 mt-1">
+                  {counts.newBookings}
+                </div>
+                <div className="text-[11px] text-blue-700/80 font-bold mt-0.5">
+                  Requires immediate callback
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 shadow-sm">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">
+                  Completed &amp; Paid
+                </div>
+                <div className="text-2xl font-black text-emerald-600 mt-1">
+                  {counts.completed}
+                </div>
+                <div className="text-[11px] text-emerald-700/80 font-bold mt-0.5">
+                  Delivered with warranty
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Bulk Downloads
+                  </div>
+                  <div className="text-[11px] text-muted-foreground mt-0.5">
+                    Export full database ledger
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => exportBookingsToCSV(bookings, "EGS-All-Bookings-Ledger")}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 py-1.5 px-2 text-[11px] font-black text-white shadow-xs cursor-pointer active:scale-95 transition-all"
+                    title="Download complete registry as Excel spreadsheet"
+                  >
+                    <FileSpreadsheet className="size-3.5" />
+                    <span>Excel (.csv)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => exportBookingsToPDF(bookings, "EGS INDIA — Complete Bookings & Enquiries Ledger")}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface hover:bg-surface/80 py-1.5 px-2 text-[11px] font-black text-foreground cursor-pointer active:scale-95 transition-all"
+                    title="Print or Save full ledger to PDF"
+                  >
+                    <Printer className="size-3.5 text-brand" />
+                    <span>PDF Print</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* VIEW: BOOKINGS TABLES (All, New, Today, Upcoming, Completed, Cancelled, Quotes) */}
+          {(activeSection === "all-bookings" ||
+            activeSection === "new-bookings" ||
             activeSection === "todays-bookings" ||
             activeSection === "upcoming-bookings" ||
             activeSection === "completed" ||
@@ -5002,6 +5172,20 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
       {/* ============================================================ */}
       {isBookingSection && !mobileOperationsSheetOpen && (
         <div className="lg:hidden fixed bottom-[68px] left-2.5 right-2.5 z-40 bg-card/95 backdrop-blur-2xl border border-border/80 rounded-2xl shadow-xl p-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar animate-in slide-in-from-bottom-2 duration-200">
+          {/* All Bookings */}
+          <button
+            type="button"
+            onClick={() => setActiveSection("all-bookings")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSection === "all-bookings"
+                ? "bg-brand text-brand-foreground shadow-sm shadow-brand/40"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface/80"
+            }`}
+          >
+            <Layers className="size-3" />
+            <span>All ({counts.allBookings})</span>
+          </button>
+
           {/* New Leads */}
           <button
             type="button"
@@ -5093,11 +5277,13 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
             onClick={() => {
               setMobileOperationsSheetOpen(false);
               if (!isBookingSection) {
+                setActiveSection("all-bookings");
+              } else if (activeSection === "all-bookings") {
                 setActiveSection("new-bookings");
               } else if (activeSection === "new-bookings") {
                 setActiveSection("todays-bookings");
               } else {
-                setActiveSection("new-bookings");
+                setActiveSection("all-bookings");
               }
             }}
             className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all active:scale-95 cursor-pointer ${
