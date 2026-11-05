@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://egsindia.com/sitemap.xml
+Sitemap: https://www.egsindia.in/sitemap.xml

@@ -58,17 +58,29 @@ export const Route = createFileRoute("/")({
         content:
           "EGS INDIA - Expert Air Conditioner Service & HVAC Solutions in India.",
       },
+      { property: "og:site_name", content: "EGS INDIA - Expert Goods & Services" },
       { property: "og:title", content: "EGS INDIA | Expert AC Service & HVAC Solutions" },
       {
         property: "og:description",
         content:
           "EGS INDIA - Expert Air Conditioner Service & HVAC Solutions in India.",
       },
-      { property: "og:image", content: "/og-image.png" },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://www.egsindia.in" },
+      { property: "og:image", content: "https://www.egsindia.in/og-image.png" },
+      { property: "og:image:secure_url", content: "https://www.egsindia.in/og-image.png" },
+      { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "EGS INDIA - HVAC Engineering & Doorstep AC Solutions" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "/og-image.png" },
+      { name: "twitter:title", content: "EGS INDIA | Expert AC Service & HVAC Solutions" },
+      {
+        name: "twitter:description",
+        content:
+          "EGS INDIA - Expert Air Conditioner Service & HVAC Solutions in India.",
+      },
+      { name: "twitter:image", content: "https://www.egsindia.in/og-image.png" },
     ],
   }),
   component: Index,

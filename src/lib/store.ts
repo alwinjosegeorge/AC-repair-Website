@@ -439,8 +439,8 @@ export const EGS_COMPANY_DETAILS = {
   sacCode: "998719", // Maintenance, repair and cleaning of HVAC & machinery
   phone: "+91 98956 88833",
   whatsapp: "919895688833",
-  email: "service@egsindia.com",
-  website: "https://egsindia.com",
+  email: "service@egsindia.in",
+  website: "https://www.egsindia.in",
   registeredOffice: "EGS Towers, Near Collectorate, Kollam - 691001, Kerala",
   cochinOffice: "Infopark Phase 1, Kakkanad, Ernakulam - 682030",
   trivandrumOffice: "Golf Links Road, Kowdiar, Thiruvananthapuram - 695003",
@@ -2154,7 +2154,7 @@ Your digital invoice & 30-day warranty card have been generated. Thank you for c
     case "CANCELLED":
       text = `Booking Update - *EGS INDIA*
 Your booking *${booking.id}* has been marked CANCELLED as requested.
-If you need to reschedule in the future, please call us at +91 98956 88833 or visit https://egsindia.com.`;
+If you need to reschedule in the future, please call our 24/7 helpline at +91 98956 88833.`;
       break;
 
     default:
@@ -2269,7 +2269,7 @@ Here is your official Annual Maintenance Contract (AMC) Agreement with EGS INDIA
 • 90-minute priority emergency dispatch
 • 365-day cooling & workmanship assurance certificate
 
-Your official signed contract document is ready. For 24/7 HVAC support, reach us at +91 98956 88833 or service@egsindia.com.`;
+Your official signed contract document is ready. For 24/7 HVAC support, reach us at +91 98956 88833 or service@egsindia.in.`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
@@ -2584,7 +2584,7 @@ Thank you for your payment to *Expert Goods & Services (EGS INDIA)*!
 Your serviced AC is covered under our 30-Day Free Revisit & Performance Guarantee.
 
 To view or print your GST tax invoice, visit our portal or contact our 24/7 support.
-Helpline: +91 98956 88833 | https://egsindia.com`;
+Helpline: +91 98956 88833 (24/7 HVAC Breakdown Support)`;
 
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
@@ -2620,8 +2620,8 @@ Here are the details for your official GST Tax Invoice and 30-Day Workmanship Wa
 • Coverage: 100% Free Senior Technician Re-attend Guarantee for any cooling loss or gas drop.
 
 GSTIN: ${EGS_COMPANY_DETAILS.gstin} | PAN: ${EGS_COMPANY_DETAILS.pan}
-Helpline: ${EGS_COMPANY_DETAILS.phone} | service@egsindia.com
-Official Portal: https://egsindia.com
+Helpline: ${EGS_COMPANY_DETAILS.phone} | service@egsindia.in
+Official HVAC Support: Expert Goods & Services India (EGS INDIA)
 
 _Thank you for choosing EGS INDIA!_`;
 

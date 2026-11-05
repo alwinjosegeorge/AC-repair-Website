@@ -564,7 +564,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
     trackGoogleAdsConversion({
       transactionId: txId,
       value: 1499,
-      customerEmail: "contact@egsindia.com",
+      customerEmail: "contact@egsindia.in",
       customerPhone: "+919895012345",
       customerName: "Rajesh",
       city: "Kollam",
@@ -584,7 +584,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
     sendMetaCapiEvent(
       "Lead",
       {
-        email: "contact@egsindia.com",
+        email: "contact@egsindia.in",
         phone: "+919895012345",
         firstName: "Rajesh",
         city: "Ernakulam",

@@ -469,7 +469,7 @@ export async function sendMetaCapiEvent(
         event_time: eventTime,
         event_id: eventId,
         action_source: "website",
-        event_source_url: typeof window !== "undefined" ? window.location.href : "https://egsindia.com",
+        event_source_url: typeof window !== "undefined" ? window.location.href : "https://www.egsindia.in",
         user_data: {
           em: hashedEmail ? [hashedEmail] : undefined,
           ph: hashedPhone ? [hashedPhone] : undefined,

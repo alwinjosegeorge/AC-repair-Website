@@ -95,6 +95,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "google-site-verification",
         content: DEFAULT_TRACKING_CONFIG.gscVerification,
       },
+      { property: "og:site_name", content: "EGS INDIA - Expert Goods & Services" },
       { property: "og:title", content: "EGS INDIA | Expert AC Service & HVAC Solutions" },
       {
         property: "og:description",
@@ -102,10 +103,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "EGS INDIA - Expert Air Conditioner Service, Repair, Installation, AMC & Commercial HVAC Solutions in India.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "/og-image.png" },
+      { property: "og:url", content: "https://www.egsindia.in" },
+      { property: "og:image", content: "https://www.egsindia.in/og-image.png" },
+      { property: "og:image:secure_url", content: "https://www.egsindia.in/og-image.png" },
+      { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "EGS INDIA - Expert Goods & Services HVAC Solutions" },
+      { property: "og:image:alt", content: "EGS INDIA - HVAC Engineering & Doorstep AC Solutions" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "EGS INDIA | Expert AC Service & HVAC Solutions" },
       {
@@ -113,7 +117,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "EGS INDIA - Expert Air Conditioner Service, Repair, Installation, AMC & Commercial HVAC Solutions in India.",
       },
-      { name: "twitter:image", content: "/og-image.png" },
+      { name: "twitter:image", content: "https://www.egsindia.in/og-image.png" },
     ],
     links: [
       {
