@@ -2589,6 +2589,45 @@ Helpline: +91 98956 88833 | https://egsindia.com`;
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
 }
 
+export function generateTaxInvoiceWhatsAppURL(invoice: EGSInvoice): string {
+  const cleanPhone = (invoice.customerPhone || "").replace(/[^0-9]/g, "");
+  const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+  const text = `*OFFICIAL GST TAX INVOICE & 30-DAY GUARANTEE* 🧾❄️
+*Expert Goods & Services India (EGS INDIA)*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Dear *${invoice.customerName}*,
+
+Here are the details for your official GST Tax Invoice and 30-Day Workmanship Warranty Certificate:
+
+📋 *TAX INVOICE (Rule 46 CGST Rules):*
+• Invoice No: *${invoice.invoiceNo}*
+• Booking Reference: *${invoice.bookingId || "Direct"}*
+• Date: *${invoice.date}*
+• Service: *${invoice.items[0]?.description || invoice.acType || "HVAC Service"}*
+• Assigned Specialist: ${invoice.technicianName || "EGS Certified Specialist"}
+
+💵 *TAX BREAKDOWN (18% GST):*
+• Taxable Subtotal: ₹${invoice.subtotal.toFixed(2)}
+• CGST (9.0%): ₹${invoice.cgst.toFixed(2)}
+• SGST (9.0%): ₹${invoice.sgst.toFixed(2)}
+• *Grand Total Paid:* *₹${invoice.grandTotal.toFixed(2)}*
+• Payment Mode: ${invoice.paymentMethod}${invoice.transactionRef ? ` (${invoice.transactionRef})` : ""}
+• Payment Status: *PAID / VERIFIED* ✅
+
+🛡️ *30-DAY POST-SERVICE WARRANTY CERTIFICATE:*
+• Protection: Certified Cooling & Workmanship Protection
+• Warranty Valid Until: *${invoice.warrantyValidUntil}* (30 Days Validity)
+• Coverage: 100% Free Senior Technician Re-attend Guarantee for any cooling loss or gas drop.
+
+GSTIN: ${EGS_COMPANY_DETAILS.gstin} | PAN: ${EGS_COMPANY_DETAILS.pan}
+Helpline: ${EGS_COMPANY_DETAILS.phone} | service@egsindia.com
+Official Portal: https://egsindia.com
+
+_Thank you for choosing EGS INDIA!_`;
+
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+}
+
 export function generateCustomerPaymentLinkWhatsAppURL(booking: Booking): string {
   const cleanPhone = (booking.whatsappNumber || booking.phone).replace(/[^0-9]/g, "");
   const targetPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;

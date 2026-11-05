@@ -19,6 +19,8 @@ import {
   generatePaymentReceiptWhatsAppURL,
   generateTechnicianEtaWhatsAppURL,
   generateTechnicianCompletedWhatsAppURL,
+  generateInvoiceForBooking,
+  generateTaxInvoiceWhatsAppURL,
   formatDisplayDate,
   formatDateTime,
   EGS_CALL_NUMBER,
@@ -64,6 +66,7 @@ import {
   Building2,
   ExternalLink,
 } from "lucide-react";
+import { exportTaxInvoiceToPDF } from "@/lib/export";
 
 export const Route = createFileRoute("/technician")({
   beforeLoad: () => {
@@ -1253,35 +1256,32 @@ export function TechnicianMobilePortal() {
 
             {/* Buttons */}
             <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  const inv = generateInvoiceForBooking(receiptModalJob);
+                  exportTaxInvoiceToPDF(inv);
+                }}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-brand hover:bg-brand/90 py-3 text-xs font-black uppercase tracking-wider text-brand-foreground shadow-lg shadow-brand/25 cursor-pointer active:scale-95"
+              >
+                <Printer className="size-4" />
+                <span>Download / Print GST Tax Invoice PDF</span>
+              </button>
+
               <a
-                href={generatePaymentReceiptWhatsAppURL({
-                  id: `TXN-2026-${receiptModalJob.id.replace(/\D/g, "") || "8801"}`,
-                  invoiceNo: `INV-2026-${receiptModalJob.id.replace(/\D/g, "") || "1088"}`,
-                  bookingId: receiptModalJob.id,
-                  customerName: receiptModalJob.customerName,
-                  phone: receiptModalJob.phone,
-                  whatsapp: receiptModalJob.whatsappNumber || receiptModalJob.phone,
-                  amount: receiptModalJob.estimatedAmount,
-                  subtotal: Math.round(receiptModalJob.estimatedAmount / 1.18),
-                  taxAmount: Math.round(receiptModalJob.estimatedAmount - receiptModalJob.estimatedAmount / 1.18),
-                  paymentMethod: "UPI / QR Code",
-                  status: "PAID",
-                  serviceName: receiptModalJob.serviceName,
-                  createdAt: receiptModalJob.createdAt,
-                  paidAt: new Date().toISOString(),
-                })}
+                href={generateTaxInvoiceWhatsAppURL(generateInvoiceForBooking(receiptModalJob))}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] py-3 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#25D366]/25"
               >
                 <MessageSquare className="size-4 fill-current" />
-                <span>Re-send Receipt via WhatsApp</span>
+                <span>Send Official Tax Invoice &amp; 30-Day Warranty via WhatsApp</span>
               </a>
 
               <button
                 type="button"
                 onClick={() => setReceiptModalJob(null)}
-                className="w-full rounded-xl border border-slate-800 bg-slate-900 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800 cursor-pointer"
               >
                 Close
               </button>

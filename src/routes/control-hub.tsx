@@ -41,6 +41,7 @@ import {
   EGS_CALL_NUMBER,
   EGS_WHATSAPP_NUMBER,
   syncBookingsWithDatabase,
+  generateTaxInvoiceWhatsAppURL,
   formatDisplayDate,
   formatDateTime,
 } from "@/lib/store";
@@ -103,7 +104,7 @@ import {
   FileSpreadsheet,
   Globe,
 } from "lucide-react";
-import { exportBookingsToCSV, exportBookingsToPDF } from "@/lib/export";
+import { exportBookingsToCSV, exportBookingsToPDF, exportTaxInvoiceToPDF } from "@/lib/export";
 import {
   getTrackingConfig,
   saveTrackingConfig,
@@ -1068,7 +1069,7 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
   };
 
   return (
-    <div className="min-h-screen bg-surface/50 text-foreground font-sans flex flex-col">
+    <div className="min-h-screen bg-surface/50 text-foreground font-sans flex flex-col print:hidden">
       {/* Top Admin Application Header */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 px-4 py-3 backdrop-blur-md shadow-sm">
         <div className="flex items-center justify-between">
@@ -1854,13 +1855,29 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
                               <button
                                 type="button"
                                 onClick={() => advanceStatus(b)}
-                                className="inline-flex items-center gap-1 rounded-lg bg-brand-soft border border-brand/20 px-2.5 py-1 text-[11px] font-bold text-brand hover:bg-brand/20"
+                                className="inline-flex items-center gap-1 rounded-lg bg-brand-soft border border-brand/20 px-2.5 py-1 text-[11px] font-bold text-brand hover:bg-brand/20 cursor-pointer"
                                 title="Advance to next workflow status"
                               >
                                 <span>Advance</span>
                                 <ArrowRight className="size-3" />
                               </button>
                             )}
+
+                            {/* Official GST Tax Invoice & 30-Day Guarantee Button */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const inv =
+                                  getInvoiceByNumber(`INV-2026-${b.id.replace(/\D/g, "")}`) ||
+                                  generateInvoiceForBooking(b);
+                                setSelectedInvoice(inv);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 px-2 py-1 text-[11px] font-bold text-emerald-600 hover:bg-emerald-500/25 cursor-pointer shadow-xs active:scale-95"
+                              title="Generate & View Official GST Tax Invoice & 30-Day Warranty"
+                            >
+                              <FileCheck2 className="size-3" />
+                              <span>Invoice</span>
+                            </button>
 
                             {/* Official Quotation / Contract button if quotation request or AMC */}
                             {(activeSection === "quotation-requests" || b.serviceCategory === "ac-amc") && (
@@ -3710,6 +3727,48 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
               </a>
             </div>
 
+            {/* Official GST Tax Invoice & 30-Day Warranty Dispatch */}
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-xs font-black text-emerald-600 uppercase flex items-center gap-1.5">
+                  <ShieldCheck className="size-4" />
+                  Official GST Tax Invoice &amp; 30-Day Guarantee
+                </span>
+                <span className="text-xs text-foreground/80 mt-0.5 block">
+                  Rule 46 CGST Tax Invoice, 18% GST Breakdown &amp; 30-Day Revisit Warranty Certificate
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const inv =
+                      getInvoiceByNumber(`INV-2026-${selectedBooking.id.replace(/\D/g, "")}`) ||
+                      generateInvoiceForBooking(selectedBooking);
+                    exportTaxInvoiceToPDF(inv);
+                  }}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-3 py-2 text-xs font-bold text-foreground hover:bg-surface shadow-xs cursor-pointer active:scale-95"
+                  title="Print / Save clean PDF without background bleed"
+                >
+                  <Printer className="size-3.5 text-brand" />
+                  <span>PDF / Print</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const inv =
+                      getInvoiceByNumber(`INV-2026-${selectedBooking.id.replace(/\D/g, "")}`) ||
+                      generateInvoiceForBooking(selectedBooking);
+                    setSelectedInvoice(inv);
+                  }}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-emerald-700 cursor-pointer active:scale-95"
+                >
+                  <FileText className="size-3.5" />
+                  <span>View Invoice</span>
+                </button>
+              </div>
+            </div>
+
             {/* Technician Assignment */}
             <div className="rounded-2xl border border-border bg-card p-4 space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
@@ -4553,32 +4612,19 @@ export function AdminDashboard({ onLock }: { onLock?: () => void } = {}) {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-foreground hover:bg-surface/80 cursor-pointer"
+                  onClick={() => exportTaxInvoiceToPDF(selectedInvoice)}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-foreground hover:bg-surface/80 cursor-pointer shadow-xs active:scale-95"
+                  title="Export / Print official clean Tax Invoice PDF"
                 >
                   <Printer className="size-3.5 text-brand" />
                   <span>Print / PDF</span>
                 </button>
                 <a
-                  href={generatePaymentReceiptWhatsAppURL({
-                    id: `TXN-${selectedInvoice.invoiceNo.replace(/\D/g, "")}`,
-                    invoiceNo: selectedInvoice.invoiceNo,
-                    bookingId: selectedInvoice.bookingId,
-                    customerName: selectedInvoice.customerName,
-                    phone: selectedInvoice.customerPhone,
-                    whatsapp: selectedInvoice.customerPhone,
-                    amount: selectedInvoice.grandTotal,
-                    subtotal: selectedInvoice.subtotal,
-                    taxAmount: selectedInvoice.taxAmount,
-                    paymentMethod: selectedInvoice.paymentMethod,
-                    status: selectedInvoice.paymentStatus,
-                    serviceName: selectedInvoice.items[0]?.description || "HVAC Service",
-                    createdAt: selectedInvoice.date,
-                    paidAt: selectedInvoice.date,
-                  }, selectedInvoice)}
+                  href={generateTaxInvoiceWhatsAppURL(selectedInvoice)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#25D366] px-3 py-1.5 text-xs font-black text-white hover:bg-[#20ba59]"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#25D366] px-3 py-1.5 text-xs font-black text-white hover:bg-[#20ba59] shadow-xs active:scale-95"
+                  title="Send official GST Tax Invoice & 30-Day Guarantee to customer via WhatsApp"
                 >
                   <MessageSquare className="size-3.5 fill-current" />
                   <span>Send WhatsApp</span>
